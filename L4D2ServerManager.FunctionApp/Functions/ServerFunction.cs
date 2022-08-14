@@ -32,11 +32,14 @@ public class ServerFunction
     }
 
     private string VirtualMachineName => _configuration.GetValue<string>(nameof(VirtualMachineName));
+    private string AuthorizationKey => _configuration.GetValue<string>(nameof(AuthorizationKey));
 
     [FunctionName(nameof(ServerFunction) + "_" + nameof(Get))]
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "server/{port}")] HttpRequest httpRequest,
         int port)
     {
+        httpRequest.EnsureAuthentication(AuthorizationKey);
+
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
@@ -47,6 +50,8 @@ public class ServerFunction
     public async Task<IActionResult> InfoAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "server/{port}/info")] HttpRequest httpRequest,
         int port)
     {
+        httpRequest.EnsureAuthentication(AuthorizationKey);
+
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
         var serverInfo = await _serverService.GetServerInfoAsync(server);
@@ -58,6 +63,8 @@ public class ServerFunction
     public IActionResult Players([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "server/{port}/players")] HttpRequest httpRequest,
         int port)
     {
+        httpRequest.EnsureAuthentication(AuthorizationKey);
+
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
         var players = _playerService.GetPlayers(server);
@@ -69,6 +76,8 @@ public class ServerFunction
     public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
         int port)
     {
+        httpRequest.EnsureAuthentication(AuthorizationKey);
+
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
@@ -81,6 +90,8 @@ public class ServerFunction
     public async Task<IActionResult> StopAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/stop")] HttpRequest httpRequest,
         int port)
     {
+        httpRequest.EnsureAuthentication(AuthorizationKey);
+
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
@@ -93,6 +104,8 @@ public class ServerFunction
     public async Task<IActionResult> OpenPortAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/open-port")] HttpRequest httpRequest,
         int port)
     {
+        httpRequest.EnsureAuthentication(AuthorizationKey);
+
         var command = await httpRequest.DeserializeBodyAsync<OpenPortCommand>();
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
@@ -106,6 +119,8 @@ public class ServerFunction
     public async Task<IActionResult> ClosePortAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/close-port")] HttpRequest httpRequest,
         int port)
     {
+        httpRequest.EnsureAuthentication(AuthorizationKey);
+
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
