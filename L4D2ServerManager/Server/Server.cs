@@ -1,6 +1,7 @@
 ﻿using L4D2ServerManager.Server.Commands;
 using L4D2ServerManager.Server.Results;
 using L4D2ServerManager.VirtualMachine;
+using L4D2ServerManager.VirtualMachine.ValueObjects;
 
 namespace L4D2ServerManager.Server;
 
@@ -28,6 +29,8 @@ public class Server : IServer
         }
     }
 
+    public PortInfo PortInfo => VirtualMachine.GetPortInfoAsync(Port).Result;
+
     public async Task RunAsync()
     {
         if (IsRunning)
@@ -46,5 +49,15 @@ public class Server : IServer
         var command = new StopServerCommand(Port);
 
         await VirtualMachine.RunCommandAsync(command);
+    }
+
+    public async Task OpenPortAsync(string ranges)
+    {
+        await VirtualMachine.OpenPortAsync(Port, ranges);
+    }
+
+    public async Task ClosePortAsync()
+    {
+        await VirtualMachine.ClosePortAsync(Port);
     }
 }

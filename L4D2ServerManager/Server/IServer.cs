@@ -1,4 +1,5 @@
 ﻿using L4D2ServerManager.VirtualMachine;
+using L4D2ServerManager.VirtualMachine.ValueObjects;
 
 namespace L4D2ServerManager.Server;
 
@@ -8,6 +9,9 @@ public interface IServer
     string IpAddress { get; }
     int Port { get; }
     bool IsRunning { get; }
+    PortInfo PortInfo { get; }
     Task RunAsync();
     Task StopAsync();
+    Task OpenPortAsync(string ranges);
+    Task ClosePortAsync();
 }

@@ -1,5 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
+using L4D2ServerManager.FunctionApp.Commands;
+using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Players.Services;
 using L4D2ServerManager.Server.Services;
 using L4D2ServerManager.VirtualMachine.Services;
@@ -83,6 +85,31 @@ public class ServerFunction
         var server = _serverService.GetByPort(virtualMachine, port);
 
         await server.StopAsync();
+
+        return new OkObjectResult(server);
+    }
+
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(OpenPortAsync))]
+    public async Task<IActionResult> OpenPortAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/open-port")] HttpRequest httpRequest,
+        int port)
+    {
+        var command = await httpRequest.DeserializeBodyAsync<OpenPortCommand>();
+        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+        var server = _serverService.GetByPort(virtualMachine, port);
+
+        await server.OpenPortAsync(command.Ranges);
+
+        return new OkObjectResult(server);
+    }
+
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(ClosePortAsync))]
+    public async Task<IActionResult> ClosePortAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/close-port")] HttpRequest httpRequest,
+        int port)
+    {
+        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+        var server = _serverService.GetByPort(virtualMachine, port);
+
+        await server.ClosePortAsync();
 
         return new OkObjectResult(server);
     }

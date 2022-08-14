@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Azure.ResourceManager.Compute;
+﻿using Azure.ResourceManager.Compute;
 using Azure.ResourceManager.Network;
 using L4D2ServerManager.Azure;
 
@@ -14,19 +13,23 @@ public class VirtualMachineService : IVirtualMachineService
         _context = context;
     }
 
-    public VirtualMachine GetByName(string name)
+    public IVirtualMachine GetByName(string name)
     {
         var virtualMachines = _context.SubscriptionResource.GetVirtualMachines();
         var virtualMachine = virtualMachines.First(f => f.Data.Name == name);
         var networkProfile = virtualMachine.Data.NetworkProfile;
         var networkInterfaces = networkProfile.NetworkInterfaces;
         var networkInterfaceReference = networkInterfaces.First();
-        var networkInterface = _context.ArmClient.GetNetworkInterfaceResource(new ResourceIdentifier(networkInterfaceReference.Id!));
-        var ipConfigurations = networkInterface.GetNetworkInterfaceIPConfigurations();
+        var networkInterfaceResources = _context.SubscriptionResource.GetNetworkInterfaces();
+        var networkInterfaceResource = networkInterfaceResources.First(f => f.Data.Id == networkInterfaceReference.Id);
+        var ipConfigurations = networkInterfaceResource.GetNetworkInterfaceIPConfigurations();
         var ipConfiguration = ipConfigurations.First().Data;
         var publicIpAddresses = _context.SubscriptionResource.GetPublicIPAddresses();
         var publicIpAddress = publicIpAddresses.FirstOrDefault(f => f.Data.Id! == ipConfiguration.PublicIPAddress.Id)!.Data;
+        var networkSecurityGroupData = networkInterfaceResource.Data.NetworkSecurityGroup;
+        var networkSecurityGroups = _context.SubscriptionResource.GetNetworkSecurityGroups();
+        var networkSecurityGroupResource = networkSecurityGroups.First(f => f.Data.Id == networkSecurityGroupData.Id);
 
-        return new VirtualMachine(virtualMachine, publicIpAddress);
+        return new VirtualMachine(virtualMachine, publicIpAddress, networkSecurityGroupResource);
     }
 }
