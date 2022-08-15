@@ -3,6 +3,7 @@ using Azure.ResourceManager.Compute;
 using Azure.ResourceManager.Compute.Models;
 using Azure.ResourceManager.Network;
 using Azure.ResourceManager.Network.Models;
+using L4D2ServerManager.Azure;
 using L4D2ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.VirtualMachine.Enums;
 using L4D2ServerManager.VirtualMachine.Results;
@@ -12,24 +13,87 @@ namespace L4D2ServerManager.VirtualMachine;
 
 public class VirtualMachine : IVirtualMachine
 {
-    private readonly NetworkSecurityGroupResource _networkSecurityGroupResource;
-    private readonly PublicIPAddressData _publicIpAddress;
-    private readonly VirtualMachineResource _virtualMachine;
+    private readonly IAzureContext _context;
+    private readonly string _virtualMachineName;
+    private NetworkInterfaceResource? _networkInterfaceResource;
+    private NetworkSecurityGroupResource? _networkSecurityGroupResource;
+    private PublicIPAddressData? _publicIpAddress;
+    private VirtualMachineResource? _virtualMachineResource;
 
-    public VirtualMachine(VirtualMachineResource virtualMachine,
-        PublicIPAddressData publicIpAddress,
-        NetworkSecurityGroupResource networkSecurityGroupResource)
+    public VirtualMachine(IAzureContext context, string virtualMachineName)
     {
-        _virtualMachine = virtualMachine;
-        _publicIpAddress = publicIpAddress;
-        _networkSecurityGroupResource = networkSecurityGroupResource;
+        _context = context;
+        _virtualMachineName = virtualMachineName;
+    }
+
+    private NetworkSecurityGroupResource NetworkSecurityGroupResource
+    {
+        get
+        {
+            if (_networkSecurityGroupResource != null)
+                return _networkSecurityGroupResource;
+
+            var networkSecurityGroupData = NetworkInterfaceResource.Data.NetworkSecurityGroup;
+            var networkSecurityGroups = _context.SubscriptionResource.GetNetworkSecurityGroups();
+            var networkSecurityGroupResource = networkSecurityGroups.First(f => f.Data.Id == networkSecurityGroupData.Id);
+
+            return _networkSecurityGroupResource = networkSecurityGroupResource;
+        }
+    }
+
+    private PublicIPAddressData PublicIpAddress
+    {
+        get
+        {
+            if (_publicIpAddress != null)
+                return _publicIpAddress;
+
+
+            var ipConfigurations = NetworkInterfaceResource.GetNetworkInterfaceIPConfigurations();
+            var ipConfiguration = ipConfigurations.First().Data;
+            var publicIpAddresses = _context.SubscriptionResource.GetPublicIPAddresses();
+            var publicIpAddress = publicIpAddresses.FirstOrDefault(f => f.Data.Id! == ipConfiguration.PublicIPAddress.Id)!.Data;
+
+            return _publicIpAddress = publicIpAddress;
+        }
+    }
+
+    private NetworkInterfaceResource NetworkInterfaceResource
+    {
+        get
+        {
+            if (_networkInterfaceResource != null)
+                return _networkInterfaceResource;
+
+            var networkProfile = VirtualMachineResource.Data.NetworkProfile;
+            var networkInterfaces = networkProfile.NetworkInterfaces;
+            var networkInterfaceReference = networkInterfaces.First();
+            var networkInterfaceResources = _context.SubscriptionResource.GetNetworkInterfaces();
+            var networkInterfaceResource = networkInterfaceResources.First(f => f.Data.Id == networkInterfaceReference.Id);
+
+            return _networkInterfaceResource = networkInterfaceResource;
+        }
+    }
+
+    private VirtualMachineResource VirtualMachineResource
+    {
+        get
+        {
+            if (_virtualMachineResource != null)
+                return _virtualMachineResource;
+
+            var virtualMachines = _context.SubscriptionResource.GetVirtualMachines();
+            var virtualMachine = virtualMachines.First(f => f.Data.Name == _virtualMachineName);
+
+            return _virtualMachineResource = virtualMachine;
+        }
     }
 
     public VirtualMachineStatus Status
     {
         get
         {
-            var instanceView = _virtualMachine.InstanceView().Value;
+            var instanceView = VirtualMachineResource.InstanceView().Value;
             var statuses = instanceView.Statuses;
 
             if (statuses.Any(status => status.Code == "PowerState/running"))
@@ -44,14 +108,14 @@ public class VirtualMachine : IVirtualMachine
 
     public bool IsOn => Status == VirtualMachineStatus.On;
     public bool IsOff => Status == VirtualMachineStatus.Off;
-    public string IpAddress => IsOn ? _publicIpAddress.IPAddress : null!;
+    public string IpAddress => IsOn ? PublicIpAddress.IPAddress : null!;
 
     public async Task PowerOnAsync()
     {
         if (IsOn)
             return;
 
-        await _virtualMachine.PowerOnAsync(WaitUntil.Completed);
+        await VirtualMachineResource.PowerOnAsync(WaitUntil.Completed);
     }
 
     public async Task PowerOffAsync()
@@ -59,7 +123,7 @@ public class VirtualMachine : IVirtualMachine
         if (IsOff)
             return;
 
-        await _virtualMachine.PowerOffAsync(WaitUntil.Completed);
+        await VirtualMachineResource.PowerOffAsync(WaitUntil.Completed);
     }
 
     public async Task<RunScriptResult> RunCommandAsync(RunScriptCommand command)
@@ -72,14 +136,14 @@ public class VirtualMachine : IVirtualMachine
         foreach (var line in command.Script)
             runCommandInput.Script.Add(line);
 
-        var runCommandResult = await _virtualMachine.RunCommandAsync(WaitUntil.Completed, runCommandInput);
+        var runCommandResult = await VirtualMachineResource.RunCommandAsync(WaitUntil.Completed, runCommandInput);
 
         return new RunScriptResult(runCommandResult.Value);
     }
 
     public async Task<PortInfo> GetPortInfoAsync(int port)
     {
-        var securityRule = await _networkSecurityGroupResource.GetSecurityRuleAsync(port.ToString());
+        var securityRule = await NetworkSecurityGroupResource.GetSecurityRuleAsync(port.ToString());
         var securityRuleData = securityRule.Value.Data;
 
         return new PortInfo(securityRuleData);
@@ -87,7 +151,7 @@ public class VirtualMachine : IVirtualMachine
 
     public async Task OpenPortAsync(int port, string ranges)
     {
-        var securityRule = await _networkSecurityGroupResource.GetSecurityRuleAsync(port.ToString());
+        var securityRule = await NetworkSecurityGroupResource.GetSecurityRuleAsync(port.ToString());
         var securityRuleData = securityRule.Value.Data;
 
         securityRuleData.Access = SecurityRuleAccess.Allow;
@@ -98,7 +162,7 @@ public class VirtualMachine : IVirtualMachine
 
     public async Task ClosePortAsync(int port)
     {
-        var securityRule = await _networkSecurityGroupResource.GetSecurityRuleAsync(port.ToString());
+        var securityRule = await NetworkSecurityGroupResource.GetSecurityRuleAsync(port.ToString());
         var securityRuleData = securityRule.Value.Data;
 
         securityRuleData.Access = SecurityRuleAccess.Deny;
