@@ -47,27 +47,23 @@ public class ServerFunction
     }
 
     [FunctionName(nameof(ServerFunction) + "_" + nameof(InfoAsync))]
-    public async Task<IActionResult> InfoAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "server/{port}/info")] HttpRequest httpRequest,
-        int port)
+    public async Task<IActionResult> InfoAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "server/{ip}:{port}/info")] HttpRequest httpRequest,
+        string ip, int port)
     {
         httpRequest.EnsureAuthentication(AuthorizationKey);
 
-        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
-        var server = _serverService.GetByPort(virtualMachine, port);
-        var serverInfo = await _serverService.GetServerInfoAsync(server);
+        var serverInfo = await _serverService.GetServerInfoAsync(ip, port);
 
         return new OkObjectResult(serverInfo);
     }
 
     [FunctionName(nameof(ServerFunction) + "_" + nameof(Players))]
-    public IActionResult Players([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "server/{port}/players")] HttpRequest httpRequest,
-        int port)
+    public IActionResult Players([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "server/{ip}:{port}/players")] HttpRequest httpRequest,
+        string ip, int port)
     {
         httpRequest.EnsureAuthentication(AuthorizationKey);
 
-        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
-        var server = _serverService.GetByPort(virtualMachine, port);
-        var players = _playerService.GetPlayers(server);
+        var players = _playerService.GetPlayers(ip, port);
 
         return new OkObjectResult(players.ToList());
     }

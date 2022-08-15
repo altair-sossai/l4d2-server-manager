@@ -20,10 +20,10 @@ public class ServerService : IServerService
         return new Server(virtualMachine, port);
     }
 
-    public async Task<ServerInfo.ValueObjects.ServerInfo> GetServerInfoAsync(IServer server)
+    public async Task<ServerInfo.ValueObjects.ServerInfo> GetServerInfoAsync(string ip, int port)
     {
         var serverInfoService = SteamContext.ServerInfoService;
-        var responseData = await serverInfoService.GetServerInfo(SteamApiKey, $"addr\\{server.IpAddress}:{server.Port}");
+        var responseData = await serverInfoService.GetServerInfo(SteamApiKey, $"addr\\{ip}:{port}");
         var serverInfo = responseData.Response?.Servers?.First();
 
         return serverInfo!;

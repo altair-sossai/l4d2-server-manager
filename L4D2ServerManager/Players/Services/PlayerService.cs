@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using L4D2ServerManager.Server;
 
 namespace L4D2ServerManager.Players.Services;
 
@@ -9,13 +8,10 @@ public class PlayerService : IPlayerService
 {
     private static readonly byte[] Request = {0xFF, 0xFF, 0xFF, 0xFF, 0x55, 0xFF, 0xFF, 0xFF, 0xFF};
 
-    public IEnumerable<Player> GetPlayers(IServer server)
+    public IEnumerable<Player> GetPlayers(string ip, int port)
     {
-        if (!server.VirtualMachine.IsOn)
-            yield break;
-
-        var ipAddress = IPAddress.Parse(server.VirtualMachine.IpAddress);
-        var ipEndPoint = new IPEndPoint(ipAddress, Convert.ToUInt16(server.Port));
+        var ipAddress = IPAddress.Parse(ip);
+        var ipEndPoint = new IPEndPoint(ipAddress, Convert.ToUInt16(port));
         using var udpClient = new UdpClient();
         udpClient.Send(Request, Request.Length, ipEndPoint);
 

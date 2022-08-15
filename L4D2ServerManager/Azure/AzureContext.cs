@@ -8,10 +8,10 @@ namespace L4D2ServerManager.Azure;
 
 public class AzureContext : IAzureContext
 {
+    private static ArmClient? _armClient;
+    private static SubscriptionResource? _subscriptionResource;
+    private static TokenCredential? _tokenCredential;
     private readonly IConfiguration _configuration;
-    private ArmClient? _armClient;
-    private SubscriptionResource? _subscriptionResource;
-    private TokenCredential? _tokenCredential;
 
     public AzureContext(IConfiguration configuration)
     {
@@ -22,6 +22,6 @@ public class AzureContext : IAzureContext
     private string ClientId => _configuration.GetValue<string>(nameof(ClientId));
     private string ClientSecret => _configuration.GetValue<string>(nameof(ClientSecret));
     private TokenCredential TokenCredential => _tokenCredential ??= new ClientSecretCredential(TenantId, ClientId, ClientSecret);
-    public ArmClient ArmClient => _armClient ??= new ArmClient(TokenCredential);
+    private ArmClient ArmClient => _armClient ??= new ArmClient(TokenCredential);
     public SubscriptionResource SubscriptionResource => _subscriptionResource ??= ArmClient.GetDefaultSubscription();
 }
