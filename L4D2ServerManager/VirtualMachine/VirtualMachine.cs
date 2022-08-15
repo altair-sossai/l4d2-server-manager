@@ -123,7 +123,7 @@ public class VirtualMachine : IVirtualMachine
         if (IsOff)
             return;
 
-        await VirtualMachineResource.PowerOffAsync(WaitUntil.Completed);
+        await VirtualMachineResource.DeallocateAsync(WaitUntil.Completed);
     }
 
     public async Task<RunScriptResult> RunCommandAsync(RunScriptCommand command)
