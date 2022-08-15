@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
-using L4D2ServerManager.ServerInfo.Services;
+using L4D2ServerManager.Server.Info.Services;
 using Refit;
 
-namespace L4D2ServerManager.ServerInfo.Context;
+namespace L4D2ServerManager.Server.Info.Context;
 
 public static class SteamContext
 {

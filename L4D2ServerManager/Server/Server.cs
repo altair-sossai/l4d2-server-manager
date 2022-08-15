@@ -1,5 +1,5 @@
 ﻿using L4D2ServerManager.Server.Commands;
-using L4D2ServerManager.Server.Results;
+using L4D2ServerManager.Server.Services;
 using L4D2ServerManager.VirtualMachine;
 using L4D2ServerManager.VirtualMachine.ValueObjects;
 
@@ -7,8 +7,11 @@ namespace L4D2ServerManager.Server;
 
 public class Server : IServer
 {
-    public Server(IVirtualMachine virtualMachine, int port)
+    private readonly IServerService _serverService;
+
+    public Server(IServerService serverService, IVirtualMachine virtualMachine, int port)
     {
+        _serverService = serverService;
         VirtualMachine = virtualMachine;
         Port = port;
     }
@@ -16,19 +19,7 @@ public class Server : IServer
     public IVirtualMachine VirtualMachine { get; }
     public string IpAddress => VirtualMachine.IpAddress;
     public int Port { get; }
-
-    public bool IsRunning
-    {
-        get
-        {
-            var command = new GetRunningServersCommand();
-            var commandResult = VirtualMachine.RunCommandAsync(command).Result;
-            var runningServersResult = new GetRunningServersResult(commandResult);
-
-            return runningServersResult.Ports.Contains(Port);
-        }
-    }
-
+    public bool IsRunning => _serverService.IsRunningAsync(IpAddress, Port).Result;
     public PortInfo PortInfo => VirtualMachine.GetPortInfoAsync(Port).Result;
 
     public async Task RunAsync()

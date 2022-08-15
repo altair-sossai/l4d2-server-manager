@@ -53,6 +53,8 @@ public class ServerFunction
         httpRequest.EnsureAuthentication(AuthorizationKey);
 
         var serverInfo = await _serverService.GetServerInfoAsync(ip, port);
+        if (serverInfo == null)
+            return new NotFoundResult();
 
         return new OkObjectResult(serverInfo);
     }

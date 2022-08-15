@@ -1,7 +1,7 @@
-﻿using L4D2ServerManager.ServerInfo.ValueObjects;
+﻿using L4D2ServerManager.Server.Info.ValueObjects;
 using Refit;
 
-namespace L4D2ServerManager.ServerInfo.Services;
+namespace L4D2ServerManager.Server.Info.Services;
 
 public interface IServerInfoService
 {

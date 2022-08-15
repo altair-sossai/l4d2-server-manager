@@ -1,4 +1,5 @@
-﻿using L4D2ServerManager.ServerInfo.Context;
+﻿using L4D2ServerManager.Server.Info.Context;
+using L4D2ServerManager.Server.Info.ValueObjects;
 using L4D2ServerManager.VirtualMachine;
 using Microsoft.Extensions.Configuration;
 
@@ -17,15 +18,21 @@ public class ServerService : IServerService
 
     public IServer GetByPort(IVirtualMachine virtualMachine, int port)
     {
-        return new Server(virtualMachine, port);
+        return new Server(this, virtualMachine, port);
     }
 
-    public async Task<ServerInfo.ValueObjects.ServerInfo> GetServerInfoAsync(string ip, int port)
+    public async Task<bool> IsRunningAsync(string ip, int port)
+    {
+        var serverInfo = await GetServerInfoAsync(ip, port);
+
+        return serverInfo != null;
+    }
+
+    public async Task<ServerInfo?> GetServerInfoAsync(string ip, int port)
     {
         var serverInfoService = SteamContext.ServerInfoService;
         var responseData = await serverInfoService.GetServerInfo(SteamApiKey, $"addr\\{ip}:{port}");
-        var serverInfo = responseData.Response?.Servers?.First();
 
-        return serverInfo!;
+        return responseData.Response?.Servers?.FirstOrDefault();
     }
 }
