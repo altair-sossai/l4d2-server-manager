@@ -93,14 +93,19 @@ public class VirtualMachine : IVirtualMachine
     {
         get
         {
-            var instanceView = VirtualMachineResource.InstanceView().Value;
-            var statuses = instanceView.Statuses;
+            for (var seconds = 5; seconds < 15; seconds++)
+            {
+                var instanceView = VirtualMachineResource.InstanceView().Value;
+                var statuses = instanceView.Statuses;
 
-            if (statuses.Any(status => status.Code == "PowerState/running"))
-                return VirtualMachineStatus.On;
+                if (statuses.Any(status => status.Code == "PowerState/running"))
+                    return VirtualMachineStatus.On;
 
-            if (statuses.Any(status => status.Code == "PowerState/deallocated"))
-                return VirtualMachineStatus.Off;
+                if (statuses.Any(status => status.Code == "PowerState/deallocated"))
+                    return VirtualMachineStatus.Off;
+
+                Thread.Sleep(TimeSpan.FromSeconds(5));
+            }
 
             return VirtualMachineStatus.Unknown;
         }
