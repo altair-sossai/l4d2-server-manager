@@ -30,6 +30,8 @@ public class Server : IServer
         var command = new RunServerCommand(Port);
 
         await VirtualMachine.RunCommandAsync(command);
+
+        WaitUntilItsRunning();
     }
 
     public async Task StopAsync()
@@ -50,5 +52,11 @@ public class Server : IServer
     public async Task ClosePortAsync()
     {
         await VirtualMachine.ClosePortAsync(Port);
+    }
+
+    private void WaitUntilItsRunning()
+    {
+        for (var seconds = 5; !IsRunning && seconds <= 15; seconds++)
+            Thread.Sleep(TimeSpan.FromSeconds(seconds));
     }
 }
