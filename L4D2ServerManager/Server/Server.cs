@@ -22,26 +22,26 @@ public class Server : IServer
     public bool IsRunning => _serverService.IsRunningAsync(IpAddress, Port).Result;
     public PortInfo PortInfo => VirtualMachine.GetPortInfoAsync(Port).Result;
 
-    public async Task RunAsync()
+    public void Run()
     {
         if (IsRunning)
             return;
 
         var command = new RunServerCommand(Port);
 
-        await VirtualMachine.RunCommandAsync(command);
+        VirtualMachine.RunCommand(command);
 
         WaitUntilItsRunning();
     }
 
-    public async Task StopAsync()
+    public void Stop()
     {
         if (!IsRunning)
             return;
 
         var command = new StopServerCommand(Port);
 
-        await VirtualMachine.RunCommandAsync(command);
+        VirtualMachine.RunCommand(command);
     }
 
     public async Task OpenPortAsync(string ranges)

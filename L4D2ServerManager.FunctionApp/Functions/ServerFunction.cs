@@ -70,8 +70,8 @@ public class ServerFunction
         return new OkObjectResult(players.ToList());
     }
 
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(RunAsync))]
-    public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(Run))]
+    public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
         int port)
     {
         httpRequest.EnsureAuthentication(AuthorizationKey);
@@ -79,13 +79,13 @@ public class ServerFunction
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
-        await server.RunAsync();
+        server.Run();
 
         return new OkObjectResult(server);
     }
 
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(StopAsync))]
-    public async Task<IActionResult> StopAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/stop")] HttpRequest httpRequest,
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(Stop))]
+    public IActionResult Stop([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/stop")] HttpRequest httpRequest,
         int port)
     {
         httpRequest.EnsureAuthentication(AuthorizationKey);
@@ -93,7 +93,7 @@ public class ServerFunction
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
-        await server.StopAsync();
+        server.Stop();
 
         return new OkObjectResult(server);
     }

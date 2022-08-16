@@ -6,13 +6,13 @@ using Azure.ResourceManager.Network.Models;
 using L4D2ServerManager.Azure;
 using L4D2ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.VirtualMachine.Enums;
-using L4D2ServerManager.VirtualMachine.Results;
 using L4D2ServerManager.VirtualMachine.ValueObjects;
 
 namespace L4D2ServerManager.VirtualMachine;
 
 public class VirtualMachine : IVirtualMachine
 {
+    private static readonly object Lock = new();
     private readonly IAzureContext _context;
     private readonly string _virtualMachineName;
     private NetworkInterfaceResource? _networkInterfaceResource;
@@ -131,19 +131,17 @@ public class VirtualMachine : IVirtualMachine
         await VirtualMachineResource.DeallocateAsync(WaitUntil.Completed);
     }
 
-    public async Task<RunScriptResult> RunCommandAsync(RunScriptCommand command)
+    public void RunCommand(RunScriptCommand command)
     {
         if (!IsOn)
-            return RunScriptResult.Empty;
+            return;
 
         var runCommandInput = new RunCommandInput("RunShellScript");
 
         foreach (var line in command.Script)
             runCommandInput.Script.Add(line);
 
-        var runCommandResult = await VirtualMachineResource.RunCommandAsync(WaitUntil.Completed, runCommandInput);
-
-        return new RunScriptResult(runCommandResult.Value);
+        RunCommandLocked(runCommandInput);
     }
 
     public async Task<PortInfo> GetPortInfoAsync(int port)
@@ -174,5 +172,13 @@ public class VirtualMachine : IVirtualMachine
         securityRuleData.SourceAddressPrefix = "*";
 
         await securityRule.Value.UpdateAsync(WaitUntil.Completed, securityRuleData);
+    }
+
+    private void RunCommandLocked(RunCommandInput runCommandInput)
+    {
+        lock (Lock)
+        {
+            VirtualMachineResource.RunCommandAsync(WaitUntil.Completed, runCommandInput).Wait();
+        }
     }
 }

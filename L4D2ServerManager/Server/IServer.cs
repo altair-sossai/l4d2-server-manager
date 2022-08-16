@@ -10,8 +10,8 @@ public interface IServer
     int Port { get; }
     bool IsRunning { get; }
     PortInfo PortInfo { get; }
-    Task RunAsync();
-    Task StopAsync();
+    void Run();
+    void Stop();
     Task OpenPortAsync(string ranges);
     Task ClosePortAsync();
 }
