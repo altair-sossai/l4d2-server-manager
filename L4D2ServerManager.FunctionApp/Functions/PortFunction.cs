@@ -23,7 +23,7 @@ public class PortFunction
     {
         httpRequest.EnsureAuthentication(AuthorizationKey);
 
-        var ports = new[] {27016, 27017};
+        var ports = new[] {27016, 27017, 27018};
 
         return new OkObjectResult(ports);
     }
