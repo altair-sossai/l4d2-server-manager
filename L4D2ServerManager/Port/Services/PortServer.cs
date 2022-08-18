@@ -22,7 +22,7 @@ public class PortServer : IPortServer
         foreach (var portNumber in Ports.Split(',', ';', ' ').Select(int.Parse))
         {
             var serverInfo = _serverService.GetServerInfoAsync(ip, portNumber).Result;
-            var port = new Port(portNumber, serverInfo?.Players ?? 0);
+            var port = new Port(portNumber, serverInfo);
 
             yield return port;
         }
