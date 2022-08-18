@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Commands;
 using L4D2ServerManager.FunctionApp.Extensions;
@@ -67,7 +66,7 @@ public class ServerFunction
 
         var players = _playerService.GetPlayers(ip, port);
 
-        return new OkObjectResult(players.ToList());
+        return new OkObjectResult(players);
     }
 
     [FunctionName(nameof(ServerFunction) + "_" + nameof(Run))]

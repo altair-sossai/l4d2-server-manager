@@ -8,33 +8,48 @@ public class PlayerService : IPlayerService
 {
     private static readonly byte[] Request = {0xFF, 0xFF, 0xFF, 0xFF, 0x55, 0xFF, 0xFF, 0xFF, 0xFF};
 
-    public IEnumerable<Player> GetPlayers(string ip, int port)
+    public List<Player> GetPlayers(string ip, int port)
     {
-        var ipAddress = IPAddress.Parse(ip);
-        var ipEndPoint = new IPEndPoint(ipAddress, Convert.ToUInt16(port));
-        using var udpClient = new UdpClient();
-        udpClient.Send(Request, Request.Length, ipEndPoint);
+        var players = new List<Player>();
 
-        var asyncResult = udpClient.BeginReceive(null, null);
-        asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(5));
+        try
+        {
+            var ipAddress = IPAddress.Parse(ip);
+            var ipEndPoint = new IPEndPoint(ipAddress, Convert.ToUInt16(port));
+            using var udpClient = new UdpClient();
+            udpClient.Send(Request, Request.Length, ipEndPoint);
 
-        if (!asyncResult.IsCompleted)
-            yield break;
+            var asyncResult = udpClient.BeginReceive(null, null);
+            asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(5));
 
-        var bytes = udpClient.EndReceive(asyncResult, ref ipEndPoint);
-        if (bytes.Length != 9 || bytes[4] != 0x41)
-            yield break;
+            if (!asyncResult.IsCompleted)
+                return players;
 
-        bytes[4] = 0x55;
-        udpClient.Send(bytes, bytes.Length, ipEndPoint);
+            var bytes = udpClient.EndReceive(asyncResult, ref ipEndPoint);
+            if (bytes.Length != 9 || bytes[4] != 0x41)
+                return players;
 
-        var memoryStream = new MemoryStream(udpClient.Receive(ref ipEndPoint));
-        var binaryReader = new BinaryReader(memoryStream, Encoding.UTF8);
-        memoryStream.Seek(4, SeekOrigin.Begin);
-        binaryReader.ReadByte();
+            bytes[4] = 0x55;
+            udpClient.Send(bytes, bytes.Length, ipEndPoint);
 
-        var count = binaryReader.ReadByte();
-        for (var i = 0; i < count; i++)
-            yield return new Player(ref binaryReader);
+            var memoryStream = new MemoryStream(udpClient.Receive(ref ipEndPoint));
+            var binaryReader = new BinaryReader(memoryStream, Encoding.UTF8);
+            memoryStream.Seek(4, SeekOrigin.Begin);
+            binaryReader.ReadByte();
+
+            var count = binaryReader.ReadByte();
+            for (var i = 0; i < count; i++)
+            {
+                var player = new Player(ref binaryReader);
+
+                players.Add(player);
+            }
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(exception);
+        }
+
+        return players;
     }
 }
