@@ -4,6 +4,8 @@ namespace L4D2ServerManager.Server.Info.ValueObjects;
 
 public class ServerInfo
 {
+    private string? _gametype;
+
     [JsonPropertyName("addr")]
     public string? Addr { get; set; }
 
@@ -53,5 +55,9 @@ public class ServerInfo
     public string? Os { get; set; }
 
     [JsonPropertyName("gametype")]
-    public string? Gametype { get; set; }
+    public string? Gametype
+    {
+        get => _gametype;
+        set => _gametype = string.IsNullOrEmpty(value) ? value : string.Join(", ", value.Split(','));
+    }
 }
