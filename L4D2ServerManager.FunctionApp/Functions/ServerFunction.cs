@@ -80,7 +80,7 @@ public class ServerFunction
 
         server.Run();
 
-        return new OkObjectResult(server);
+        return new OkResult();
     }
 
     [FunctionName(nameof(ServerFunction) + "_" + nameof(Stop))]
@@ -94,7 +94,7 @@ public class ServerFunction
 
         server.Stop();
 
-        return new OkObjectResult(server);
+        return new OkResult();
     }
 
     [FunctionName(nameof(ServerFunction) + "_" + nameof(KickAllPlayers))]
@@ -123,7 +123,7 @@ public class ServerFunction
 
         await server.OpenPortAsync(command.Ranges);
 
-        return new OkObjectResult(server);
+        return new OkResult();
     }
 
     [FunctionName(nameof(ServerFunction) + "_" + nameof(ClosePortAsync))]
@@ -137,6 +137,6 @@ public class ServerFunction
 
         await server.ClosePortAsync();
 
-        return new OkObjectResult(server);
+        return new OkResult();
     }
 }
