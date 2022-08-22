@@ -97,6 +97,20 @@ public class ServerFunction
         return new OkObjectResult(server);
     }
 
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(KickAllPlayers))]
+    public IActionResult KickAllPlayers([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/kick-all-players")] HttpRequest httpRequest,
+        int port)
+    {
+        httpRequest.EnsureAuthentication(AuthorizationKey);
+
+        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+        var server = _serverService.GetByPort(virtualMachine, port);
+
+        server.KickAllPlayers();
+
+        return new OkResult();
+    }
+
     [FunctionName(nameof(ServerFunction) + "_" + nameof(OpenPortAsync))]
     public async Task<IActionResult> OpenPortAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/open-port")] HttpRequest httpRequest,
         int port)

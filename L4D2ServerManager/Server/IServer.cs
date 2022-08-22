@@ -12,6 +12,7 @@ public interface IServer
     PortInfo PortInfo { get; }
     void Run();
     void Stop();
+    void KickAllPlayers();
     Task OpenPortAsync(string ranges);
     Task ClosePortAsync();
 }
