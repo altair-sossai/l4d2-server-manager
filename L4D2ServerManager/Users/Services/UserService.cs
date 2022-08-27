@@ -16,9 +16,17 @@ public class UserService : IUserService
 
     private TableClient UserTable => _userTable ??= _context.GetTableClient("Users").Result;
 
-    public User? Authenticate(AuthenticationCommand command)
+    public User EnsureAuthentication(string token)
     {
-        return command.Valid ? UserTable.Query<User>(user => user.Id == command.UserId && user.Secret == command.UserSecret).FirstOrDefault() : null;
+        var command = new AuthenticationCommand(token);
+        if (!command.Valid)
+            throw new UnauthorizedAccessException();
+
+        var user = UserTable.Query<User>(user => user.Id == command.UserId && user.Secret == command.UserSecret).FirstOrDefault();
+        if (user == null)
+            throw new UnauthorizedAccessException();
+
+        return user;
     }
 
     public List<User> GetUsers()

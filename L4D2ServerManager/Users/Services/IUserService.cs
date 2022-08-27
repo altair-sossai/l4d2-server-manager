@@ -1,9 +1,7 @@
-﻿using L4D2ServerManager.Users.Commands;
-
-namespace L4D2ServerManager.Users.Services;
+﻿namespace L4D2ServerManager.Users.Services;
 
 public interface IUserService
 {
-    User? Authenticate(AuthenticationCommand command);
+    User EnsureAuthentication(string token);
     List<User> GetUsers();
 }

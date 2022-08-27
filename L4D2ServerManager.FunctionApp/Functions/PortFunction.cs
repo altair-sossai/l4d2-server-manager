@@ -1,33 +1,31 @@
 using System.Linq;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Port.Services;
+using L4D2ServerManager.Users.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Configuration;
 
 namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class PortFunction
 {
-    private readonly IConfiguration _configuration;
     private readonly IPortServer _portServer;
+    private readonly IUserService _userService;
 
-    public PortFunction(IConfiguration configuration,
+    public PortFunction(IUserService userService,
         IPortServer portServer)
     {
-        _configuration = configuration;
+        _userService = userService;
         _portServer = portServer;
     }
-
-    private string AuthorizationKey => _configuration.GetValue<string>(nameof(AuthorizationKey));
 
     [FunctionName(nameof(PortFunction) + "_" + nameof(Get))]
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ports/{ip}")] HttpRequest httpRequest,
         string ip)
     {
-        httpRequest.EnsureAuthentication(AuthorizationKey);
+        _userService.EnsureAuthentication(httpRequest.GetToken());
 
         var ports = _portServer.GetPorts(ip).ToList();
 
