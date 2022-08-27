@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Extensions;
-using L4D2ServerManager.Users.Constants;
 using L4D2ServerManager.Users.Services;
+using L4D2ServerManager.VirtualMachine.Extensions;
 using L4D2ServerManager.VirtualMachine.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -60,7 +60,7 @@ public class VirtualMachineFunction
 
         _userService.ApplyPermissions(user, virtualMachine);
 
-        if (!virtualMachine.Permissions.Contains(VirtualMachinePermissions.PowerOff))
+        if (!virtualMachine.CanPowerOff())
             throw new UnauthorizedAccessException();
 
         await virtualMachine.PowerOffAsync();
