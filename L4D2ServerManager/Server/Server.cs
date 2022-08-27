@@ -1,5 +1,6 @@
 ﻿using L4D2ServerManager.Server.Commands;
 using L4D2ServerManager.Server.Services;
+using L4D2ServerManager.Users;
 using L4D2ServerManager.VirtualMachine;
 using L4D2ServerManager.VirtualMachine.ValueObjects;
 
@@ -21,8 +22,10 @@ public class Server : IServer
     public int Port { get; }
     public bool IsRunning => _serverService.IsRunningAsync(IpAddress, Port).Result;
     public PortInfo PortInfo => VirtualMachine.GetPortInfoAsync(Port).Result;
+    public HashSet<string> Permissions { get; } = new();
+    public string? StartedBy => VirtualMachine.StartedBy(Port);
 
-    public void Run()
+    public async Task RunAsync(User user)
     {
         if (IsRunning)
             return;
@@ -30,6 +33,8 @@ public class Server : IServer
         var command = new RunServerCommand(Port);
 
         VirtualMachine.RunCommand(command);
+
+        await VirtualMachine.UpdateTagValueAsync($"port-{Port}-started-by", user.Id);
 
         WaitUntilItsRunning();
     }

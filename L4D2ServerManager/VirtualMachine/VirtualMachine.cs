@@ -3,9 +3,11 @@ using Azure.ResourceManager.Compute;
 using Azure.ResourceManager.Compute.Models;
 using Azure.ResourceManager.Network;
 using Azure.ResourceManager.Network.Models;
-using L4D2ServerManager.Azure;
+using L4D2ServerManager.Contexts.AzureSubscription;
+using L4D2ServerManager.Users;
 using L4D2ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.VirtualMachine.Enums;
+using L4D2ServerManager.VirtualMachine.Extensions;
 using L4D2ServerManager.VirtualMachine.ValueObjects;
 
 namespace L4D2ServerManager.VirtualMachine;
@@ -13,14 +15,14 @@ namespace L4D2ServerManager.VirtualMachine;
 public class VirtualMachine : IVirtualMachine
 {
     private static readonly object Lock = new();
-    private readonly IAzureContext _context;
+    private readonly IAzureSubscriptionContext _context;
     private readonly string _virtualMachineName;
     private NetworkInterfaceResource? _networkInterfaceResource;
     private NetworkSecurityGroupResource? _networkSecurityGroupResource;
     private PublicIPAddressData? _publicIpAddress;
     private VirtualMachineResource? _virtualMachineResource;
 
-    public VirtualMachine(IAzureContext context, string virtualMachineName)
+    public VirtualMachine(IAzureSubscriptionContext context, string virtualMachineName)
     {
         _context = context;
         _virtualMachineName = virtualMachineName;
@@ -114,13 +116,27 @@ public class VirtualMachine : IVirtualMachine
     public bool IsOn => Status == VirtualMachineStatus.On;
     public bool IsOff => Status == VirtualMachineStatus.Off;
     public string IpAddress => IsOn ? PublicIpAddress.IPAddress : null!;
+    public HashSet<string> Permissions { get; } = new();
 
-    public async Task PowerOnAsync()
+    public string? PowerOnBy
+    {
+        get
+        {
+            const string key = "power-on-by";
+
+            var tags = VirtualMachineResource.Data.Tags;
+
+            return tags.ContainsKey(key) ? tags[key] : null;
+        }
+    }
+
+    public async Task PowerOnAsync(User user)
     {
         if (IsOn)
             return;
 
         await VirtualMachineResource.PowerOnAsync(WaitUntil.Completed);
+        await UpdateTagValueAsync("power-on-by", user.Id);
     }
 
     public async Task PowerOffAsync()
@@ -172,6 +188,19 @@ public class VirtualMachine : IVirtualMachine
         securityRuleData.SourceAddressPrefix = "*";
 
         await securityRule.Value.UpdateAsync(WaitUntil.Completed, securityRuleData);
+    }
+
+    public async Task UpdateTagValueAsync(string key, string value)
+    {
+        await VirtualMachineResource.UpdateTagValueAsync(key, value);
+    }
+
+    public string? StartedBy(int port)
+    {
+        var key = $"port-{port}-started-by";
+        var tags = VirtualMachineResource.Data.Tags;
+
+        return tags.ContainsKey(key) ? tags[key] : null;
     }
 
     private void RunCommandLocked(RunCommandInput runCommandInput)

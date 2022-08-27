@@ -1,4 +1,5 @@
-﻿using L4D2ServerManager.VirtualMachine.Commands;
+﻿using L4D2ServerManager.Users;
+using L4D2ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.VirtualMachine.Enums;
 using L4D2ServerManager.VirtualMachine.ValueObjects;
 
@@ -10,10 +11,14 @@ public interface IVirtualMachine
     bool IsOn { get; }
     bool IsOff { get; }
     string IpAddress { get; }
-    Task PowerOnAsync();
+    HashSet<string> Permissions { get; }
+    string? PowerOnBy { get; }
+    Task PowerOnAsync(User user);
     Task PowerOffAsync();
     void RunCommand(RunScriptCommand command);
     Task<PortInfo> GetPortInfoAsync(int port);
     Task OpenPortAsync(int port, string ranges);
     Task ClosePortAsync(int port);
+    Task UpdateTagValueAsync(string key, string value);
+    string? StartedBy(int port);
 }

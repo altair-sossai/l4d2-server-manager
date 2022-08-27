@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -17,11 +16,8 @@ public static class HttpRequestDataExtensions
         return t;
     }
 
-    public static void EnsureAuthentication(this HttpRequest httpRequest, string authKey)
+    public static string AuthorizationToken(this HttpRequest httpRequest)
     {
-        var authorization = httpRequest.Headers["Authorization"].ToString();
-
-        if (authorization != authKey)
-            throw new Exception("Invalid Auth Key");
+        return httpRequest.Headers["Authorization"].ToString();
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Azure.ResourceManager.Resources;
 
-namespace L4D2ServerManager.Azure;
+namespace L4D2ServerManager.Contexts.AzureSubscription;
 
-public interface IAzureContext
+public interface IAzureSubscriptionContext
 {
     SubscriptionResource SubscriptionResource { get; }
 }
