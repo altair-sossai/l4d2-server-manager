@@ -26,4 +26,17 @@ public class UserFunction
 
         return new OkObjectResult(users);
     }
+
+    [FunctionName(nameof(UserFunction) + "_" + nameof(GetById))]
+    public IActionResult GetById([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{userId}")] HttpRequest httpRequest,
+        string userId)
+    {
+        _userService.EnsureAuthentication(httpRequest.GetToken());
+
+        var user = _userService.GetUser(userId);
+        if (user == null)
+            return new NotFoundResult();
+
+        return new OkObjectResult(user.Info());
+    }
 }

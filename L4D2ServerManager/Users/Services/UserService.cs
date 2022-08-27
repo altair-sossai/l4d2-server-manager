@@ -36,6 +36,11 @@ public class UserService : IUserService
         return user;
     }
 
+    public User? GetUser(string userId)
+    {
+        return UserTable.Query<User>(user => user.Id == userId).FirstOrDefault();
+    }
+
     public IEnumerable<User> GetUsers()
     {
         return UserTable.Query<User>();
