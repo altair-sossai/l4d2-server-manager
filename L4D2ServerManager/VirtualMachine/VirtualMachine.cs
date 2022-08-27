@@ -130,13 +130,35 @@ public class VirtualMachine : IVirtualMachine
         }
     }
 
+    public DateTime? PowerOnAt
+    {
+        get
+        {
+            const string key = "power-on-at";
+
+            var tags = VirtualMachineResource.Data.Tags;
+
+            if (!tags.ContainsKey(key))
+                return null;
+
+            return DateTime.TryParse(tags[key], out var date) ? date : null;
+        }
+    }
+
     public async Task PowerOnAsync(User user)
     {
         if (IsOn)
             return;
 
         await VirtualMachineResource.PowerOnAsync(WaitUntil.Completed);
-        await UpdateTagValueAsync("power-on-by", user.Id);
+
+        var values = new Dictionary<string, string>
+        {
+            {"power-on-by", user.Id},
+            {"power-on-at", DateTime.UtcNow.ToString("O")}
+        };
+
+        await UpdateTagsAsync(values);
     }
 
     public async Task PowerOffAsync()
@@ -190,9 +212,9 @@ public class VirtualMachine : IVirtualMachine
         await securityRule.Value.UpdateAsync(WaitUntil.Completed, securityRuleData);
     }
 
-    public async Task UpdateTagValueAsync(string key, string value)
+    public async Task UpdateTagsAsync(IDictionary<string, string> values)
     {
-        await VirtualMachineResource.UpdateTagValueAsync(key, value);
+        await VirtualMachineResource.UpdateTagsAsync(values);
     }
 
     public string? StartedBy(int port)
@@ -201,6 +223,17 @@ public class VirtualMachine : IVirtualMachine
         var tags = VirtualMachineResource.Data.Tags;
 
         return tags.ContainsKey(key) ? tags[key] : null;
+    }
+
+    public DateTime? StartedAt(int port)
+    {
+        var key = $"port-{port}-started-at";
+        var tags = VirtualMachineResource.Data.Tags;
+
+        if (!tags.ContainsKey(key))
+            return null;
+
+        return DateTime.TryParse(tags[key], out var date) ? date : null;
     }
 
     private void RunCommandLocked(RunCommandInput runCommandInput)

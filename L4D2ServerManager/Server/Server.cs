@@ -24,6 +24,7 @@ public class Server : IServer
     public PortInfo PortInfo => VirtualMachine.GetPortInfoAsync(Port).Result;
     public HashSet<string> Permissions { get; } = new();
     public string? StartedBy => VirtualMachine.StartedBy(Port);
+    public DateTime? StartedAt => VirtualMachine.StartedAt(Port);
 
     public async Task RunAsync(User user)
     {
@@ -31,10 +32,15 @@ public class Server : IServer
             return;
 
         var command = new RunServerCommand(Port);
-
         VirtualMachine.RunCommand(command);
 
-        await VirtualMachine.UpdateTagValueAsync($"port-{Port}-started-by", user.Id);
+        var values = new Dictionary<string, string>
+        {
+            {$"port-{Port}-started-by", user.Id},
+            {$"port-{Port}-started-at", DateTime.UtcNow.ToString("O")}
+        };
+
+        await VirtualMachine.UpdateTagsAsync(values);
 
         WaitUntilItsRunning();
     }

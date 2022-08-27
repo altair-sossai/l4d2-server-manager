@@ -13,6 +13,7 @@ public interface IServer
     PortInfo PortInfo { get; }
     HashSet<string> Permissions { get; }
     string? StartedBy { get; }
+    DateTime? StartedAt { get; }
     Task RunAsync(User user);
     void Stop();
     void KickAllPlayers();

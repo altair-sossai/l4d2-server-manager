@@ -13,12 +13,14 @@ public interface IVirtualMachine
     string IpAddress { get; }
     HashSet<string> Permissions { get; }
     string? PowerOnBy { get; }
+    DateTime? PowerOnAt { get; }
     Task PowerOnAsync(User user);
     Task PowerOffAsync();
     void RunCommand(RunScriptCommand command);
     Task<PortInfo> GetPortInfoAsync(int port);
     Task OpenPortAsync(int port, string ranges);
     Task ClosePortAsync(int port);
-    Task UpdateTagValueAsync(string key, string value);
+    Task UpdateTagsAsync(IDictionary<string, string> values);
     string? StartedBy(int port);
+    DateTime? StartedAt(int port);
 }
