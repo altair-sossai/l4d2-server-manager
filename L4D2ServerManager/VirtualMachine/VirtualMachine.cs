@@ -136,7 +136,7 @@ public class VirtualMachine : IVirtualMachine
             return;
 
         await VirtualMachineResource.PowerOnAsync(WaitUntil.Completed);
-        await VirtualMachineResource.UpdateTagValue("power-on-by", user.Id);
+        await UpdateTagValueAsync("power-on-by", user.Id);
     }
 
     public async Task PowerOffAsync()
@@ -188,6 +188,11 @@ public class VirtualMachine : IVirtualMachine
         securityRuleData.SourceAddressPrefix = "*";
 
         await securityRule.Value.UpdateAsync(WaitUntil.Completed, securityRuleData);
+    }
+
+    public async Task UpdateTagValueAsync(string key, string value)
+    {
+        await VirtualMachineResource.UpdateTagValueAsync(key, value);
     }
 
     public string? StartedBy(int port)

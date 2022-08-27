@@ -1,7 +1,9 @@
+using System;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Commands;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Players.Services;
+using L4D2ServerManager.Server.Extensions;
 using L4D2ServerManager.Server.Services;
 using L4D2ServerManager.Users.Services;
 using L4D2ServerManager.VirtualMachine.Services;
@@ -40,10 +42,11 @@ public class ServerFunction
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "server/{port}")] HttpRequest httpRequest,
         int port)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
-
+        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
+
+        _userService.ApplyPermissions(user, server);
 
         return new OkObjectResult(server);
     }
@@ -72,16 +75,15 @@ public class ServerFunction
         return new OkObjectResult(players);
     }
 
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(Run))]
-    public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(RunAsync))]
+    public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
         int port)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
-
+        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
-        server.Run();
+        await server.RunAsync(user);
 
         return new OkResult();
     }
@@ -90,10 +92,14 @@ public class ServerFunction
     public IActionResult Stop([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/stop")] HttpRequest httpRequest,
         int port)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
-
+        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
+
+        _userService.ApplyPermissions(user, server);
+
+        if (!server.CanStop())
+            throw new UnauthorizedAccessException();
 
         server.Stop();
 
@@ -104,10 +110,14 @@ public class ServerFunction
     public IActionResult KickAllPlayers([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/kick-all-players")] HttpRequest httpRequest,
         int port)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
-
+        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
+
+        _userService.ApplyPermissions(user, server);
+
+        if (!server.CanKickAllPlayers())
+            throw new UnauthorizedAccessException();
 
         server.KickAllPlayers();
 
@@ -118,11 +128,15 @@ public class ServerFunction
     public async Task<IActionResult> OpenPortAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/open-port")] HttpRequest httpRequest,
         int port)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
-
+        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
         var command = await httpRequest.DeserializeBodyAsync<OpenPortCommand>();
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
+
+        _userService.ApplyPermissions(user, server);
+
+        if (!server.CanOpenPort())
+            throw new UnauthorizedAccessException();
 
         await server.OpenPortAsync(command.Ranges);
 
@@ -133,10 +147,14 @@ public class ServerFunction
     public async Task<IActionResult> ClosePortAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/close-port")] HttpRequest httpRequest,
         int port)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
-
+        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
+
+        _userService.ApplyPermissions(user, server);
+
+        if (!server.CanClosePort())
+            throw new UnauthorizedAccessException();
 
         await server.ClosePortAsync();
 

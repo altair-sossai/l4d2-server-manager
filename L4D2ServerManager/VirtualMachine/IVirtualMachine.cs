@@ -19,5 +19,6 @@ public interface IVirtualMachine
     Task<PortInfo> GetPortInfoAsync(int port);
     Task OpenPortAsync(int port, string ranges);
     Task ClosePortAsync(int port);
+    Task UpdateTagValueAsync(string key, string value);
     string? StartedBy(int port);
 }

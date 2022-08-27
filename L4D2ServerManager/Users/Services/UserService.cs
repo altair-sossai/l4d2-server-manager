@@ -1,6 +1,8 @@
 ﻿using Azure.Data.Tables;
 using L4D2ServerManager.Contexts.AzureTableStorage;
 using L4D2ServerManager.Port.Services;
+using L4D2ServerManager.Server;
+using L4D2ServerManager.Server.Extensions;
 using L4D2ServerManager.Users.Commands;
 using L4D2ServerManager.Users.Constants;
 using L4D2ServerManager.VirtualMachine;
@@ -57,9 +59,30 @@ public class UserService : IUserService
         ApplyPowerOffPermission(user, virtualMachine);
     }
 
+    public void ApplyPermissions(User user, IServer server)
+    {
+        if (user.Admin)
+        {
+            ApplyAllPermissions(server);
+            return;
+        }
+
+        ApplyStopPermission(user, server);
+        ApplyKickAllPlayersPermission(user, server);
+        ApplyOpenPortPermission(user, server);
+        ApplyClosePortPermission(user, server);
+    }
+
     private static void ApplyAllPermissions(IVirtualMachine virtualMachine)
     {
-        virtualMachine.Permissions.Add(VirtualMachinePermissions.PowerOff);
+        foreach (var permission in VirtualMachinePermissions.All)
+            virtualMachine.Permissions.Add(permission);
+    }
+
+    private static void ApplyAllPermissions(IServer server)
+    {
+        foreach (var permission in ServerPermissions.All)
+            server.Permissions.Add(permission);
     }
 
     private void ApplyPowerOffPermission(User user, IVirtualMachine virtualMachine)
@@ -70,5 +93,33 @@ public class UserService : IUserService
             return;
 
         virtualMachine.Permissions.Add(VirtualMachinePermissions.PowerOff);
+    }
+
+    private static void ApplyStopPermission(User user, IServer server)
+    {
+        ApplyServerPermission(user, server, ServerPermissions.Stop);
+    }
+
+    private static void ApplyKickAllPlayersPermission(User user, IServer server)
+    {
+        ApplyServerPermission(user, server, ServerPermissions.KickAllPlayers);
+    }
+
+    private static void ApplyOpenPortPermission(User user, IServer server)
+    {
+        ApplyServerPermission(user, server, ServerPermissions.OpenPort);
+    }
+
+    private static void ApplyClosePortPermission(User user, IServer server)
+    {
+        ApplyServerPermission(user, server, ServerPermissions.ClosePort);
+    }
+
+    private static void ApplyServerPermission(User user, IServer server, string permission)
+    {
+        if (!server.WasStartedBy(user))
+            return;
+
+        server.Permissions.Add(permission);
     }
 }
