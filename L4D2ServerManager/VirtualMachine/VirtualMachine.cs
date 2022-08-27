@@ -3,7 +3,7 @@ using Azure.ResourceManager.Compute;
 using Azure.ResourceManager.Compute.Models;
 using Azure.ResourceManager.Network;
 using Azure.ResourceManager.Network.Models;
-using L4D2ServerManager.Azure;
+using L4D2ServerManager.Contexts.AzureSubscription;
 using L4D2ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.VirtualMachine.Enums;
 using L4D2ServerManager.VirtualMachine.ValueObjects;
@@ -13,14 +13,14 @@ namespace L4D2ServerManager.VirtualMachine;
 public class VirtualMachine : IVirtualMachine
 {
     private static readonly object Lock = new();
-    private readonly IAzureContext _context;
+    private readonly IAzureSubscriptionContext _context;
     private readonly string _virtualMachineName;
     private NetworkInterfaceResource? _networkInterfaceResource;
     private NetworkSecurityGroupResource? _networkSecurityGroupResource;
     private PublicIPAddressData? _publicIpAddress;
     private VirtualMachineResource? _virtualMachineResource;
 
-    public VirtualMachine(IAzureContext context, string virtualMachineName)
+    public VirtualMachine(IAzureSubscriptionContext context, string virtualMachineName)
     {
         _context = context;
         _virtualMachineName = virtualMachineName;

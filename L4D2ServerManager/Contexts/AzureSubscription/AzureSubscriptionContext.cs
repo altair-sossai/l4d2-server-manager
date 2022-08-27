@@ -4,16 +4,16 @@ using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 using Microsoft.Extensions.Configuration;
 
-namespace L4D2ServerManager.Azure;
+namespace L4D2ServerManager.Contexts.AzureSubscription;
 
-public class AzureContext : IAzureContext
+public class AzureSubscriptionContext : IAzureSubscriptionContext
 {
     private static ArmClient? _armClient;
     private static SubscriptionResource? _subscriptionResource;
     private static TokenCredential? _tokenCredential;
     private readonly IConfiguration _configuration;
 
-    public AzureContext(IConfiguration configuration)
+    public AzureSubscriptionContext(IConfiguration configuration)
     {
         _configuration = configuration;
     }
