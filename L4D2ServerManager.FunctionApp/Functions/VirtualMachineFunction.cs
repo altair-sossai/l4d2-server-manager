@@ -32,7 +32,7 @@ public class VirtualMachineFunction
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(Get))]
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "virtual-machine")] HttpRequest httpRequest)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
+        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
 
         _userService.ApplyPermissions(user, virtualMachine);
@@ -43,7 +43,7 @@ public class VirtualMachineFunction
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOnAsync))]
     public async Task<IActionResult> PowerOnAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-on")] HttpRequest httpRequest)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
+        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         await virtualMachine.PowerOnAsync(user);
 
@@ -55,7 +55,7 @@ public class VirtualMachineFunction
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOffAsync))]
     public async Task<IActionResult> PowerOffAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-off")] HttpRequest httpRequest)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
+        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
 
         _userService.ApplyPermissions(user, virtualMachine);

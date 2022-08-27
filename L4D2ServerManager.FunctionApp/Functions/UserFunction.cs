@@ -20,7 +20,7 @@ public class UserFunction
     [FunctionName(nameof(UserFunction) + "_" + nameof(Get))]
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users")] HttpRequest httpRequest)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
+        _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
 
         var users = _userService.GetUsers().Select(user => user.Info()).ToList();
 
@@ -31,7 +31,7 @@ public class UserFunction
     public IActionResult GetById([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{userId}")] HttpRequest httpRequest,
         string userId)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
+        _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
 
         var user = _userService.GetUser(userId);
         if (user == null)

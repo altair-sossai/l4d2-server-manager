@@ -42,7 +42,7 @@ public class ServerFunction
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "server/{port}")] HttpRequest httpRequest,
         int port)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
+        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
@@ -55,7 +55,7 @@ public class ServerFunction
     public async Task<IActionResult> InfoAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "server/{ip}:{port}/info")] HttpRequest httpRequest,
         string ip, int port)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
+        _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
 
         var serverInfo = await _serverService.GetServerInfoAsync(ip, port);
         if (serverInfo == null)
@@ -68,7 +68,7 @@ public class ServerFunction
     public IActionResult Players([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "server/{ip}:{port}/players")] HttpRequest httpRequest,
         string ip, int port)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
+        _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
 
         var players = _playerService.GetPlayers(ip, port);
 
@@ -79,7 +79,7 @@ public class ServerFunction
     public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
         int port)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
+        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
@@ -92,7 +92,7 @@ public class ServerFunction
     public IActionResult Stop([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/stop")] HttpRequest httpRequest,
         int port)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
+        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
@@ -110,7 +110,7 @@ public class ServerFunction
     public IActionResult KickAllPlayers([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/kick-all-players")] HttpRequest httpRequest,
         int port)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
+        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
@@ -128,7 +128,7 @@ public class ServerFunction
     public async Task<IActionResult> OpenPortAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/open-port")] HttpRequest httpRequest,
         int port)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
+        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
         var command = await httpRequest.DeserializeBodyAsync<OpenPortCommand>();
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
@@ -147,7 +147,7 @@ public class ServerFunction
     public async Task<IActionResult> ClosePortAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/close-port")] HttpRequest httpRequest,
         int port)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
+        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 

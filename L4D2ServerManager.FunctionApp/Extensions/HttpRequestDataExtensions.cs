@@ -16,7 +16,7 @@ public static class HttpRequestDataExtensions
         return t;
     }
 
-    public static string GetToken(this HttpRequest httpRequest)
+    public static string AuthorizationToken(this HttpRequest httpRequest)
     {
         return httpRequest.Headers["Authorization"].ToString();
     }

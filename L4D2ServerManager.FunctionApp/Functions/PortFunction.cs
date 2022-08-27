@@ -25,7 +25,7 @@ public class PortFunction
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ports/{ip}")] HttpRequest httpRequest,
         string ip)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
+        _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
 
         var ports = _portServer.GetPorts(ip).ToList();
 
