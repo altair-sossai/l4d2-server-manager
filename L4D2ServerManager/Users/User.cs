@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Azure.Data.Tables;
+using L4D2ServerManager.Users.ValueObjects;
 
 namespace L4D2ServerManager.Users;
 
@@ -19,4 +20,15 @@ public class User : ITableEntity
     public string RowKey { get; set; } = default!;
     public DateTimeOffset? Timestamp { get; set; }
     public ETag ETag { get; set; }
+
+    public UserInfo Info()
+    {
+        return new UserInfo
+        {
+            Id = Id,
+            DisplayName = DisplayName,
+            Steam = Steam,
+            Admin = Admin
+        };
+    }
 }

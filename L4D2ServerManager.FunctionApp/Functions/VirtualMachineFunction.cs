@@ -1,5 +1,7 @@
+using System;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Extensions;
+using L4D2ServerManager.Users.Constants;
 using L4D2ServerManager.Users.Services;
 using L4D2ServerManager.VirtualMachine.Services;
 using Microsoft.AspNetCore.Http;
@@ -30,9 +32,10 @@ public class VirtualMachineFunction
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(Get))]
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "virtual-machine")] HttpRequest httpRequest)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
-
+        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+
+        _userService.ApplyPermissions(user, virtualMachine);
 
         return new OkObjectResult(virtualMachine);
     }
@@ -40,11 +43,11 @@ public class VirtualMachineFunction
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOnAsync))]
     public async Task<IActionResult> PowerOnAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-on")] HttpRequest httpRequest)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
-
+        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+        await virtualMachine.PowerOnAsync(user);
 
-        await virtualMachine.PowerOnAsync();
+        _userService.ApplyPermissions(user, virtualMachine);
 
         return new OkObjectResult(virtualMachine);
     }
@@ -52,9 +55,13 @@ public class VirtualMachineFunction
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOffAsync))]
     public async Task<IActionResult> PowerOffAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-off")] HttpRequest httpRequest)
     {
-        _userService.EnsureAuthentication(httpRequest.GetToken());
-
+        var user = _userService.EnsureAuthentication(httpRequest.GetToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+
+        _userService.ApplyPermissions(user, virtualMachine);
+
+        if (!virtualMachine.Permissions.Contains(VirtualMachinePermissions.PowerOff))
+            throw new UnauthorizedAccessException();
 
         await virtualMachine.PowerOffAsync();
 
