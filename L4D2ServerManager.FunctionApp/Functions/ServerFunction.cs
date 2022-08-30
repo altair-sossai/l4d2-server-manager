@@ -75,15 +75,15 @@ public class ServerFunction
         return new OkObjectResult(players);
     }
 
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(RunAsync))]
-    public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(Run))]
+    public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
         int port)
     {
         var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         var server = _serverService.GetByPort(virtualMachine, port);
 
-        await server.RunAsync(user);
+        server.Run(user);
 
         return new OkResult();
     }
