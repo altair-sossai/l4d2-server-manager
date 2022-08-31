@@ -76,8 +76,8 @@ public class ServerFunction
         return new OkObjectResult(players);
     }
 
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(Run))]
-    public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(RunLocked))]
+    public IActionResult RunLocked([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
         int port)
     {
         lock (Lock)
