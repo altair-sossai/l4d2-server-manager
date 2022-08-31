@@ -8,7 +8,6 @@ namespace L4D2ServerManager.Server;
 
 public class Server : IServer
 {
-    private static readonly object Lock = new();
     private readonly IServerService _serverService;
 
     public Server(IServerService serverService, IVirtualMachine virtualMachine, int port)
@@ -27,26 +26,23 @@ public class Server : IServer
     public string? StartedBy => VirtualMachine.StartedBy(Port);
     public DateTime? StartedAt => VirtualMachine.StartedAt(Port);
 
-    public void Run(User user)
+    public async Task RunAsync(User user)
     {
-        lock (Lock)
+        if (IsRunning)
+            return;
+
+        var command = new RunServerCommand(Port);
+        VirtualMachine.RunCommand(command);
+
+        var values = new Dictionary<string, string>
         {
-            if (IsRunning)
-                return;
+            {$"port-{Port}-started-by", user.Id},
+            {$"port-{Port}-started-at", DateTime.UtcNow.ToString("O")}
+        };
 
-            var command = new RunServerCommand(Port);
-            VirtualMachine.RunCommand(command);
+        await VirtualMachine.UpdateTagsAsync(values);
 
-            var values = new Dictionary<string, string>
-            {
-                {$"port-{Port}-started-by", user.Id},
-                {$"port-{Port}-started-at", DateTime.UtcNow.ToString("O")}
-            };
-
-            VirtualMachine.UpdateTagsAsync(values).Wait();
-
-            WaitUntilItsRunning();
-        }
+        WaitUntilItsRunning();
     }
 
     public void Stop()

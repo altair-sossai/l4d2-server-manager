@@ -17,6 +17,7 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class ServerFunction
 {
+    private static readonly object Lock = new();
     private readonly IConfiguration _configuration;
     private readonly IPlayerService _playerService;
     private readonly IServerService _serverService;
@@ -79,13 +80,16 @@ public class ServerFunction
     public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
         int port)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
-        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
-        var server = _serverService.GetByPort(virtualMachine, port);
+        lock (Lock)
+        {
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+            var server = _serverService.GetByPort(virtualMachine, port);
 
-        server.Run(user);
+            server.RunAsync(user).Wait();
 
-        return new OkResult();
+            return new OkResult();
+        }
     }
 
     [FunctionName(nameof(ServerFunction) + "_" + nameof(Stop))]
