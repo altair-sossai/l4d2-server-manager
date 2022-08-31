@@ -14,7 +14,7 @@ public interface IServer
     HashSet<string> Permissions { get; }
     string? StartedBy { get; }
     DateTime? StartedAt { get; }
-    void Run(User user);
+    Task RunAsync(User user);
     void Stop();
     void KickAllPlayers();
     Task OpenPortAsync(string ranges);
