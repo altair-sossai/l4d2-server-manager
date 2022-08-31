@@ -2,5 +2,5 @@
 
 public interface IPortServer
 {
-    IEnumerable<Port> GetPorts(string ip);
+    List<Port> GetPorts(string ip);
 }

@@ -1,4 +1,3 @@
-using System.Linq;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Port.Services;
 using L4D2ServerManager.Users.Services;
@@ -27,7 +26,7 @@ public class PortFunction
     {
         _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
 
-        var ports = _portServer.GetPorts(ip).ToList();
+        var ports = _portServer.GetPorts(ip);
 
         return new OkObjectResult(ports);
     }

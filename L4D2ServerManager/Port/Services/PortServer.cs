@@ -17,14 +17,18 @@ public class PortServer : IPortServer
 
     private string Ports => _configuration.GetValue<string>(nameof(Ports));
 
-    public IEnumerable<Port> GetPorts(string ip)
+    public List<Port> GetPorts(string ip)
     {
-        foreach (var portNumber in Ports.Split(',', ';', ' ').Select(int.Parse))
+        var ports = new List<Port>();
+
+        Parallel.ForEach(Ports.Split(',', ';', ' ').Select(int.Parse), portNumber =>
         {
             var serverInfo = _serverService.GetServerInfoAsync(ip, portNumber).Result;
             var port = new Port(portNumber, serverInfo);
 
-            yield return port;
-        }
+            ports.Add(port);
+        });
+
+        return ports.OrderBy(o => o.PortNumber).ToList();
     }
 }

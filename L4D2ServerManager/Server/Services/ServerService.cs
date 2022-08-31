@@ -30,9 +30,17 @@ public class ServerService : IServerService
 
     public async Task<ServerInfo?> GetServerInfoAsync(string ip, int port)
     {
-        var serverInfoService = SteamContext.ServerInfoService;
-        var responseData = await serverInfoService.GetServerInfo(SteamApiKey, $"addr\\{ip}:{port}");
+        try
+        {
+            var serverInfoService = SteamContext.ServerInfoService;
+            var responseData = await serverInfoService.GetServerInfo(SteamApiKey, $"addr\\{ip}:{port}");
 
-        return responseData.Response?.Servers?.FirstOrDefault();
+            return responseData.Response?.Servers?.FirstOrDefault();
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(exception);
+            return null;
+        }
     }
 }
