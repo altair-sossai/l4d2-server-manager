@@ -70,7 +70,6 @@ public class UserService : IUserService
         ApplyStopPermission(user, server);
         ApplyKickAllPlayersPermission(user, server);
         ApplyGivePillsPermission(user, server);
-        ApplyFillSurvivorsHealthPermission(user, server);
         ApplyOpenPortPermission(user, server);
         ApplyClosePortPermission(user, server);
     }
@@ -110,11 +109,6 @@ public class UserService : IUserService
     private static void ApplyGivePillsPermission(User user, IServer server)
     {
         ApplyServerPermission(user, server, ServerPermissions.GivePills);
-    }
-
-    private static void ApplyFillSurvivorsHealthPermission(User user, IServer server)
-    {
-        ApplyServerPermission(user, server, ServerPermissions.FillSurvivorsHealth);
     }
 
     private static void ApplyOpenPortPermission(User user, IServer server)

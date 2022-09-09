@@ -146,24 +146,6 @@ public class ServerFunction
         return new OkResult();
     }
 
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(FillSurvivorsHealth))]
-    public IActionResult FillSurvivorsHealth([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/fill-survivors-health")] HttpRequest httpRequest,
-        int port)
-    {
-        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
-        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
-        var server = _serverService.GetByPort(virtualMachine, port);
-
-        _userService.ApplyPermissions(user, server);
-
-        if (!server.CanFillSurvivorsHealth())
-            throw new UnauthorizedAccessException();
-
-        server.FillSurvivorsHealth();
-
-        return new OkResult();
-    }
-
     [FunctionName(nameof(ServerFunction) + "_" + nameof(OpenPortAsync))]
     public async Task<IActionResult> OpenPortAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/open-port")] HttpRequest httpRequest,
         int port)

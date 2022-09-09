@@ -18,7 +18,6 @@ public interface IServer
     void Stop();
     void KickAllPlayers();
     void GivePills();
-    void FillSurvivorsHealth();
     Task OpenPortAsync(string ranges);
     Task ClosePortAsync();
 }
