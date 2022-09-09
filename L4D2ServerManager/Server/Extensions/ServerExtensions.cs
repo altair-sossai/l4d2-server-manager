@@ -20,6 +20,16 @@ public static class ServerExtensions
         return server.Permissions.Contains(ServerPermissions.KickAllPlayers);
     }
 
+    public static bool CanGivePills(this IServer server)
+    {
+        return server.Permissions.Contains(ServerPermissions.GivePills);
+    }
+
+    public static bool CanFillSurvivorsHealth(this IServer server)
+    {
+        return server.Permissions.Contains(ServerPermissions.FillSurvivorsHealth);
+    }
+
     public static bool CanOpenPort(this IServer server)
     {
         return server.Permissions.Contains(ServerPermissions.OpenPort);

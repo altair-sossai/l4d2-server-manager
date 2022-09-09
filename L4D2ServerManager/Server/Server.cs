@@ -65,6 +65,26 @@ public class Server : IServer
         VirtualMachine.RunCommand(command);
     }
 
+    public void GivePills()
+    {
+        if (!IsRunning)
+            return;
+
+        var command = new GivePillsCommand(Port);
+
+        VirtualMachine.RunCommand(command);
+    }
+
+    public void FillSurvivorsHealth()
+    {
+        if (!IsRunning)
+            return;
+
+        var command = new FillSurvivorsHealthCommand(Port);
+
+        VirtualMachine.RunCommand(command);
+    }
+
     public async Task OpenPortAsync(string ranges)
     {
         await VirtualMachine.OpenPortAsync(Port, ranges);
