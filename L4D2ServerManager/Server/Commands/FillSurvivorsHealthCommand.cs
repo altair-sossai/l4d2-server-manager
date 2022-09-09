@@ -6,6 +6,6 @@ public class FillSurvivorsHealthCommand : RunScriptCommand
 {
     public FillSurvivorsHealthCommand(int port)
     {
-        Script.Add($@"sudo screen -S {port} -X stuff 'sm_sethpplayer @survivors 100\n'");
+        Script.Add($@"sudo screen -S {port} -X stuff 'say !sethpplayer @survivors 100\n'");
     }
 }
