@@ -15,6 +15,7 @@ public interface IServer
     string? StartedBy { get; }
     DateTime? StartedAt { get; }
     Task RunAsync(User user);
+    Task RunZoneAsync(User user);
     void Stop();
     void KickAllPlayers();
     void GivePills();

@@ -92,6 +92,22 @@ public class ServerFunction
         }
     }
 
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(RunZoneLocked))]
+    public IActionResult RunZoneLocked([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run-zone")] HttpRequest httpRequest,
+        int port)
+    {
+        lock (Lock)
+        {
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+            var server = _serverService.GetByPort(virtualMachine, port);
+
+            server.RunZoneAsync(user).Wait();
+
+            return new OkResult();
+        }
+    }
+
     [FunctionName(nameof(ServerFunction) + "_" + nameof(Stop))]
     public IActionResult Stop([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/stop")] HttpRequest httpRequest,
         int port)

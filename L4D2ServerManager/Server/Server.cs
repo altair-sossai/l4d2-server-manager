@@ -2,6 +2,7 @@
 using L4D2ServerManager.Server.Services;
 using L4D2ServerManager.Users;
 using L4D2ServerManager.VirtualMachine;
+using L4D2ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.VirtualMachine.ValueObjects;
 
 namespace L4D2ServerManager.Server;
@@ -28,21 +29,16 @@ public class Server : IServer
 
     public async Task RunAsync(User user)
     {
-        if (IsRunning)
-            return;
-
         var command = new RunServerCommand(Port);
-        VirtualMachine.RunCommand(command);
 
-        var values = new Dictionary<string, string>
-        {
-            {$"port-{Port}-started-by", user.Id},
-            {$"port-{Port}-started-at", DateTime.UtcNow.ToString("O")}
-        };
+        await RunAsync(user, command);
+    }
 
-        await VirtualMachine.UpdateTagsAsync(values);
+    public async Task RunZoneAsync(User user)
+    {
+        var command = new RunZoneServerCommand(Port);
 
-        WaitUntilItsRunning();
+        await RunAsync(user, command);
     }
 
     public void Stop()
@@ -83,6 +79,24 @@ public class Server : IServer
     public async Task ClosePortAsync()
     {
         await VirtualMachine.ClosePortAsync(Port);
+    }
+
+    private async Task RunAsync(User user, RunScriptCommand command)
+    {
+        if (IsRunning)
+            return;
+
+        VirtualMachine.RunCommand(command);
+
+        var values = new Dictionary<string, string>
+        {
+            {$"port-{Port}-started-by", user.Id},
+            {$"port-{Port}-started-at", DateTime.UtcNow.ToString("O")}
+        };
+
+        await VirtualMachine.UpdateTagsAsync(values);
+
+        WaitUntilItsRunning();
     }
 
     private void WaitUntilItsRunning()
