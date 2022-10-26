@@ -1,7 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Extensions;
+using L4D2ServerManager.Port.Services;
 using L4D2ServerManager.Users.Services;
+using L4D2ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.VirtualMachine.Extensions;
 using L4D2ServerManager.VirtualMachine.Services;
 using Microsoft.AspNetCore.Http;
@@ -15,16 +17,19 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 public class VirtualMachineFunction
 {
     private readonly IConfiguration _configuration;
+    private readonly IPortServer _portServer;
     private readonly IUserService _userService;
     private readonly IVirtualMachineService _virtualMachineService;
 
     public VirtualMachineFunction(IConfiguration configuration,
         IUserService userService,
-        IVirtualMachineService virtualMachineService)
+        IVirtualMachineService virtualMachineService,
+        IPortServer portServer)
     {
         _configuration = configuration;
         _userService = userService;
         _virtualMachineService = virtualMachineService;
+        _portServer = portServer;
     }
 
     private string VirtualMachineName => _configuration.GetValue<string>(nameof(VirtualMachineName));
@@ -46,6 +51,10 @@ public class VirtualMachineFunction
         var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         await virtualMachine.PowerOnAsync(user);
+
+        var ports = _portServer.GetPorts(virtualMachine.IpAddress);
+        var command = new IpTablesRulesCommand(ports);
+        virtualMachine.RunCommand(command);
 
         _userService.ApplyPermissions(user, virtualMachine);
 
