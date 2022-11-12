@@ -61,16 +61,6 @@ public class Server : IServer
         VirtualMachine.RunCommand(command);
     }
 
-    public void GivePills()
-    {
-        if (!IsRunning)
-            return;
-
-        var command = new GivePillsCommand(Port);
-
-        VirtualMachine.RunCommand(command);
-    }
-
     public async Task OpenPortAsync(string ranges)
     {
         await VirtualMachine.OpenPortAsync(Port, ranges);
@@ -90,8 +80,8 @@ public class Server : IServer
 
         var values = new Dictionary<string, string>
         {
-            {$"port-{Port}-started-by", user.Id},
-            {$"port-{Port}-started-at", DateTime.UtcNow.ToString("O")}
+            { $"port-{Port}-started-by", user.Id },
+            { $"port-{Port}-started-at", DateTime.UtcNow.ToString("O") }
         };
 
         await VirtualMachine.UpdateTagsAsync(values);

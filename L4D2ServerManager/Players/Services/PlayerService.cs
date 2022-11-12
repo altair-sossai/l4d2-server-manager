@@ -6,7 +6,7 @@ namespace L4D2ServerManager.Players.Services;
 
 public class PlayerService : IPlayerService
 {
-    private static readonly byte[] Request = {0xFF, 0xFF, 0xFF, 0xFF, 0x55, 0xFF, 0xFF, 0xFF, 0xFF};
+    private static readonly byte[] Request = { 0xFF, 0xFF, 0xFF, 0xFF, 0x55, 0xFF, 0xFF, 0xFF, 0xFF };
 
     public List<Player> GetPlayers(string ip, int port)
     {

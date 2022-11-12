@@ -18,7 +18,6 @@ public interface IServer
     Task RunZoneAsync(User user);
     void Stop();
     void KickAllPlayers();
-    void GivePills();
     Task OpenPortAsync(string ranges);
     Task ClosePortAsync();
 }
