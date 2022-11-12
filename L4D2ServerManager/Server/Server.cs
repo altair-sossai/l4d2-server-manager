@@ -91,7 +91,7 @@ public class Server : IServer
 
     private void WaitUntilItsRunning()
     {
-        for (var seconds = 5; !IsRunning && seconds <= 15; seconds++)
-            Thread.Sleep(TimeSpan.FromSeconds(seconds));
+        for (var attempt = 0; !IsRunning && attempt < 15; attempt++)
+            Thread.Sleep(TimeSpan.FromSeconds(1));
     }
 }

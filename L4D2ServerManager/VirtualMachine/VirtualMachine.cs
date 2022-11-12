@@ -20,6 +20,7 @@ public class VirtualMachine : IVirtualMachine
     private NetworkInterfaceResource? _networkInterfaceResource;
     private NetworkSecurityGroupResource? _networkSecurityGroupResource;
     private PublicIPAddressData? _publicIpAddress;
+    private VirtualMachineInstanceView? _virtualMachineInstanceView;
     private VirtualMachineResource? _virtualMachineResource;
 
     public VirtualMachine(IAzureSubscriptionContext context, string virtualMachineName)
@@ -49,7 +50,6 @@ public class VirtualMachine : IVirtualMachine
         {
             if (_publicIpAddress != null)
                 return _publicIpAddress;
-
 
             var ipConfigurations = NetworkInterfaceResource.GetNetworkInterfaceIPConfigurations();
             var ipConfiguration = ipConfigurations.First().Data;
@@ -91,13 +91,24 @@ public class VirtualMachine : IVirtualMachine
         }
     }
 
+    private VirtualMachineInstanceView VirtualMachineInstanceView
+    {
+        get
+        {
+            if (_virtualMachineInstanceView != null)
+                return _virtualMachineInstanceView;
+
+            return _virtualMachineInstanceView = VirtualMachineResource.InstanceView().Value;
+        }
+    }
+
     public VirtualMachineStatus Status
     {
         get
         {
-            for (var seconds = 5; seconds < 15; seconds++)
+            for (var attempt = 0; attempt <= 15; attempt++)
             {
-                var instanceView = VirtualMachineResource.InstanceView().Value;
+                var instanceView = VirtualMachineInstanceView;
                 var statuses = instanceView.Statuses;
 
                 if (statuses.Any(status => status.Code == "PowerState/running"))
@@ -106,7 +117,7 @@ public class VirtualMachine : IVirtualMachine
                 if (statuses.Any(status => status.Code == "PowerState/deallocated"))
                     return VirtualMachineStatus.Off;
 
-                Thread.Sleep(TimeSpan.FromSeconds(5));
+                Thread.Sleep(TimeSpan.FromSeconds(1));
             }
 
             return VirtualMachineStatus.Unknown;
@@ -152,6 +163,8 @@ public class VirtualMachine : IVirtualMachine
 
         await VirtualMachineResource.PowerOnAsync(WaitUntil.Completed);
 
+        _virtualMachineInstanceView = null;
+
         var values = new Dictionary<string, string>
         {
             { "power-on-by", user.Id },
@@ -165,6 +178,8 @@ public class VirtualMachine : IVirtualMachine
     {
         if (IsOff)
             return;
+
+        _virtualMachineInstanceView = null;
 
         await VirtualMachineResource.DeallocateAsync(WaitUntil.Completed);
     }
