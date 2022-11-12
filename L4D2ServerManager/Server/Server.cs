@@ -10,22 +10,22 @@ namespace L4D2ServerManager.Server;
 public class Server : IServer
 {
     private readonly IServerService _serverService;
+    private readonly IVirtualMachine _virtualMachine;
 
     public Server(IServerService serverService, IVirtualMachine virtualMachine, int port)
     {
         _serverService = serverService;
-        VirtualMachine = virtualMachine;
+        _virtualMachine = virtualMachine;
         Port = port;
     }
 
-    public IVirtualMachine VirtualMachine { get; }
-    public string IpAddress => VirtualMachine.IpAddress;
+    public string IpAddress => _virtualMachine.IpAddress;
     public int Port { get; }
     public bool IsRunning => _serverService.IsRunningAsync(IpAddress, Port).Result;
-    public PortInfo PortInfo => VirtualMachine.GetPortInfoAsync(Port).Result;
+    public PortInfo PortInfo => _virtualMachine.GetPortInfoAsync(Port).Result;
     public HashSet<string> Permissions { get; } = new();
-    public string? StartedBy => VirtualMachine.StartedBy(Port);
-    public DateTime? StartedAt => VirtualMachine.StartedAt(Port);
+    public string? StartedBy => _virtualMachine.StartedBy(Port);
+    public DateTime? StartedAt => _virtualMachine.StartedAt(Port);
 
     public async Task RunAsync(User user)
     {
@@ -48,7 +48,7 @@ public class Server : IServer
 
         var command = new StopServerCommand(Port);
 
-        VirtualMachine.RunCommand(command);
+        _virtualMachine.RunCommand(command);
     }
 
     public void KickAllPlayers()
@@ -58,17 +58,17 @@ public class Server : IServer
 
         var command = new KickAllPlayersCommand(Port);
 
-        VirtualMachine.RunCommand(command);
+        _virtualMachine.RunCommand(command);
     }
 
     public async Task OpenPortAsync(string ranges)
     {
-        await VirtualMachine.OpenPortAsync(Port, ranges);
+        await _virtualMachine.OpenPortAsync(Port, ranges);
     }
 
     public async Task ClosePortAsync()
     {
-        await VirtualMachine.ClosePortAsync(Port);
+        await _virtualMachine.ClosePortAsync(Port);
     }
 
     private async Task RunAsync(User user, RunScriptCommand command)
@@ -76,7 +76,7 @@ public class Server : IServer
         if (IsRunning)
             return;
 
-        VirtualMachine.RunCommand(command);
+        _virtualMachine.RunCommand(command);
 
         var values = new Dictionary<string, string>
         {
@@ -84,7 +84,7 @@ public class Server : IServer
             { $"port-{Port}-started-at", DateTime.UtcNow.ToString("O") }
         };
 
-        await VirtualMachine.UpdateTagsAsync(values);
+        await _virtualMachine.UpdateTagsAsync(values);
 
         WaitUntilItsRunning();
     }

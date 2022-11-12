@@ -1,12 +1,10 @@
 ﻿using L4D2ServerManager.Users;
-using L4D2ServerManager.VirtualMachine;
 using L4D2ServerManager.VirtualMachine.ValueObjects;
 
 namespace L4D2ServerManager.Server;
 
 public interface IServer
 {
-    IVirtualMachine VirtualMachine { get; }
     string IpAddress { get; }
     int Port { get; }
     bool IsRunning { get; }
