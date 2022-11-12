@@ -52,11 +52,14 @@ public class VirtualMachineFunction
         var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
         await virtualMachine.PowerOnAsync(user);
 
-        var ports = _portServer.GetPorts(virtualMachine.IpAddress);
-        var command = new IpTablesRulesCommand(ports);
-        virtualMachine.RunCommand(command);
+        _ = Task.Run(() =>
+        {
+            var ports = _portServer.GetPorts(virtualMachine.IpAddress);
+            var command = new IpTablesRulesCommand(ports);
+            virtualMachine.RunCommand(command);
 
-        _userService.ApplyPermissions(user, virtualMachine);
+            _userService.ApplyPermissions(user, virtualMachine);
+        });
 
         return new OkObjectResult(virtualMachine);
     }
