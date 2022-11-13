@@ -168,7 +168,7 @@ public class VirtualMachine : IVirtualMachine
         var values = new Dictionary<string, string>
         {
             { "power-on-by", user.Id },
-            { "power-on-at", DateTime.UtcNow.ToString("O") }
+            { "power-on-at", DateTime.UtcNow.ToString("u") }
         };
 
         await UpdateTagsAsync(values);

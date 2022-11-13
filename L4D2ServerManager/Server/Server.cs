@@ -81,7 +81,7 @@ public class Server : IServer
         var values = new Dictionary<string, string>
         {
             { $"port-{Port}-started-by", user.Id },
-            { $"port-{Port}-started-at", DateTime.UtcNow.ToString("O") }
+            { $"port-{Port}-started-at", DateTime.UtcNow.ToString("u") }
         };
 
         await _virtualMachine.UpdateTagsAsync(values);
