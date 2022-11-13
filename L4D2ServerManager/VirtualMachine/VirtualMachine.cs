@@ -230,6 +230,8 @@ public class VirtualMachine : IVirtualMachine
     public async Task UpdateTagsAsync(IDictionary<string, string> values)
     {
         await VirtualMachineResource.UpdateTagsAsync(values);
+
+        ClearVirtualMachineCache();
     }
 
     public string? StartedBy(int port)
@@ -249,6 +251,15 @@ public class VirtualMachine : IVirtualMachine
             return null;
 
         return DateTime.TryParse(tags[key], out var date) ? date : null;
+    }
+
+    private void ClearVirtualMachineCache()
+    {
+        _networkInterfaceResource = null;
+        _networkSecurityGroupResource = null;
+        _publicIpAddress = null;
+        _virtualMachineInstanceView = null;
+        _virtualMachineResource = null;
     }
 
     private void RunCommandLocked(RunCommandInput runCommandInput)
