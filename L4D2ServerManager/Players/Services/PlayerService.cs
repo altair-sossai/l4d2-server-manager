@@ -17,15 +17,12 @@ public class PlayerService : IPlayerService
             var ipAddress = IPAddress.Parse(ip);
             var ipEndPoint = new IPEndPoint(ipAddress, Convert.ToUInt16(port));
             using var udpClient = new UdpClient();
+            udpClient.Client.SendTimeout = 5000;
+            udpClient.Client.ReceiveTimeout = 5000;
+
             udpClient.Send(Request, Request.Length, ipEndPoint);
 
-            var asyncResult = udpClient.BeginReceive(null, null);
-            asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(5));
-
-            if (!asyncResult.IsCompleted)
-                return players;
-
-            var bytes = udpClient.EndReceive(asyncResult, ref ipEndPoint);
+            var bytes = udpClient.Receive(ref ipEndPoint);
             if (bytes.Length != 9 || bytes[4] != 0x41)
                 return players;
 
