@@ -15,7 +15,7 @@ public class PortServer : IPortServer
         _serverService = serverService;
     }
 
-    private string Ports => _configuration.GetValue<string>(nameof(Ports));
+    private string Ports => _configuration.GetValue<string>(nameof(Ports))!;
 
     public List<Port> GetPorts(string ip)
     {

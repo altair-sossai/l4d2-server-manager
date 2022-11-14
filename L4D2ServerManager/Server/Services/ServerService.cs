@@ -14,7 +14,7 @@ public class ServerService : IServerService
         _configuration = configuration;
     }
 
-    private string SteamApiKey => _configuration.GetValue<string>(nameof(SteamApiKey));
+    private string SteamApiKey => _configuration.GetValue<string>(nameof(SteamApiKey))!;
 
     public IServer GetByPort(IVirtualMachine virtualMachine, int port)
     {

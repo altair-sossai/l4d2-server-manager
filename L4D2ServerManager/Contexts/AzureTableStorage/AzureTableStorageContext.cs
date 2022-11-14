@@ -14,7 +14,7 @@ public class AzureTableStorageContext : IAzureTableStorageContext
         _configuration = configuration;
     }
 
-    private string ConnectionString => _configuration.GetValue<string>("AzureWebJobsStorage");
+    private string ConnectionString => _configuration.GetValue<string>("AzureWebJobsStorage")!;
     private TableServiceClient TableServiceClient => _tableServiceClient ??= new TableServiceClient(ConnectionString);
 
     public async Task<TableClient> GetTableClient(string tableName)
