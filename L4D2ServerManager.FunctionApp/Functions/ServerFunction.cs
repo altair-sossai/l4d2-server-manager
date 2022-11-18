@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Commands;
 using L4D2ServerManager.FunctionApp.Extensions;
+using L4D2ServerManager.FunctionApp.Requests;
 using L4D2ServerManager.Players.Services;
 using L4D2ServerManager.Server.Extensions;
 using L4D2ServerManager.Server.Services;
@@ -85,8 +86,9 @@ public class ServerFunction
             var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             var server = _serverService.GetByPort(virtualMachine, port);
+            var request = httpRequest.DeserializeBody<RunServerRequest>();
 
-            server.RunAsync(user).Wait();
+            server.RunAsync(user, request.Campaign).Wait();
 
             return new OkResult();
         }
@@ -101,8 +103,9 @@ public class ServerFunction
             var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             var server = _serverService.GetByPort(virtualMachine, port);
+            var request = httpRequest.DeserializeBody<RunServerRequest>();
 
-            server.RunZoneAsync(user).Wait();
+            server.RunZoneAsync(user, request.Campaign).Wait();
 
             return new OkResult();
         }

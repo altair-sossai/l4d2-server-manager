@@ -1,4 +1,5 @@
 ﻿using L4D2ServerManager.Server.Commands;
+using L4D2ServerManager.Server.Enums;
 using L4D2ServerManager.Server.Services;
 using L4D2ServerManager.Users;
 using L4D2ServerManager.VirtualMachine;
@@ -27,16 +28,16 @@ public class Server : IServer
     public string? StartedBy => _virtualMachine.StartedBy(Port);
     public DateTime? StartedAt => _virtualMachine.StartedAt(Port);
 
-    public async Task RunAsync(User user)
+    public async Task RunAsync(User user, Campaign campaign)
     {
-        var command = new RunServerCommand(Port);
+        var command = new RunServerCommand(Port, campaign);
 
         await RunAsync(user, command);
     }
 
-    public async Task RunZoneAsync(User user)
+    public async Task RunZoneAsync(User user, Campaign campaign)
     {
-        var command = new RunZoneServerCommand(Port);
+        var command = new RunZoneServerCommand(Port, campaign);
 
         await RunAsync(user, command);
     }

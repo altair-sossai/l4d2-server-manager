@@ -1,4 +1,5 @@
-﻿using L4D2ServerManager.Users;
+﻿using L4D2ServerManager.Server.Enums;
+using L4D2ServerManager.Users;
 using L4D2ServerManager.VirtualMachine.ValueObjects;
 
 namespace L4D2ServerManager.Server;
@@ -12,8 +13,8 @@ public interface IServer
     HashSet<string> Permissions { get; }
     string? StartedBy { get; }
     DateTime? StartedAt { get; }
-    Task RunAsync(User user);
-    Task RunZoneAsync(User user);
+    Task RunAsync(User user, Campaign campaign);
+    Task RunZoneAsync(User user, Campaign campaign);
     void Stop();
     void KickAllPlayers();
     Task OpenPortAsync(string ranges);
