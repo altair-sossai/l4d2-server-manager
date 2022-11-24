@@ -34,6 +34,7 @@ public class VirtualMachineFunction
     }
 
     private string VirtualMachineName => _configuration.GetValue<string>(nameof(VirtualMachineName));
+    private int AttemptsToShutdown => _configuration.GetValue(nameof(AttemptsToShutdown), 3);
 
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(Get))]
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "virtual-machine")] HttpRequest httpRequest)
@@ -100,7 +101,7 @@ public class VirtualMachineFunction
             return new OkObjectResult(virtualMachine);
         }
 
-        if (virtualMachine.ShutdownAttempt >= 3)
+        if (virtualMachine.ShutdownAttempt >= AttemptsToShutdown)
         {
             await virtualMachine.PowerOffAsync();
             return new OkObjectResult(virtualMachine);
