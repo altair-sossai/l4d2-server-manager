@@ -14,6 +14,7 @@ public interface IVirtualMachine
     HashSet<string> Permissions { get; }
     string? PowerOnBy { get; }
     DateTime? PowerOnAt { get; }
+    int ShutdownAttempt { get; }
     Task PowerOnAsync(User user);
     Task PowerOffAsync();
     void RunCommand(RunScriptCommand command);
@@ -23,4 +24,6 @@ public interface IVirtualMachine
     Task UpdateTagsAsync(IDictionary<string, string> values);
     string? StartedBy(int port);
     DateTime? StartedAt(int port);
+    Task ClearShutdownAttemptAsync();
+    Task IncrementShutdownAttemptAsync();
 }

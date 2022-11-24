@@ -156,6 +156,21 @@ public class VirtualMachine : IVirtualMachine
         }
     }
 
+    public int ShutdownAttempt
+    {
+        get
+        {
+            const string key = "shutdown-attempt";
+
+            var tags = VirtualMachineResource.Data.Tags;
+
+            if (!tags.ContainsKey(key))
+                return 0;
+
+            return int.TryParse(tags[key], out var shutdownAttempt) ? shutdownAttempt : 0;
+        }
+    }
+
     public async Task PowerOnAsync(User user)
     {
         if (IsOn)
@@ -168,7 +183,8 @@ public class VirtualMachine : IVirtualMachine
         var values = new Dictionary<string, string>
         {
             { "power-on-by", user.Id },
-            { "power-on-at", DateTime.UtcNow.ToString("u") }
+            { "power-on-at", DateTime.UtcNow.ToString("u") },
+            { "shutdown-attempt", "0" }
         };
 
         await UpdateTagsAsync(values);
@@ -182,6 +198,7 @@ public class VirtualMachine : IVirtualMachine
         _virtualMachineInstanceView = null;
 
         await VirtualMachineResource.DeallocateAsync(WaitUntil.Completed);
+        await ClearShutdownAttemptAsync();
     }
 
     public void RunCommand(RunScriptCommand command)
@@ -251,6 +268,29 @@ public class VirtualMachine : IVirtualMachine
             return null;
 
         return DateTime.TryParse(tags[key], out var date) ? date : null;
+    }
+
+    public async Task ClearShutdownAttemptAsync()
+    {
+        if (ShutdownAttempt == 0)
+            return;
+
+        var values = new Dictionary<string, string>
+        {
+            { "shutdown-attempt", "0" }
+        };
+
+        await UpdateTagsAsync(values);
+    }
+
+    public async Task IncrementShutdownAttemptAsync()
+    {
+        var values = new Dictionary<string, string>
+        {
+            { "shutdown-attempt", $"{ShutdownAttempt + 1}" }
+        };
+
+        await UpdateTagsAsync(values);
     }
 
     private void ClearVirtualMachineCache()

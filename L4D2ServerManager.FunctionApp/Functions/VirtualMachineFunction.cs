@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Extensions;
+using L4D2ServerManager.Port.Extensions;
 using L4D2ServerManager.Port.Services;
 using L4D2ServerManager.Users.Services;
 using L4D2ServerManager.VirtualMachine.Commands;
@@ -76,6 +77,36 @@ public class VirtualMachineFunction
             throw new UnauthorizedAccessException();
 
         await virtualMachine.PowerOffAsync();
+
+        return new OkObjectResult(virtualMachine);
+    }
+
+    [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(TryPowerOffAsync))]
+    public async Task<IActionResult> TryPowerOffAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/try-power-off")] HttpRequest httpRequest)
+    {
+        _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+
+        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+        if (virtualMachine.IsOff)
+        {
+            await virtualMachine.ClearShutdownAttemptAsync();
+            return new OkObjectResult(virtualMachine);
+        }
+
+        var ports = _portServer.GetPorts(virtualMachine.IpAddress);
+        if (ports.HasAnyPlayerConnected())
+        {
+            await virtualMachine.ClearShutdownAttemptAsync();
+            return new OkObjectResult(virtualMachine);
+        }
+
+        if (virtualMachine.ShutdownAttempt >= 3)
+        {
+            await virtualMachine.PowerOffAsync();
+            return new OkObjectResult(virtualMachine);
+        }
+
+        await virtualMachine.IncrementShutdownAttemptAsync();
 
         return new OkObjectResult(virtualMachine);
     }
