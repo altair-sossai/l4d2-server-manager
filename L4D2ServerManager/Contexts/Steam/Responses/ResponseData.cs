@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace L4D2ServerManager.Modules.ServerManager.Server.Info.ValueObjects;
+namespace L4D2ServerManager.Contexts.Steam.Responses;
 
 public class ResponseData<T>
     where T : class

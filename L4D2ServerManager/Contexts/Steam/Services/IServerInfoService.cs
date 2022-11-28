@@ -1,7 +1,8 @@
-﻿using L4D2ServerManager.Modules.ServerManager.Server.Info.ValueObjects;
+﻿using L4D2ServerManager.Contexts.Steam.Responses;
+using L4D2ServerManager.Contexts.Steam.ValueObjects;
 using Refit;
 
-namespace L4D2ServerManager.Modules.ServerManager.Server.Info.Services;
+namespace L4D2ServerManager.Contexts.Steam.Services;
 
 public interface IServerInfoService
 {

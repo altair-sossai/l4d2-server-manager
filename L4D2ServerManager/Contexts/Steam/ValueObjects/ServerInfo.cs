@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace L4D2ServerManager.Modules.ServerManager.Server.Info.ValueObjects;
+namespace L4D2ServerManager.Contexts.Steam.ValueObjects;
 
 public class ServerInfo
 {
@@ -10,7 +10,7 @@ public class ServerInfo
     public string? Addr { get; set; }
 
     [JsonPropertyName("gameport")]
-    public int Gameport { get; set; }
+    public int? Gameport { get; set; }
 
     [JsonPropertyName("steamid")]
     public string? Steamid { get; set; }
@@ -19,7 +19,7 @@ public class ServerInfo
     public string? Name { get; set; }
 
     [JsonPropertyName("appid")]
-    public int Appid { get; set; }
+    public int? Appid { get; set; }
 
     [JsonPropertyName("gamedir")]
     public string? Gamedir { get; set; }
@@ -31,25 +31,25 @@ public class ServerInfo
     public string? Product { get; set; }
 
     [JsonPropertyName("region")]
-    public int Region { get; set; }
+    public int? Region { get; set; }
 
     [JsonPropertyName("players")]
-    public int Players { get; set; }
+    public int? Players { get; set; }
 
     [JsonPropertyName("max_players")]
-    public int MaxPlayers { get; set; }
+    public int? MaxPlayers { get; set; }
 
     [JsonPropertyName("bots")]
-    public int Bots { get; set; }
+    public int? Bots { get; set; }
 
     [JsonPropertyName("map")]
     public string? Map { get; set; }
 
     [JsonPropertyName("secure")]
-    public bool Secure { get; set; }
+    public bool? Secure { get; set; }
 
     [JsonPropertyName("dedicated")]
-    public bool Dedicated { get; set; }
+    public bool? Dedicated { get; set; }
 
     [JsonPropertyName("os")]
     public string? Os { get; set; }
