@@ -1,8 +1,8 @@
-﻿using Azure;
+﻿using System.Runtime.Serialization;
+using Azure;
+using Azure.Data.Tables;
 using L4D2ServerManager.Users.Enums;
 using L4D2ServerManager.Users.ValueObjects;
-using Microsoft.WindowsAzure.Storage.Table;
-using ITableEntity = Azure.Data.Tables.ITableEntity;
 
 namespace L4D2ServerManager.Users;
 
@@ -18,7 +18,7 @@ public class User : ITableEntity
     public string? Steam { get; set; }
     public int AccessLevelValue { get; set; }
 
-    [IgnoreProperty]
+    [IgnoreDataMember]
     public AccessLevel AccessLevel
     {
         get => (AccessLevel)AccessLevelValue;
