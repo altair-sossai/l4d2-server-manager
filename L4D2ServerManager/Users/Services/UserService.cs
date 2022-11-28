@@ -5,6 +5,7 @@ using L4D2ServerManager.Server;
 using L4D2ServerManager.Server.Extensions;
 using L4D2ServerManager.Users.Commands;
 using L4D2ServerManager.Users.Constants;
+using L4D2ServerManager.Users.Enums;
 using L4D2ServerManager.VirtualMachine;
 using L4D2ServerManager.VirtualMachine.Extensions;
 
@@ -50,7 +51,7 @@ public class UserService : IUserService
 
     public void ApplyPermissions(User user, IVirtualMachine virtualMachine)
     {
-        if (user.Admin)
+        if (user.AccessLevel.HasFlag(AccessLevel.VirtualMachine))
         {
             ApplyAllPermissions(virtualMachine);
             return;
@@ -61,7 +62,7 @@ public class UserService : IUserService
 
     public void ApplyPermissions(User user, IServer server)
     {
-        if (user.Admin)
+        if (user.AccessLevel.HasFlag(AccessLevel.VirtualMachine))
         {
             ApplyAllPermissions(server);
             return;

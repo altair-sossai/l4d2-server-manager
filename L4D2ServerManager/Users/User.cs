@@ -1,6 +1,8 @@
 ﻿using Azure;
-using Azure.Data.Tables;
+using L4D2ServerManager.Users.Enums;
 using L4D2ServerManager.Users.ValueObjects;
+using Microsoft.WindowsAzure.Storage.Table;
+using ITableEntity = Azure.Data.Tables.ITableEntity;
 
 namespace L4D2ServerManager.Users;
 
@@ -14,7 +16,15 @@ public class User : ITableEntity
 
     public string? DisplayName { get; set; }
     public string? Steam { get; set; }
-    public bool Admin { get; set; }
+    public int AccessLevelValue { get; set; }
+
+    [IgnoreProperty]
+    public AccessLevel AccessLevel
+    {
+        get => (AccessLevel)AccessLevelValue;
+        set => AccessLevelValue = (int)value;
+    }
+
     public string? Secret { get; set; }
     public string PartitionKey { get; set; } = "shared";
     public string RowKey { get; set; } = default!;
@@ -28,7 +38,7 @@ public class User : ITableEntity
             Id = Id,
             DisplayName = DisplayName,
             Steam = Steam,
-            Admin = Admin
+            AccessLevel = AccessLevel
         };
     }
 }
