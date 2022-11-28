@@ -1,4 +1,4 @@
-﻿using Azure.Data.Tables;
+using Azure.Data.Tables;
 using L4D2ServerManager.Contexts.AzureTableStorage;
 using L4D2ServerManager.Contexts.Steam;
 using L4D2ServerManager.Contexts.Steam.Services;
@@ -36,7 +36,7 @@ public class SuspectedPlayerService : ISuspectedPlayerService
         return SuspectedPlayerTable.Query<SuspectedPlayer>();
     }
 
-    public async Task<SuspectedPlayer?> AddAsync(SuspectedPlayerCommand command)
+    public async Task<SuspectedPlayer?> AddAsync(AddSuspectedPlayerCommand command)
     {
         var steamId = await ResolveSteamIdAsync(command.Login) ?? command.SteamId;
         var suspectedPlayer = await BuildSuspectedPlayerAsync(steamId);

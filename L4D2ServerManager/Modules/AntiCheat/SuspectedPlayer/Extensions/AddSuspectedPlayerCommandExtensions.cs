@@ -3,9 +3,9 @@ using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
 
 namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Extensions;
 
-public static class SuspectedPlayerCommandExtensions
+public static class AddSuspectedPlayerCommandExtensions
 {
-    public static string? Login(this SuspectedPlayerCommand command)
+    public static string? Login(this AddSuspectedPlayerCommand command)
     {
         var patterns = new[]
         {
@@ -16,7 +16,7 @@ public static class SuspectedPlayerCommandExtensions
         return command.MatchValue(patterns);
     }
 
-    public static string? SteamId(this SuspectedPlayerCommand command)
+    public static string? SteamId(this AddSuspectedPlayerCommand command)
     {
         var patterns = new[]
         {
@@ -27,7 +27,7 @@ public static class SuspectedPlayerCommandExtensions
         return command.MatchValue(patterns);
     }
 
-    private static string? MatchValue(this SuspectedPlayerCommand command, IEnumerable<string> patterns)
+    private static string? MatchValue(this AddSuspectedPlayerCommand command, IEnumerable<string> patterns)
     {
         if (string.IsNullOrEmpty(command.SuspectedPlayer))
             return null;
