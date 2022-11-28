@@ -1,6 +1,6 @@
 using L4D2ServerManager.FunctionApp.Extensions;
-using L4D2ServerManager.Port.Services;
-using L4D2ServerManager.Users.Services;
+using L4D2ServerManager.Modules.Auth.Users.Services;
+using L4D2ServerManager.Modules.ServerManager.Port.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;

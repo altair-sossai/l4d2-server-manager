@@ -1,4 +1,4 @@
-﻿using L4D2ServerManager.Server.Enums;
+﻿using L4D2ServerManager.Modules.ServerManager.Server.Enums;
 
 namespace L4D2ServerManager.FunctionApp.Requests;
 
