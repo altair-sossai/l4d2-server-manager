@@ -7,4 +7,5 @@ public interface ISuspectedPlayerService
     SuspectedPlayer? GetSuspectedPlayer(string? steamId);
     IEnumerable<SuspectedPlayer> GetSuspectedPlayers();
     SuspectedPlayer AddOrUpdate(SuspectedPlayerCommand command);
+    void Delete(string? steamId);
 }

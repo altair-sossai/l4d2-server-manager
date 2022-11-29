@@ -44,7 +44,14 @@ public class SuspectedPlayerService : ISuspectedPlayerService
         _mapper.Map(command, suspectedPlayer);
         _validator.ValidateAndThrowAsync(suspectedPlayer).Wait();
 
+        SuspectedPlayerTable.UpsertEntity(suspectedPlayer);
+
         return suspectedPlayer;
+    }
+
+    public void Delete(string? steamId)
+    {
+        SuspectedPlayerTable.DeleteEntity("shared", steamId);
     }
 
     private void CreateIfNotExists()
