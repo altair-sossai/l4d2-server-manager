@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
+using L4D2ServerManager.Modules.Auth.Users.Enums;
 using L4D2ServerManager.Modules.Auth.Users.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,7 @@ public class UserFunction
     {
         try
         {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
             var users = _userService.GetUsers().Select(user => user.Info()).ToList();
 
@@ -42,7 +43,7 @@ public class UserFunction
     {
         try
         {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
             var user = _userService.GetUser(userId);
             if (user == null)

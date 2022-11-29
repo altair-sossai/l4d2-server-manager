@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
+using L4D2ServerManager.Modules.Auth.Users.Enums;
 using L4D2ServerManager.Modules.Auth.Users.Services;
 using L4D2ServerManager.Modules.ServerManager.Port.Extensions;
 using L4D2ServerManager.Modules.ServerManager.Port.Services;
@@ -42,7 +43,7 @@ public class VirtualMachineFunction
     {
         try
         {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
 
             _userService.ApplyPermissions(user, virtualMachine);
@@ -60,7 +61,7 @@ public class VirtualMachineFunction
     {
         try
         {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             await virtualMachine.PowerOnAsync(user);
 
@@ -86,7 +87,7 @@ public class VirtualMachineFunction
     {
         try
         {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
 
             _userService.ApplyPermissions(user, virtualMachine);
@@ -109,7 +110,7 @@ public class VirtualMachineFunction
     {
         try
         {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             if (virtualMachine.IsOff)

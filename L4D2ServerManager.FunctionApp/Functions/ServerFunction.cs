@@ -4,6 +4,7 @@ using L4D2ServerManager.FunctionApp.Commands;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.FunctionApp.Requests;
+using L4D2ServerManager.Modules.Auth.Users.Enums;
 using L4D2ServerManager.Modules.Auth.Users.Services;
 using L4D2ServerManager.Modules.ServerManager.Players.Services;
 using L4D2ServerManager.Modules.ServerManager.Server.Extensions;
@@ -47,7 +48,7 @@ public class ServerFunction
     {
         try
         {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             var server = _serverService.GetByPort(virtualMachine, port);
 
@@ -67,7 +68,7 @@ public class ServerFunction
     {
         try
         {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
             var serverInfo = await _serverService.GetServerInfoAsync(ip, port);
             if (serverInfo == null)
@@ -87,7 +88,7 @@ public class ServerFunction
     {
         try
         {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
             var players = _playerService.GetPlayers(ip, port);
 
@@ -107,7 +108,7 @@ public class ServerFunction
         {
             lock (Lock)
             {
-                var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+                var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
                 var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
                 var server = _serverService.GetByPort(virtualMachine, port);
                 var request = httpRequest.DeserializeBody<RunServerRequest>();
@@ -131,7 +132,7 @@ public class ServerFunction
         {
             lock (Lock)
             {
-                var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+                var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
                 var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
                 var server = _serverService.GetByPort(virtualMachine, port);
                 var request = httpRequest.DeserializeBody<RunServerRequest>();
@@ -153,7 +154,7 @@ public class ServerFunction
     {
         try
         {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             var server = _serverService.GetByPort(virtualMachine, port);
 
@@ -178,7 +179,7 @@ public class ServerFunction
     {
         try
         {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             var server = _serverService.GetByPort(virtualMachine, port);
 
@@ -203,7 +204,7 @@ public class ServerFunction
     {
         try
         {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
             var command = await httpRequest.DeserializeBodyAsync<OpenPortCommand>();
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             var server = _serverService.GetByPort(virtualMachine, port);
@@ -229,7 +230,7 @@ public class ServerFunction
     {
         try
         {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             var server = _serverService.GetByPort(virtualMachine, port);
 

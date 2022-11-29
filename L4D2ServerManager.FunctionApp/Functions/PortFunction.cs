@@ -1,6 +1,7 @@
 using System;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
+using L4D2ServerManager.Modules.Auth.Users.Enums;
 using L4D2ServerManager.Modules.Auth.Users.Services;
 using L4D2ServerManager.Modules.ServerManager.Port.Services;
 using Microsoft.AspNetCore.Http;
@@ -28,7 +29,7 @@ public class PortFunction
     {
         try
         {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
             var ports = _portServer.GetPorts(ip);
 
