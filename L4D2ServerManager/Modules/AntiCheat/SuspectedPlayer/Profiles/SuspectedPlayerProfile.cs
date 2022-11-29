@@ -9,6 +9,7 @@ public class SuspectedPlayerProfile : Profile
     public SuspectedPlayerProfile()
     {
         CreateMap<SuspectedPlayerCommand, SuspectedPlayer>()
+            .ForMember(dest => dest.SteamId, opt => opt.MapFrom((src, dest) => dest.SteamId ?? src.SteamId))
             .AfterMap<ComplementSuspectedPlayerDataMappingAction>();
     }
 }

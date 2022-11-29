@@ -2,21 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using FluentValidation;
 
 namespace L4D2ServerManager.FunctionApp.Errors;
 
 public class ErrorResult
 {
-    private static readonly JsonSerializerOptions Options = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        ReferenceHandler = ReferenceHandler.IgnoreCycles
-    };
-
     private ErrorResult(ValidationException validationException)
     {
         StatusCode = HttpStatusCode.BadRequest;
@@ -40,13 +31,11 @@ public class ErrorResult
     public string Message { get; }
     public List<Error> Errors { get; } = new();
 
-    public string ToJson()
-    {
-        return JsonSerializer.Serialize(this, Options);
-    }
-
     public static ErrorResult Build(Exception exception)
     {
+        if (exception is AggregateException)
+            exception = exception.InnerException;
+
         return exception switch
         {
             ValidationException validationException => new ErrorResult(validationException),

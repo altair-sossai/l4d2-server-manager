@@ -22,7 +22,8 @@ public static class AppInjection
             .AddClasses()
             .AsImplementedInterfaces(type => assemblies.Contains(type.Assembly)));
 
-        serviceCollection.AddScoped(serviceProvider => serviceProvider.GetRequiredService<ISteamContext>().ServerInfoService);
         serviceCollection.AddScoped(serviceProvider => serviceProvider.GetRequiredService<ISteamContext>().PlayerService);
+        serviceCollection.AddScoped(serviceProvider => serviceProvider.GetRequiredService<ISteamContext>().ServerInfoService);
+        serviceCollection.AddScoped(serviceProvider => serviceProvider.GetRequiredService<ISteamContext>().SteamUserService);
     }
 }

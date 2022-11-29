@@ -28,8 +28,10 @@ public class SteamContext : ISteamContext
     }
 
     public string SteamApiKey => _configuration.GetValue<string>(nameof(SteamApiKey))!;
-    public IServerInfoService ServerInfoService => CreateService<IServerInfoService>();
+
     public IPlayerService PlayerService => CreateService<IPlayerService>();
+    public IServerInfoService ServerInfoService => CreateService<IServerInfoService>();
+    public ISteamUserService SteamUserService => CreateService<ISteamUserService>();
 
     private static T CreateService<T>()
     {

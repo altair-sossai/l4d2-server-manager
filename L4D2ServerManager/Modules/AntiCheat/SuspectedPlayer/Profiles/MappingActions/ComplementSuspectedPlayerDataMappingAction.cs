@@ -23,7 +23,8 @@ public class ComplementSuspectedPlayerDataMappingAction : IMappingAction<Suspect
 
     public void Process(SuspectedPlayerCommand command, SuspectedPlayer suspectedPlayer, ResolutionContext context)
     {
-        suspectedPlayer.SteamId ??= ResolveSteamIdAsync(command.Login).Result ?? command.SteamId;
+        if (string.IsNullOrEmpty(suspectedPlayer.SteamId))
+            suspectedPlayer.SteamId = ResolveSteamIdAsync(command.Login).Result ?? command.SteamId;
 
         if (string.IsNullOrEmpty(suspectedPlayer.SteamId))
             return;

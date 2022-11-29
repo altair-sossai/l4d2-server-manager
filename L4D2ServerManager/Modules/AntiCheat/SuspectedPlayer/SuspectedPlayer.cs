@@ -8,7 +8,7 @@ public class SuspectedPlayer : ITableEntity
     public string? SteamId
     {
         get => RowKey;
-        set => RowKey = value ?? string.Empty;
+        set => RowKey = value ?? null!;
     }
 
     public string? Name { get; set; }
