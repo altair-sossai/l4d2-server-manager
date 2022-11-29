@@ -4,6 +4,7 @@ namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
 
 public interface ISuspectedPlayerService
 {
+    SuspectedPlayer? GetSuspectedPlayer(string? steamId);
     IEnumerable<SuspectedPlayer> GetSuspectedPlayers();
-    Task<SuspectedPlayer?> AddAsync(AddSuspectedPlayerCommand command);
+    SuspectedPlayer AddOrUpdate(SuspectedPlayerCommand command);
 }

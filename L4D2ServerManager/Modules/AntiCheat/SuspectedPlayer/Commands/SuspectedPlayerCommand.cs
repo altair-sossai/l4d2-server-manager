@@ -2,7 +2,7 @@
 
 namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
 
-public class AddSuspectedPlayerCommand
+public class SuspectedPlayerCommand
 {
     public string? SuspectedPlayer { get; set; }
     public string? Login => this.Login();

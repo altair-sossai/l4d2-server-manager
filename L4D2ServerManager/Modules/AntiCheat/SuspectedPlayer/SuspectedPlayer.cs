@@ -14,7 +14,10 @@ public class SuspectedPlayer : ITableEntity
     public string? Name { get; set; }
     public string? PictureUrl { get; set; }
     public string? ProfileUrl { get; set; }
-    public int? TotalHoursPlayed { get; set; }
+    public int TotalHoursPlayed { get; set; }
+
+    public static SuspectedPlayer Default => new();
+
     public string PartitionKey { get; set; } = "shared";
     public string RowKey { get; set; } = default!;
     public DateTimeOffset? Timestamp { get; set; }
