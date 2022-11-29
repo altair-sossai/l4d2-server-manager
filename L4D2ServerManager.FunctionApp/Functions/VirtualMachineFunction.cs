@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Modules.Auth.Users.Services;
 using L4D2ServerManager.Modules.ServerManager.Port.Extensions;
@@ -39,76 +40,104 @@ public class VirtualMachineFunction
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(Get))]
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "virtual-machine")] HttpRequest httpRequest)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
-        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+        try
+        {
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
 
-        _userService.ApplyPermissions(user, virtualMachine);
+            _userService.ApplyPermissions(user, virtualMachine);
 
-        return new OkObjectResult(virtualMachine);
+            return new OkObjectResult(virtualMachine);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
     }
 
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOnAsync))]
     public async Task<IActionResult> PowerOnAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-on")] HttpRequest httpRequest)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
-        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
-        await virtualMachine.PowerOnAsync(user);
-
-        _ = Task.Run(() =>
+        try
         {
-            var ports = _portServer.GetPorts(virtualMachine.IpAddress);
-            var command = new IpTablesRulesCommand(ports);
-            virtualMachine.RunCommand(command);
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+            await virtualMachine.PowerOnAsync(user);
 
-            _userService.ApplyPermissions(user, virtualMachine);
-        });
+            _ = Task.Run(() =>
+            {
+                var ports = _portServer.GetPorts(virtualMachine.IpAddress);
+                var command = new IpTablesRulesCommand(ports);
+                virtualMachine.RunCommand(command);
 
-        return new OkObjectResult(virtualMachine);
+                _userService.ApplyPermissions(user, virtualMachine);
+            });
+
+            return new OkObjectResult(virtualMachine);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
     }
 
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOffAsync))]
     public async Task<IActionResult> PowerOffAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-off")] HttpRequest httpRequest)
     {
-        var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
-        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+        try
+        {
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
 
-        _userService.ApplyPermissions(user, virtualMachine);
+            _userService.ApplyPermissions(user, virtualMachine);
 
-        if (!virtualMachine.CanPowerOff())
-            throw new UnauthorizedAccessException();
+            if (!virtualMachine.CanPowerOff())
+                throw new UnauthorizedAccessException();
 
-        await virtualMachine.PowerOffAsync();
+            await virtualMachine.PowerOffAsync();
 
-        return new OkObjectResult(virtualMachine);
+            return new OkObjectResult(virtualMachine);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
     }
 
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(TryPowerOffAsync))]
     public async Task<IActionResult> TryPowerOffAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/try-power-off")] HttpRequest httpRequest)
     {
-        _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
-
-        var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
-        if (virtualMachine.IsOff)
+        try
         {
-            await virtualMachine.ClearShutdownAttemptAsync();
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+            if (virtualMachine.IsOff)
+            {
+                await virtualMachine.ClearShutdownAttemptAsync();
+                return new OkObjectResult(virtualMachine);
+            }
+
+            var ports = _portServer.GetPorts(virtualMachine.IpAddress);
+            if (ports.HasAnyPlayerConnected())
+            {
+                await virtualMachine.ClearShutdownAttemptAsync();
+                return new OkObjectResult(virtualMachine);
+            }
+
+            if (virtualMachine.ShutdownAttempt >= AttemptsToShutdown)
+            {
+                await virtualMachine.PowerOffAsync();
+                return new OkObjectResult(virtualMachine);
+            }
+
+            await virtualMachine.IncrementShutdownAttemptAsync();
+
             return new OkObjectResult(virtualMachine);
         }
-
-        var ports = _portServer.GetPorts(virtualMachine.IpAddress);
-        if (ports.HasAnyPlayerConnected())
+        catch (Exception exception)
         {
-            await virtualMachine.ClearShutdownAttemptAsync();
-            return new OkObjectResult(virtualMachine);
+            return ErrorResult.Build(exception).ResponseMessageResult();
         }
-
-        if (virtualMachine.ShutdownAttempt >= AttemptsToShutdown)
-        {
-            await virtualMachine.PowerOffAsync();
-            return new OkObjectResult(virtualMachine);
-        }
-
-        await virtualMachine.IncrementShutdownAttemptAsync();
-
-        return new OkObjectResult(virtualMachine);
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Modules.Auth.Users.Services;
 using L4D2ServerManager.Modules.ServerManager.Port.Services;
@@ -24,10 +26,17 @@ public class PortFunction
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ports/{ip}")] HttpRequest httpRequest,
         string ip)
     {
-        _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+        try
+        {
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
 
-        var ports = _portServer.GetPorts(ip);
+            var ports = _portServer.GetPorts(ip);
 
-        return new OkObjectResult(ports);
+            return new OkObjectResult(ports);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
     }
 }

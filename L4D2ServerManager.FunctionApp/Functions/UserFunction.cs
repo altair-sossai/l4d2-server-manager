@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Modules.Auth.Users.Services;
 using Microsoft.AspNetCore.Http;
@@ -20,23 +22,37 @@ public class UserFunction
     [FunctionName(nameof(UserFunction) + "_" + nameof(Get))]
     public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users")] HttpRequest httpRequest)
     {
-        _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+        try
+        {
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
 
-        var users = _userService.GetUsers().Select(user => user.Info()).ToList();
+            var users = _userService.GetUsers().Select(user => user.Info()).ToList();
 
-        return new OkObjectResult(users);
+            return new OkObjectResult(users);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
     }
 
     [FunctionName(nameof(UserFunction) + "_" + nameof(GetById))]
     public IActionResult GetById([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{userId}")] HttpRequest httpRequest,
         string userId)
     {
-        _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+        try
+        {
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
 
-        var user = _userService.GetUser(userId);
-        if (user == null)
-            return new NotFoundResult();
+            var user = _userService.GetUser(userId);
+            if (user == null)
+                return new NotFoundResult();
 
-        return new OkObjectResult(user.Info());
+            return new OkObjectResult(user.Info());
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
     }
 }
