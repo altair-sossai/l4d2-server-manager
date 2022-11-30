@@ -42,7 +42,7 @@ public class SuspectedPlayerService : ISuspectedPlayerService
 
     public IEnumerable<SuspectedPlayer> GetSuspectedPlayers()
     {
-        return SuspectedPlayerTable.Query<SuspectedPlayer>();
+        return SuspectedPlayerTable.Query<SuspectedPlayer>().OrderBy(o => o.Name);
     }
 
     public SuspectedPlayer AddOrUpdate(SuspectedPlayerCommand command)
