@@ -94,4 +94,10 @@ public class SuspectedPlayerFunction
             return ErrorResult.Build(exception).ResponseMessageResult();
         }
     }
+
+    [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(Sync))]
+    public void Sync([TimerTrigger("0 */10 * * * *")] TimerInfo timerInfo)
+    {
+        _suspectedPlayerService.Sync();
+    }
 }

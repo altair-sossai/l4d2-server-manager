@@ -58,6 +58,19 @@ public class SuspectedPlayerService : ISuspectedPlayerService
         return suspectedPlayer;
     }
 
+    public void Sync()
+    {
+        foreach (var suspectedPlayer in GetSuspectedPlayers())
+        {
+            var suspectedPlayerCommand = new SuspectedPlayerCommand
+            {
+                SuspectedPlayer = suspectedPlayer.SteamId
+            };
+
+            AddOrUpdate(suspectedPlayerCommand);
+        }
+    }
+
     public void Delete(string? steamId)
     {
         SuspectedPlayerTable.DeleteEntity("shared", steamId);
