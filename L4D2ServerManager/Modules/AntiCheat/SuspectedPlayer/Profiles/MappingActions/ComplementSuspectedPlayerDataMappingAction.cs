@@ -24,7 +24,7 @@ public class ComplementSuspectedPlayerDataMappingAction : IMappingAction<Suspect
     public void Process(SuspectedPlayerCommand command, SuspectedPlayer suspectedPlayer, ResolutionContext context)
     {
         if (suspectedPlayer.SteamId == 0)
-            suspectedPlayer.SteamId = ResolveSteamIdAsync(command.Login).Result ?? command.SteamId ?? 0;
+            suspectedPlayer.SteamId = _steamUserService.ResolveSteamIdAsync(_steamContext.SteamApiKey, command.Login).Result ?? command.SteamId ?? 0;
 
         if (suspectedPlayer.SteamId == 0)
             return;
@@ -34,15 +34,5 @@ public class ComplementSuspectedPlayerDataMappingAction : IMappingAction<Suspect
 
         var ownedGamesResponse = _playerService.GetOwnedGamesAsync(_steamContext.SteamApiKey, suspectedPlayer.SteamId.ToString()).Result;
         suspectedPlayer.Update(ownedGamesResponse.Response);
-    }
-
-    private async Task<long?> ResolveSteamIdAsync(string? login)
-    {
-        if (string.IsNullOrEmpty(login))
-            return await Task.FromResult(0);
-
-        var response = await _steamUserService.ResolveVanityUrlAsync(_steamContext.SteamApiKey, login);
-
-        return response is { Response: { Success: 1 } } && long.TryParse(response.Response.SteamId, out var steamId) ? steamId : null;
     }
 }

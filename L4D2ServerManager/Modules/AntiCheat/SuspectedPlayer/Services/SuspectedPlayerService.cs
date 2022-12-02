@@ -47,7 +47,7 @@ public class SuspectedPlayerService : ISuspectedPlayerService
 
     public SuspectedPlayer AddOrUpdate(SuspectedPlayerCommand command)
     {
-        var steamId = ResolveSteamIdAsync(command.Login).Result ?? command.SteamId ?? 0;
+        var steamId = _steamUserService.ResolveSteamIdAsync(_steamContext.SteamApiKey, command.Login).Result ?? command.SteamId ?? 0;
         var suspectedPlayer = GetSuspectedPlayer(steamId) ?? SuspectedPlayer.Default;
 
         _mapper.Map(command, suspectedPlayer);
@@ -84,15 +84,5 @@ public class SuspectedPlayerService : ISuspectedPlayerService
         SuspectedPlayerTable.CreateIfNotExists();
 
         _created = true;
-    }
-
-    private async Task<long?> ResolveSteamIdAsync(string? login)
-    {
-        if (string.IsNullOrEmpty(login))
-            return await Task.FromResult(0);
-
-        var response = await _steamUserService.ResolveVanityUrlAsync(_steamContext.SteamApiKey, login);
-
-        return response is { Response: { Success: 1 } } && long.TryParse(response.Response.SteamId, out var steamId) ? steamId : null;
     }
 }
