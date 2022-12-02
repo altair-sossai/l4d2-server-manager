@@ -6,5 +6,5 @@ public class SuspectedPlayerCommand
 {
     public string? SuspectedPlayer { get; set; }
     public string? Login => this.Login();
-    public string? SteamId => this.SteamId();
+    public long? SteamId => this.SteamId();
 }

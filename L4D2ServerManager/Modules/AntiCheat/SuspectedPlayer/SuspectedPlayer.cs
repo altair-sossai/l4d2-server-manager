@@ -1,16 +1,19 @@
 ﻿using Azure;
 using Azure.Data.Tables;
+using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Extensions;
 
 namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer;
 
 public class SuspectedPlayer : ITableEntity
 {
-    public string? SteamId
+    public long SteamId
     {
-        get => RowKey;
-        set => RowKey = value ?? null!;
+        get => long.TryParse(RowKey, out var steamId) ? steamId : 0;
+        set => RowKey = value.ToString();
     }
 
+    public long Steam3 => this.Steam3();
+    public long Steam => this.Steam();
     public string? Name { get; set; }
     public string? PictureUrl { get; set; }
     public string? ProfileUrl { get; set; }

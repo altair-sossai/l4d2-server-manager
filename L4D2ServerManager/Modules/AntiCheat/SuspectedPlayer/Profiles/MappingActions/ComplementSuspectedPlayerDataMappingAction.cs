@@ -23,26 +23,26 @@ public class ComplementSuspectedPlayerDataMappingAction : IMappingAction<Suspect
 
     public void Process(SuspectedPlayerCommand command, SuspectedPlayer suspectedPlayer, ResolutionContext context)
     {
-        if (string.IsNullOrEmpty(suspectedPlayer.SteamId))
-            suspectedPlayer.SteamId = ResolveSteamIdAsync(command.Login).Result ?? command.SteamId;
+        if (suspectedPlayer.SteamId == 0)
+            suspectedPlayer.SteamId = ResolveSteamIdAsync(command.Login).Result ?? command.SteamId ?? 0;
 
-        if (string.IsNullOrEmpty(suspectedPlayer.SteamId))
+        if (suspectedPlayer.SteamId == 0)
             return;
 
-        var playerSummariesResponse = _steamUserService.GetPlayerSummariesAsync(_steamContext.SteamApiKey, suspectedPlayer.SteamId).Result;
+        var playerSummariesResponse = _steamUserService.GetPlayerSummariesAsync(_steamContext.SteamApiKey, suspectedPlayer.SteamId.ToString()).Result;
         suspectedPlayer.Update(playerSummariesResponse.Response);
 
-        var ownedGamesResponse = _playerService.GetOwnedGamesAsync(_steamContext.SteamApiKey, suspectedPlayer.SteamId).Result;
+        var ownedGamesResponse = _playerService.GetOwnedGamesAsync(_steamContext.SteamApiKey, suspectedPlayer.SteamId.ToString()).Result;
         suspectedPlayer.Update(ownedGamesResponse.Response);
     }
 
-    private async Task<string?> ResolveSteamIdAsync(string? login)
+    private async Task<long?> ResolveSteamIdAsync(string? login)
     {
         if (string.IsNullOrEmpty(login))
-            return await Task.FromResult((string?)null);
+            return await Task.FromResult(0);
 
         var response = await _steamUserService.ResolveVanityUrlAsync(_steamContext.SteamApiKey, login);
 
-        return response is { Response: { Success: 1 } } ? response.Response.SteamId : null;
+        return response is { Response: { Success: 1 } } && long.TryParse(response.Response.SteamId, out var steamId) ? steamId : null;
     }
 }

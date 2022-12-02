@@ -43,7 +43,7 @@ public class SuspectedPlayerFunction
 
     [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(GetSuspectedPlayer))]
     public IActionResult GetSuspectedPlayer([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players/{steamId}")] HttpRequest httpRequest,
-        string steamId)
+        long steamId)
     {
         try
         {

@@ -16,7 +16,7 @@ public static class SuspectedPlayerCommandExtensions
         return command.MatchValue(patterns);
     }
 
-    public static string? SteamId(this SuspectedPlayerCommand command)
+    public static long? SteamId(this SuspectedPlayerCommand command)
     {
         var patterns = new[]
         {
@@ -24,7 +24,7 @@ public static class SuspectedPlayerCommandExtensions
             @"^https?:\/\/steamcommunity\.com\/profiles\/(\d+)\/?$"
         };
 
-        return command.MatchValue(patterns);
+        return long.TryParse(command.MatchValue(patterns), out var steamId) ? steamId : null;
     }
 
     private static string? MatchValue(this SuspectedPlayerCommand command, IEnumerable<string> patterns)

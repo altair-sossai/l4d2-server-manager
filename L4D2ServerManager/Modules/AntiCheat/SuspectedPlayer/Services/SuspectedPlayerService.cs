@@ -35,9 +35,9 @@ public class SuspectedPlayerService : ISuspectedPlayerService
 
     private TableClient SuspectedPlayerTable => _userTable ??= _tableContext.GetTableClient("SuspectedPlayers").Result;
 
-    public SuspectedPlayer? GetSuspectedPlayer(string? steamId)
+    public SuspectedPlayer? GetSuspectedPlayer(long steamId)
     {
-        return string.IsNullOrEmpty(steamId) ? null : SuspectedPlayerTable.Query<SuspectedPlayer>(q => q.RowKey == steamId).FirstOrDefault();
+        return steamId == 0 ? null : SuspectedPlayerTable.Query<SuspectedPlayer>(q => q.RowKey == steamId.ToString()).FirstOrDefault();
     }
 
     public IEnumerable<SuspectedPlayer> GetSuspectedPlayers()
@@ -47,7 +47,7 @@ public class SuspectedPlayerService : ISuspectedPlayerService
 
     public SuspectedPlayer AddOrUpdate(SuspectedPlayerCommand command)
     {
-        var steamId = ResolveSteamIdAsync(command.Login).Result ?? command.SteamId;
+        var steamId = ResolveSteamIdAsync(command.Login).Result ?? command.SteamId ?? 0;
         var suspectedPlayer = GetSuspectedPlayer(steamId) ?? SuspectedPlayer.Default;
 
         _mapper.Map(command, suspectedPlayer);
@@ -64,7 +64,7 @@ public class SuspectedPlayerService : ISuspectedPlayerService
         {
             var suspectedPlayerCommand = new SuspectedPlayerCommand
             {
-                SuspectedPlayer = suspectedPlayer.SteamId
+                SuspectedPlayer = suspectedPlayer.SteamId.ToString()
             };
 
             AddOrUpdate(suspectedPlayerCommand);
@@ -86,13 +86,13 @@ public class SuspectedPlayerService : ISuspectedPlayerService
         _created = true;
     }
 
-    private async Task<string?> ResolveSteamIdAsync(string? login)
+    private async Task<long?> ResolveSteamIdAsync(string? login)
     {
         if (string.IsNullOrEmpty(login))
-            return await Task.FromResult((string?)null);
+            return await Task.FromResult(0);
 
         var response = await _steamUserService.ResolveVanityUrlAsync(_steamContext.SteamApiKey, login);
 
-        return response is { Response: { Success: 1 } } ? response.Response.SteamId : null;
+        return response is { Response: { Success: 1 } } && long.TryParse(response.Response.SteamId, out var steamId) ? steamId : null;
     }
 }
