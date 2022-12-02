@@ -7,23 +7,12 @@ public static class SuspectedPlayerExtensions
 {
     public static long Steam3(this SuspectedPlayer suspectedPlayer)
     {
-        if (suspectedPlayer.SteamId == 0)
-            return 0;
-
-        const long magicNumber = 76561197960265728;
-
-        var authserver = (suspectedPlayer.SteamId - magicNumber) & 1;
-        var steam3 = suspectedPlayer.SteamId - magicNumber - authserver;
-
-        return steam3;
+        return suspectedPlayer.SteamId == 0 ? 0 : suspectedPlayer.SteamId - 76561197960265728;
     }
 
     public static long Steam(this SuspectedPlayer suspectedPlayer)
     {
-        if (suspectedPlayer.Steam3 == 0)
-            return 0;
-
-        return suspectedPlayer.Steam3 / 2;
+        return suspectedPlayer.Steam3 == 0 ? 0 : suspectedPlayer.Steam3 / 2;
     }
 
     public static void Update(this SuspectedPlayer suspectedPlayer, PlayersInfo? playersInfo)
