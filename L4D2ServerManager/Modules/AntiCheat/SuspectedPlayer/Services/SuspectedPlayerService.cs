@@ -2,7 +2,6 @@ using AutoMapper;
 using Azure.Data.Tables;
 using FluentValidation;
 using L4D2ServerManager.Contexts.AzureTableStorage;
-using L4D2ServerManager.Contexts.Steam;
 using L4D2ServerManager.Contexts.Steam.Services;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
 
@@ -12,21 +11,18 @@ public class SuspectedPlayerService : ISuspectedPlayerService
 {
     private static bool _created;
     private readonly IMapper _mapper;
-    private readonly ISteamContext _steamContext;
-    private readonly ISteamUserService _steamUserService;
+    private readonly ISteamIdService _steamIdService;
     private readonly IAzureTableStorageContext _tableContext;
     private readonly IValidator<SuspectedPlayer> _validator;
     private TableClient? _userTable;
 
     public SuspectedPlayerService(IMapper mapper,
-        ISteamContext steamContext,
-        ISteamUserService steamUserService,
+        ISteamIdService steamIdService,
         IAzureTableStorageContext tableContext,
         IValidator<SuspectedPlayer> validator)
     {
         _mapper = mapper;
-        _steamContext = steamContext;
-        _steamUserService = steamUserService;
+        _steamIdService = steamIdService;
         _tableContext = tableContext;
         _validator = validator;
 
@@ -35,9 +31,9 @@ public class SuspectedPlayerService : ISuspectedPlayerService
 
     private TableClient SuspectedPlayerTable => _userTable ??= _tableContext.GetTableClient("SuspectedPlayers").Result;
 
-    public SuspectedPlayer? GetSuspectedPlayer(long steamId)
+    public SuspectedPlayer? GetSuspectedPlayer(long communityId)
     {
-        return steamId == 0 ? null : SuspectedPlayerTable.Query<SuspectedPlayer>(q => q.RowKey == steamId.ToString()).FirstOrDefault();
+        return communityId == 0 ? null : SuspectedPlayerTable.Query<SuspectedPlayer>(q => q.RowKey == communityId.ToString()).FirstOrDefault();
     }
 
     public IEnumerable<SuspectedPlayer> GetSuspectedPlayers()
@@ -47,7 +43,7 @@ public class SuspectedPlayerService : ISuspectedPlayerService
 
     public SuspectedPlayer AddOrUpdate(SuspectedPlayerCommand command)
     {
-        var steamId = _steamUserService.ResolveSteamIdAsync(_steamContext.SteamApiKey, command.Login).Result ?? command.SteamId ?? 0;
+        var steamId = _steamIdService.ResolveSteamIdAsync(command.CustomUrl).Result ?? command.CommunityId ?? 0;
         var suspectedPlayer = GetSuspectedPlayer(steamId) ?? SuspectedPlayer.Default;
 
         _mapper.Map(command, suspectedPlayer);
@@ -64,16 +60,16 @@ public class SuspectedPlayerService : ISuspectedPlayerService
         {
             var suspectedPlayerCommand = new SuspectedPlayerCommand
             {
-                SuspectedPlayer = suspectedPlayer.SteamId.ToString()
+                Account = suspectedPlayer.CommunityId.ToString()
             };
 
             AddOrUpdate(suspectedPlayerCommand);
         }
     }
 
-    public void Delete(string? steamId)
+    public void Delete(long communityId)
     {
-        SuspectedPlayerTable.DeleteEntity("shared", steamId);
+        SuspectedPlayerTable.DeleteEntity("shared", communityId.ToString());
     }
 
     private void CreateIfNotExists()

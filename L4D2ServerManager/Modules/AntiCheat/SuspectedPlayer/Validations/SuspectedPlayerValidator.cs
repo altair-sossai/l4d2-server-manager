@@ -10,7 +10,7 @@ public class SuspectedPlayerValidator : AbstractValidator<SuspectedPlayer>
             .NotNull()
             .NotEmpty();
 
-        RuleFor(r => r.SteamId)
+        RuleFor(r => r.CommunityId)
             .NotNull()
             .NotEmpty();
 

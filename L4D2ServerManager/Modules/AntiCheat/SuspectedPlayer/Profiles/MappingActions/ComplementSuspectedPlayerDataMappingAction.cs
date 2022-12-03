@@ -10,29 +10,32 @@ public class ComplementSuspectedPlayerDataMappingAction : IMappingAction<Suspect
 {
     private readonly IPlayerService _playerService;
     private readonly ISteamContext _steamContext;
+    private readonly ISteamIdService _steamIdService;
     private readonly ISteamUserService _steamUserService;
 
     public ComplementSuspectedPlayerDataMappingAction(ISteamContext steamContext,
         ISteamUserService steamUserService,
+        ISteamIdService steamIdService,
         IPlayerService playerService)
     {
         _steamContext = steamContext;
         _steamUserService = steamUserService;
+        _steamIdService = steamIdService;
         _playerService = playerService;
     }
 
     public void Process(SuspectedPlayerCommand command, SuspectedPlayer suspectedPlayer, ResolutionContext context)
     {
-        if (suspectedPlayer.SteamId == 0)
-            suspectedPlayer.SteamId = _steamUserService.ResolveSteamIdAsync(_steamContext.SteamApiKey, command.Login).Result ?? command.SteamId ?? 0;
+        if (suspectedPlayer.CommunityId == 0)
+            suspectedPlayer.CommunityId = _steamIdService.ResolveSteamIdAsync(command.CustomUrl).Result ?? command.CommunityId ?? 0;
 
-        if (suspectedPlayer.SteamId == 0)
+        if (suspectedPlayer.CommunityId == 0)
             return;
 
-        var playerSummariesResponse = _steamUserService.GetPlayerSummariesAsync(_steamContext.SteamApiKey, suspectedPlayer.SteamId.ToString()).Result;
+        var playerSummariesResponse = _steamUserService.GetPlayerSummariesAsync(_steamContext.SteamApiKey, suspectedPlayer.CommunityId.ToString()).Result;
         suspectedPlayer.Update(playerSummariesResponse.Response);
 
-        var ownedGamesResponse = _playerService.GetOwnedGamesAsync(_steamContext.SteamApiKey, suspectedPlayer.SteamId.ToString()).Result;
+        var ownedGamesResponse = _playerService.GetOwnedGamesAsync(_steamContext.SteamApiKey, suspectedPlayer.CommunityId.ToString()).Result;
         suspectedPlayer.Update(ownedGamesResponse.Response);
     }
 }

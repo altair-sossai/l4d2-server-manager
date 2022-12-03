@@ -5,16 +5,6 @@ namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Extensions;
 
 public static class SuspectedPlayerExtensions
 {
-    public static long Steam3(this SuspectedPlayer suspectedPlayer)
-    {
-        return suspectedPlayer.SteamId == 0 ? 0 : suspectedPlayer.SteamId - 76561197960265728;
-    }
-
-    public static long Steam(this SuspectedPlayer suspectedPlayer)
-    {
-        return suspectedPlayer.Steam3 == 0 ? 0 : suspectedPlayer.Steam3 / 2;
-    }
-
     public static void Update(this SuspectedPlayer suspectedPlayer, PlayersInfo? playersInfo)
     {
         var playerInfo = playersInfo.FirstPlayerOrDefault();
@@ -30,7 +20,7 @@ public static class SuspectedPlayerExtensions
         if (playerInfo == null)
             return;
 
-        suspectedPlayer.SteamId = long.TryParse(playerInfo.SteamId, out var steamId) ? steamId : 0;
+        suspectedPlayer.CommunityId = long.TryParse(playerInfo.SteamId, out var communityId) ? communityId : 0;
         suspectedPlayer.Name = playerInfo.PersonaName;
         suspectedPlayer.PictureUrl = playerInfo.AvatarFull;
         suspectedPlayer.ProfileUrl = playerInfo.ProfileUrl;

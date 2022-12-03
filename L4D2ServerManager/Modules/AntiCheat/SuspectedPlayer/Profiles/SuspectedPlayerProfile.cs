@@ -9,7 +9,7 @@ public class SuspectedPlayerProfile : Profile
     public SuspectedPlayerProfile()
     {
         CreateMap<SuspectedPlayerCommand, SuspectedPlayer>()
-            .ForMember(dest => dest.SteamId, opt => opt.MapFrom((src, dest) => dest.SteamId == 0 ? src.SteamId : dest.SteamId))
+            .ForMember(dest => dest.CommunityId, opt => opt.MapFrom((src, dest) => Math.Max(src.CommunityId ?? 0, dest.CommunityId)))
             .AfterMap<ComplementSuspectedPlayerDataMappingAction>();
     }
 }

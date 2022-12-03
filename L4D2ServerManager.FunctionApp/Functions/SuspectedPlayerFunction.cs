@@ -80,7 +80,7 @@ public class SuspectedPlayerFunction
     }
 
     [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(Delete))]
-    public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/{steamId}")] HttpRequest httpRequest, string steamId)
+    public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/{steamId}")] HttpRequest httpRequest, long steamId)
     {
         try
         {
