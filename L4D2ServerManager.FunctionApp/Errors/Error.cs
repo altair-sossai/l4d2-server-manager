@@ -14,7 +14,7 @@ public class Error
 
         var values = failure.FormattedMessagePlaceholderValues;
 
-        if (values != null && values.ContainsKey("PropertyName"))
+        if (values != null && values.ContainsKey("PropertyName") && values["PropertyName"] != null)
             PropertyName = values["PropertyName"].ToString() ?? PropertyName;
     }
 

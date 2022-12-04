@@ -17,6 +17,11 @@ public class SuspectedPlayerSecretRepository : BaseTableStorageRepository<Suspec
         return Exists(PartitionKey, communityId.ToString());
     }
 
+    public bool Validate(long communityId, string secret)
+    {
+        return TableClient.Query<SuspectedPlayerSecret>(q => q.PartitionKey == PartitionKey && q.RowKey == communityId.ToString() && q.Secret == secret).Any();
+    }
+
     public void Delete(long communityId)
     {
         Delete(PartitionKey, communityId.ToString());

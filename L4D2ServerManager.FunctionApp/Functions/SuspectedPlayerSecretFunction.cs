@@ -50,6 +50,24 @@ public class SuspectedPlayerSecretFunction
         }
     }
 
+
+    [FunctionName(nameof(SuspectedPlayerSecretFunction) + "_" + nameof(Validate))]
+    public IActionResult Validate([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players-secret/validate")] HttpRequest httpRequest)
+    {
+        try
+        {
+            var command = httpRequest.DeserializeBody<ValidateSecretCommand>();
+            var valid = _suspectedPlayerSecretService.Validate(command);
+            var result = new { valid };
+
+            return new OkObjectResult(result);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
+
     [FunctionName(nameof(SuspectedPlayerSecretFunction) + "_" + nameof(Delete))]
     public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players-secret/{communityId}")] HttpRequest httpRequest, long communityId)
     {
