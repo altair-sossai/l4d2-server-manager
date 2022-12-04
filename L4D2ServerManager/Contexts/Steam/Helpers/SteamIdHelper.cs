@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using L4D2ServerManager.Extensions;
+using L4D2ServerManager.Infrastructure.Extensions;
 
 namespace L4D2ServerManager.Contexts.Steam.Helpers;
 

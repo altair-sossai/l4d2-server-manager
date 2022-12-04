@@ -1,4 +1,4 @@
-﻿using L4D2ServerManager.Extensions;
+﻿using L4D2ServerManager.Infrastructure.Extensions;
 
 namespace L4D2ServerManager.Modules.ServerManager.Players;
 

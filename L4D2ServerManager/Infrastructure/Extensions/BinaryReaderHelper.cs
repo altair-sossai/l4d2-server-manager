@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace L4D2ServerManager.Extensions;
+namespace L4D2ServerManager.Infrastructure.Extensions;
 
 public static class BinaryReaderHelper
 {

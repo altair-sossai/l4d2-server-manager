@@ -14,7 +14,7 @@ public class SuspectedPlayerService : ISuspectedPlayerService
     private readonly ISteamIdService _steamIdService;
     private readonly IAzureTableStorageContext _tableContext;
     private readonly IValidator<SuspectedPlayer> _validator;
-    private TableClient? _userTable;
+    private TableClient? _suspectedPlayerTable;
 
     public SuspectedPlayerService(IMapper mapper,
         ISteamIdService steamIdService,
@@ -29,7 +29,7 @@ public class SuspectedPlayerService : ISuspectedPlayerService
         CreateIfNotExists();
     }
 
-    private TableClient SuspectedPlayerTable => _userTable ??= _tableContext.GetTableClient("SuspectedPlayers").Result;
+    private TableClient SuspectedPlayerTable => _suspectedPlayerTable ??= _tableContext.GetTableClient("SuspectedPlayer").Result;
 
     public SuspectedPlayer? GetSuspectedPlayer(long communityId)
     {

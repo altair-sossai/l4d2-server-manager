@@ -1,4 +1,4 @@
-﻿using L4D2ServerManager.Extensions;
+﻿using L4D2ServerManager.Infrastructure.Extensions;
 using L4D2ServerManager.Modules.Auth.Users.Enums;
 
 namespace L4D2ServerManager.Modules.Auth.Users.ValueObjects;
