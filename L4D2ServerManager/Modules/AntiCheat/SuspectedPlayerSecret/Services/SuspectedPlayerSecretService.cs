@@ -1,30 +1,23 @@
-﻿using Azure.Data.Tables;
-using FluentValidation;
-using L4D2ServerManager.Contexts.AzureTableStorage;
+﻿using FluentValidation;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerSecret.Commands;
+using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerSecret.Repositories;
 
 namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerSecret.Services;
 
-public class SuspectedPlayerServiceSecret : ISuspectedPlayerServiceSecret
+public class SuspectedPlayerSecretService : ISuspectedPlayerSecretService
 {
-    private static bool _created;
     private readonly IValidator<AddSuspectedPlayerSecretCommand> _commandValidator;
-    private readonly IAzureTableStorageContext _tableContext;
+    private readonly ISuspectedPlayerSecretRepository _suspectedPlayerSecretRepository;
     private readonly IValidator<SuspectedPlayerSecret> _validator;
-    private TableClient? _suspectedPlayerSecretTable;
 
-    public SuspectedPlayerServiceSecret(IAzureTableStorageContext tableContext,
+    public SuspectedPlayerSecretService(ISuspectedPlayerSecretRepository suspectedPlayerSecretRepository,
         IValidator<SuspectedPlayerSecret> validator,
         IValidator<AddSuspectedPlayerSecretCommand> commandValidator)
     {
-        _tableContext = tableContext;
+        _suspectedPlayerSecretRepository = suspectedPlayerSecretRepository;
         _validator = validator;
         _commandValidator = commandValidator;
-
-        CreateIfNotExists();
     }
-
-    private TableClient SuspectedPlayerSecretTable => _suspectedPlayerSecretTable ??= _tableContext.GetTableClient("SuspectedPlayerSecret").Result;
 
     public SuspectedPlayerSecret Add(AddSuspectedPlayerSecretCommand command)
     {
@@ -36,19 +29,8 @@ public class SuspectedPlayerServiceSecret : ISuspectedPlayerServiceSecret
         };
 
         _validator.ValidateAndThrowAsync(suspectedPlayer).Wait();
-
-        SuspectedPlayerSecretTable.AddEntity(suspectedPlayer);
+        _suspectedPlayerSecretRepository.Add(suspectedPlayer);
 
         return suspectedPlayer;
-    }
-
-    private void CreateIfNotExists()
-    {
-        if (_created)
-            return;
-
-        SuspectedPlayerSecretTable.CreateIfNotExists();
-
-        _created = true;
     }
 }

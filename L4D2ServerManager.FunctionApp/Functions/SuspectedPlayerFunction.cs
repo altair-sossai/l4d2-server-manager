@@ -4,8 +4,10 @@ using AutoMapper;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
+using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Results;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
+using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerSecret.Repositories;
 using L4D2ServerManager.Modules.Auth.Users.Enums;
 using L4D2ServerManager.Modules.Auth.Users.Services;
 using Microsoft.AspNetCore.Http;
@@ -18,16 +20,22 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 public class SuspectedPlayerFunction
 {
     private readonly IMapper _mapper;
+    private readonly ISuspectedPlayerRepository _suspectedPlayerRepository;
+    private readonly ISuspectedPlayerSecretRepository _suspectedPlayerSecretRepository;
     private readonly ISuspectedPlayerService _suspectedPlayerService;
     private readonly IUserService _userService;
 
     public SuspectedPlayerFunction(IMapper mapper,
         IUserService userService,
-        ISuspectedPlayerService suspectedPlayerService)
+        ISuspectedPlayerService suspectedPlayerService,
+        ISuspectedPlayerRepository suspectedPlayerRepository,
+        ISuspectedPlayerSecretRepository suspectedPlayerSecretRepository)
     {
         _mapper = mapper;
         _userService = userService;
         _suspectedPlayerService = suspectedPlayerService;
+        _suspectedPlayerRepository = suspectedPlayerRepository;
+        _suspectedPlayerSecretRepository = suspectedPlayerSecretRepository;
     }
 
     [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(GetSuspectedPlayers))]
@@ -37,7 +45,7 @@ public class SuspectedPlayerFunction
         {
             _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
-            var suspectedPlayers = _suspectedPlayerService.GetSuspectedPlayers();
+            var suspectedPlayers = _suspectedPlayerRepository.GetSuspectedPlayers();
             var result = _mapper.Map<List<SuspectedPlayerResult>>(suspectedPlayers);
 
             return new OkObjectResult(result);
@@ -56,7 +64,7 @@ public class SuspectedPlayerFunction
         {
             _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
-            var suspectedPlayer = _suspectedPlayerService.GetSuspectedPlayer(communityId);
+            var suspectedPlayer = _suspectedPlayerRepository.GetSuspectedPlayer(communityId);
             if (suspectedPlayer == null)
                 return new NotFoundResult();
 
@@ -95,7 +103,8 @@ public class SuspectedPlayerFunction
         try
         {
             _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
-            _suspectedPlayerService.Delete(communityId);
+            _suspectedPlayerRepository.Delete(communityId);
+            _suspectedPlayerSecretRepository.Delete(communityId);
 
             return new OkResult();
         }
