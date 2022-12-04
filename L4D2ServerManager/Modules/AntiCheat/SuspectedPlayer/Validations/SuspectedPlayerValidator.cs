@@ -11,8 +11,7 @@ public class SuspectedPlayerValidator : AbstractValidator<SuspectedPlayer>
             .NotEmpty();
 
         RuleFor(r => r.CommunityId)
-            .NotNull()
-            .NotEmpty();
+            .GreaterThan(0);
 
         RuleFor(r => r.Name)
             .NotNull()

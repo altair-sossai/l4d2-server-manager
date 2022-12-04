@@ -42,14 +42,14 @@ public class SuspectedPlayerFunction
     }
 
     [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(GetSuspectedPlayer))]
-    public IActionResult GetSuspectedPlayer([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players/{steamId}")] HttpRequest httpRequest,
-        long steamId)
+    public IActionResult GetSuspectedPlayer([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players/{communityId}")] HttpRequest httpRequest,
+        long communityId)
     {
         try
         {
             _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
-            var suspectedPlayer = _suspectedPlayerService.GetSuspectedPlayer(steamId);
+            var suspectedPlayer = _suspectedPlayerService.GetSuspectedPlayer(communityId);
             if (suspectedPlayer == null)
                 return new NotFoundResult();
 
@@ -80,12 +80,12 @@ public class SuspectedPlayerFunction
     }
 
     [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(Delete))]
-    public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/{steamId}")] HttpRequest httpRequest, long steamId)
+    public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/{communityId}")] HttpRequest httpRequest, long communityId)
     {
         try
         {
             _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
-            _suspectedPlayerService.Delete(steamId);
+            _suspectedPlayerService.Delete(communityId);
 
             return new OkResult();
         }

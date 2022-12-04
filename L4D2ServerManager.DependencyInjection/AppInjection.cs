@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using FluentValidation;
-using L4D2ServerManager.Contexts.Steam;
+using L4D2ServerManager.Contexts.Steam.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace L4D2ServerManager.DependencyInjection;
@@ -22,8 +22,6 @@ public static class AppInjection
             .AddClasses()
             .AsImplementedInterfaces(type => assemblies.Contains(type.Assembly)));
 
-        serviceCollection.AddScoped(serviceProvider => serviceProvider.GetRequiredService<ISteamContext>().PlayerService);
-        serviceCollection.AddScoped(serviceProvider => serviceProvider.GetRequiredService<ISteamContext>().ServerInfoService);
-        serviceCollection.AddScoped(serviceProvider => serviceProvider.GetRequiredService<ISteamContext>().SteamUserService);
+        serviceCollection.AddSteamContext();
     }
 }
