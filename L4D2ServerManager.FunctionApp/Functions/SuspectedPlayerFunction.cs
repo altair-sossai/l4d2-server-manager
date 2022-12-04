@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using AutoMapper;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
+using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Results;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
 using L4D2ServerManager.Modules.Auth.Users.Enums;
 using L4D2ServerManager.Modules.Auth.Users.Services;
@@ -14,12 +17,15 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class SuspectedPlayerFunction
 {
+    private readonly IMapper _mapper;
     private readonly ISuspectedPlayerService _suspectedPlayerService;
     private readonly IUserService _userService;
 
-    public SuspectedPlayerFunction(IUserService userService,
+    public SuspectedPlayerFunction(IMapper mapper,
+        IUserService userService,
         ISuspectedPlayerService suspectedPlayerService)
     {
+        _mapper = mapper;
         _userService = userService;
         _suspectedPlayerService = suspectedPlayerService;
     }
@@ -32,8 +38,9 @@ public class SuspectedPlayerFunction
             _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
             var suspectedPlayers = _suspectedPlayerService.GetSuspectedPlayers();
+            var result = _mapper.Map<List<SuspectedPlayerResult>>(suspectedPlayers);
 
-            return new OkObjectResult(suspectedPlayers);
+            return new OkObjectResult(result);
         }
         catch (Exception exception)
         {
@@ -53,7 +60,9 @@ public class SuspectedPlayerFunction
             if (suspectedPlayer == null)
                 return new NotFoundResult();
 
-            return new OkObjectResult(suspectedPlayer);
+            var result = _mapper.Map<SuspectedPlayerResult>(suspectedPlayer);
+
+            return new OkObjectResult(result);
         }
         catch (Exception exception)
         {
@@ -70,8 +79,9 @@ public class SuspectedPlayerFunction
 
             var command = httpRequest.DeserializeBody<SuspectedPlayerCommand>();
             var suspectedPlayer = _suspectedPlayerService.AddOrUpdate(command);
+            var result = _mapper.Map<SuspectedPlayerResult>(suspectedPlayer);
 
-            return new OkObjectResult(suspectedPlayer);
+            return new OkObjectResult(result);
         }
         catch (Exception exception)
         {
