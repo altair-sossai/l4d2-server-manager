@@ -1,4 +1,4 @@
-﻿using L4D2ServerManager.Modules.ServerManager.Server.Info.ValueObjects;
+﻿using L4D2ServerManager.Contexts.Steam.ValueObjects;
 
 namespace L4D2ServerManager.Modules.ServerManager.Port;
 

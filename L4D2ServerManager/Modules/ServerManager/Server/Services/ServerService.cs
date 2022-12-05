@@ -1,20 +1,17 @@
-﻿using L4D2ServerManager.Modules.ServerManager.Server.Info.Context;
-using L4D2ServerManager.Modules.ServerManager.Server.Info.ValueObjects;
+﻿using L4D2ServerManager.Contexts.Steam;
+using L4D2ServerManager.Contexts.Steam.ValueObjects;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine;
-using Microsoft.Extensions.Configuration;
 
 namespace L4D2ServerManager.Modules.ServerManager.Server.Services;
 
 public class ServerService : IServerService
 {
-    private readonly IConfiguration _configuration;
+    private readonly ISteamContext _steamContext;
 
-    public ServerService(IConfiguration configuration)
+    public ServerService(ISteamContext steamContext)
     {
-        _configuration = configuration;
+        _steamContext = steamContext;
     }
-
-    private string SteamApiKey => _configuration.GetValue<string>(nameof(SteamApiKey))!;
 
     public IServer GetByPort(IVirtualMachine virtualMachine, int port)
     {
@@ -32,8 +29,8 @@ public class ServerService : IServerService
     {
         try
         {
-            var serverInfoService = SteamContext.ServerInfoService;
-            var responseData = await serverInfoService.GetServerInfo(SteamApiKey, $"addr\\{ip}:{port}");
+            var serverInfoService = _steamContext.ServerInfoService;
+            var responseData = await serverInfoService.GetServerInfo(_steamContext.SteamApiKey, $"addr\\{ip}:{port}");
 
             return responseData.Response?.Servers?.FirstOrDefault();
         }
