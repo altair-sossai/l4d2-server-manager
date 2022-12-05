@@ -24,9 +24,9 @@ public class SuspectedPlayerSecretService : ISuspectedPlayerSecretService
 
     public bool Validate(ValidateSecretCommand command)
     {
-        _validateSecretValidator.ValidateAndThrowAsync(command).Wait();
+        var result = _validateSecretValidator.ValidateAsync(command).Result;
 
-        return true;
+        return result.IsValid;
     }
 
     public SuspectedPlayerSecret Add(AddSuspectedPlayerSecretCommand command)
