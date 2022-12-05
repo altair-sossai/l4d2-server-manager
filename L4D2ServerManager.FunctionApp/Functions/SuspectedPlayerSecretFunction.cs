@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using AutoMapper;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
@@ -34,11 +35,11 @@ public class SuspectedPlayerSecretFunction
     }
 
     [FunctionName(nameof(SuspectedPlayerSecretFunction) + "_" + nameof(Add))]
-    public IActionResult Add([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players-secret")] HttpRequest httpRequest)
+    public async Task<IActionResult> Add([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players-secret")] HttpRequest httpRequest)
     {
         try
         {
-            var command = httpRequest.DeserializeBody<AddSuspectedPlayerSecretCommand>();
+            var command = await httpRequest.DeserializeBodyAsync<AddSuspectedPlayerSecretCommand>();
             var suspectedPlayerSecret = _suspectedPlayerSecretService.Add(command);
             var result = _mapper.Map<SuspectedPlayerSecretResult>(suspectedPlayerSecret);
 
@@ -52,11 +53,11 @@ public class SuspectedPlayerSecretFunction
 
 
     [FunctionName(nameof(SuspectedPlayerSecretFunction) + "_" + nameof(Validate))]
-    public IActionResult Validate([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players-secret/validate")] HttpRequest httpRequest)
+    public async Task<IActionResult> Validate([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players-secret/validate")] HttpRequest httpRequest)
     {
         try
         {
-            var command = httpRequest.DeserializeBody<ValidateSecretCommand>();
+            var command = await httpRequest.DeserializeBodyAsync<ValidateSecretCommand>();
             var valid = _suspectedPlayerSecretService.Validate(command);
             var result = new { valid };
 

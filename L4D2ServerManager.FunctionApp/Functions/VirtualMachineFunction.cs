@@ -56,6 +56,21 @@ public class VirtualMachineFunction
         }
     }
 
+    [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(Info))]
+    public IActionResult Info([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "virtual-machine/info")] HttpRequest httpRequest)
+    {
+        try
+        {
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+
+            return new OkObjectResult(virtualMachine);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
+
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOnAsync))]
     public async Task<IActionResult> PowerOnAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-on")] HttpRequest httpRequest)
     {

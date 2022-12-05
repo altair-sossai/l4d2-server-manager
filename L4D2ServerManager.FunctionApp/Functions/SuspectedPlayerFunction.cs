@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
@@ -62,8 +63,6 @@ public class SuspectedPlayerFunction
     {
         try
         {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
-
             var suspectedPlayer = _suspectedPlayerRepository.GetSuspectedPlayer(communityId);
             if (suspectedPlayer == null)
                 return new NotFoundResult();
@@ -79,13 +78,13 @@ public class SuspectedPlayerFunction
     }
 
     [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(AddOrUpdate))]
-    public IActionResult AddOrUpdate([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players")] HttpRequest httpRequest)
+    public async Task<IActionResult> AddOrUpdate([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players")] HttpRequest httpRequest)
     {
         try
         {
             _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
-            var command = httpRequest.DeserializeBody<SuspectedPlayerCommand>();
+            var command = await httpRequest.DeserializeBodyAsync<SuspectedPlayerCommand>();
             var suspectedPlayer = _suspectedPlayerService.AddOrUpdate(command);
             var result = _mapper.Map<SuspectedPlayerResult>(suspectedPlayer);
 
