@@ -154,7 +154,7 @@ public class ServerFunction
     {
         lock (Lock)
         {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             var server = _serverService.GetByPort(virtualMachine, port);
             var request = httpRequest.DeserializeBody<RunServerRequest>();
