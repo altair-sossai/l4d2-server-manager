@@ -14,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".devops", ".devops", "{F20D
 		azure-pipelines.yml = azure-pipelines.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A2394F98-7E7B-4597-84B1-2E55E9F53F89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L4D2ServerManager.Tests", "tests\L4D2ServerManager.Tests\L4D2ServerManager.Tests.csproj", "{92D70B82-4490-46ED-A620-7349A34AFF82}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,9 +36,16 @@ Global
 		{59145010-5CE4-4BA9-873F-1C40AE00ECDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59145010-5CE4-4BA9-873F-1C40AE00ECDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59145010-5CE4-4BA9-873F-1C40AE00ECDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92D70B82-4490-46ED-A620-7349A34AFF82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92D70B82-4490-46ED-A620-7349A34AFF82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92D70B82-4490-46ED-A620-7349A34AFF82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92D70B82-4490-46ED-A620-7349A34AFF82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{92D70B82-4490-46ED-A620-7349A34AFF82} = {A2394F98-7E7B-4597-84B1-2E55E9F53F89}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E1834E4C-0EFA-44E6-901E-6B244401C394}
