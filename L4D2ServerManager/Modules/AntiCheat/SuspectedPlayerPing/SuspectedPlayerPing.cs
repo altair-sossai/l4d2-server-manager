@@ -7,7 +7,7 @@ public class SuspectedPlayerPing : ITableEntity
 {
     public long CommunityId
     {
-        get => long.TryParse(RowKey, out var steamId) ? steamId : 0;
+        get => long.TryParse(RowKey, out var communityId) ? communityId : 0;
         set => RowKey = value.ToString();
     }
 
