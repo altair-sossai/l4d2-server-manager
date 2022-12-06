@@ -42,6 +42,13 @@ public class Server : IServer
         await RunAsync(user, command);
     }
 
+    public async Task RunDunasaAsync(User user, Campaign campaign)
+    {
+        var command = new RunDunasaServerCommand(Port, campaign);
+
+        await RunAsync(user, command);
+    }
+
     public void Stop()
     {
         if (!IsRunning)

@@ -148,6 +148,23 @@ public class ServerFunction
         }
     }
 
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(RunDunasaLocked))]
+    public IActionResult RunDunasaLocked([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run-dunasa")] HttpRequest httpRequest,
+        int port)
+    {
+        lock (Lock)
+        {
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+            var server = _serverService.GetByPort(virtualMachine, port);
+            var request = httpRequest.DeserializeBody<RunServerRequest>();
+
+            server.RunDunasaAsync(user, request.Campaign).Wait();
+
+            return new OkResult();
+        }
+    }
+
     [FunctionName(nameof(ServerFunction) + "_" + nameof(Stop))]
     public IActionResult Stop([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/stop")] HttpRequest httpRequest,
         int port)
