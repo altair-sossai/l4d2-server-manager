@@ -25,7 +25,7 @@ public class SuspectedPlayerPingFunction
     }
 
     [FunctionName(nameof(SuspectedPlayerPingFunction) + "_" + nameof(Ping))]
-    public async Task<IActionResult> Ping([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players-Ping")] HttpRequest httpRequest)
+    public async Task<IActionResult> Ping([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players-ping")] HttpRequest httpRequest)
     {
         try
         {

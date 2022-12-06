@@ -7,7 +7,7 @@ public class SuspectedPlayerAuthenticationCommand
         if (string.IsNullOrEmpty(accessToken))
             return;
 
-        var segments = accessToken.Split(':', 2);
+        var segments = accessToken.Replace("basic ", string.Empty, StringComparison.CurrentCultureIgnoreCase).Trim().Split(':', 2);
 
         CommunityId = long.TryParse(segments.FirstOrDefault(), out var communityId) ? communityId : 0;
         Secret = segments.LastOrDefault();
