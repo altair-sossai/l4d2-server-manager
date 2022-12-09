@@ -9,4 +9,9 @@ public class SuspectedPlayerPingRepository : BaseTableStorageRepository<Suspecte
         : base("SuspectedPlayerPing", tableContext)
     {
     }
+
+    public SuspectedPlayerPing? Find(long communityId)
+    {
+        return Find("shared", communityId.ToString());
+    }
 }

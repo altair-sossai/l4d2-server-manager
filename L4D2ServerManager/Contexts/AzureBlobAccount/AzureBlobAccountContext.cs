@@ -45,7 +45,11 @@ public class AzureBlobAccountContext : IAzureBlobAccountContext
 
     public async Task DeleteBlobContainerAsync(string blobContainerName)
     {
-        await BlobServiceClient.DeleteBlobContainerAsync(blobContainerName);
+        var blobContainerClient = GetBlobContainerClient(blobContainerName);
+        if (!await blobContainerClient.ExistsAsync())
+            return;
+
+        await blobContainerClient.DeleteAsync();
 
         _containers.Remove(blobContainerName);
     }

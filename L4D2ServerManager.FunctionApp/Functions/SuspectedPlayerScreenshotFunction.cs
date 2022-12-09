@@ -44,8 +44,8 @@ public class SuspectedPlayerScreenshotFunction
         }
     }
 
-    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(Screenshots))]
-    public async Task<IActionResult> Screenshots([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-screenshot/{communityId:long}/screenshots")] HttpRequest httpRequest, long communityId)
+    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(GetAsync))]
+    public async Task<IActionResult> GetAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-screenshot/{communityId:long}")] HttpRequest httpRequest, long communityId)
     {
         try
         {
@@ -64,8 +64,8 @@ public class SuspectedPlayerScreenshotFunction
         }
     }
 
-    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(DeleteAllScreenshots))]
-    public async Task<IActionResult> DeleteAllScreenshots([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players-screenshot/{communityId:long}/delete-all-screenshots")] HttpRequest httpRequest, long communityId)
+    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(DeleteAsync))]
+    public async Task<IActionResult> DeleteAsync([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players-screenshot/{communityId:long}")] HttpRequest httpRequest, long communityId)
     {
         try
         {

@@ -54,6 +54,9 @@ public class SuspectedPlayerScreenshotService : ISuspectedPlayerScreenshotServic
         var containerClient = _blobAccountContext.GetBlobContainerClient(blobContainerName);
         var screenshots = new List<ScreenshotResult>();
 
+        if (!await containerClient.ExistsAsync())
+            return screenshots;
+
         await foreach (var blobItem in containerClient.GetBlobsAsync())
         {
             var url = await _blobAccountContext.GenerateSasUrlAsync(blobContainerName, blobItem.Name, BlobSasPermissions.Read, DateTimeOffset.Now.AddHours(8));
