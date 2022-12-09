@@ -70,7 +70,7 @@ public class SuspectedPlayerSecretFunction
     }
 
     [FunctionName(nameof(SuspectedPlayerSecretFunction) + "_" + nameof(Delete))]
-    public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players-secret/{communityId}")] HttpRequest httpRequest, long communityId)
+    public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players-secret/{communityId:long}")] HttpRequest httpRequest, long communityId)
     {
         try
         {

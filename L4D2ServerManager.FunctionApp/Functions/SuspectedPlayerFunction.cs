@@ -62,7 +62,7 @@ public class SuspectedPlayerFunction
     }
 
     [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(GetSuspectedPlayer))]
-    public IActionResult GetSuspectedPlayer([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players/{communityId}")] HttpRequest httpRequest,
+    public IActionResult GetSuspectedPlayer([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players/{communityId:long}")] HttpRequest httpRequest,
         long communityId)
     {
         try
@@ -101,7 +101,7 @@ public class SuspectedPlayerFunction
     }
 
     [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(Delete))]
-    public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/{communityId}")] HttpRequest httpRequest, long communityId)
+    public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/{communityId:long}")] HttpRequest httpRequest, long communityId)
     {
         try
         {

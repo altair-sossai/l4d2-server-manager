@@ -1,6 +1,7 @@
 ﻿using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 using L4D2ServerManager.Contexts.AzureBlobAccount;
+using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerScreenshot.Results;
 
 namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerScreenshot.Services;
 
@@ -15,17 +16,17 @@ public class SuspectedPlayerScreenshotService : ISuspectedPlayerScreenshotServic
 
     public Task<string> GenerateUploadUrlAsync(long communityId)
     {
-        var container = $"screenshot-{communityId}";
+        var blobContainerName = $"screenshot-{communityId}";
         var blobName = $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.jpg";
 
-        return _blobAccountContext.GenerateSasUrlAsync(container, blobName, BlobSasPermissions.Create, DateTimeOffset.Now.AddDays(1));
+        return _blobAccountContext.GenerateSasUrlAsync(blobContainerName, blobName, BlobSasPermissions.Create, DateTimeOffset.Now.AddDays(1));
     }
 
     public async Task DeleteAllScreenshots(long communityId)
     {
-        var container = $"screenshot-{communityId}";
+        var blobContainerName = $"screenshot-{communityId}";
 
-        await _blobAccountContext.DeleteBlobContainerAsync(container);
+        await _blobAccountContext.DeleteBlobContainerAsync(blobContainerName);
     }
 
     public async Task DeleteOldScreenshotsAsync()
@@ -45,5 +46,22 @@ public class SuspectedPlayerScreenshotService : ISuspectedPlayerScreenshotServic
                 await containerClient.DeleteBlobAsync(blobItem.Name, DeleteSnapshotsOption.IncludeSnapshots);
             }
         }
+    }
+
+    public async Task<List<ScreenshotResult>> ScreenshotsAsync(long communityId, int skip, int take)
+    {
+        var blobContainerName = $"screenshot-{communityId}";
+        var containerClient = _blobAccountContext.GetBlobContainerClient(blobContainerName);
+        var screenshots = new List<ScreenshotResult>();
+
+        await foreach (var blobItem in containerClient.GetBlobsAsync())
+        {
+            var url = await _blobAccountContext.GenerateSasUrlAsync(blobContainerName, blobItem.Name, BlobSasPermissions.Read, DateTimeOffset.Now.AddHours(8));
+            var screenshot = new ScreenshotResult(url, blobItem);
+
+            screenshots.Add(screenshot);
+        }
+
+        return screenshots.OrderByDescending(o => o.CreatedOn).Skip(skip).Take(take).ToList();
     }
 }

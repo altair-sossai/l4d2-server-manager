@@ -44,14 +44,34 @@ public class SuspectedPlayerScreenshotFunction
         }
     }
 
-
-    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(DeleteAllScreenshots))]
-    public IActionResult DeleteAllScreenshots([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players-screenshot/{communityId}/delete-all-screenshots")] HttpRequest httpRequest, long communityId)
+    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(Screenshots))]
+    public async Task<IActionResult> Screenshots([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-screenshot/{communityId:long}/screenshots")] HttpRequest httpRequest, long communityId)
     {
         try
         {
             _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
-            _suspectedPlayerScreenshotService.DeleteAllScreenshots(communityId);
+
+            var parameters = httpRequest.GetQueryParameterDictionary();
+            var skip = parameters.ContainsKey("skip") && int.TryParse(parameters["skip"], out var skipValue) ? skipValue : 0;
+            var take = parameters.ContainsKey("take") && int.TryParse(parameters["take"], out var takeValue) ? takeValue : 100;
+            var screenshots = await _suspectedPlayerScreenshotService.ScreenshotsAsync(communityId, skip, take);
+
+            return new OkObjectResult(screenshots);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
+
+    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(DeleteAllScreenshots))]
+    public async Task<IActionResult> DeleteAllScreenshots([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players-screenshot/{communityId:long}/delete-all-screenshots")] HttpRequest httpRequest, long communityId)
+    {
+        try
+        {
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+
+            await _suspectedPlayerScreenshotService.DeleteAllScreenshots(communityId);
 
             return new OkResult();
         }
