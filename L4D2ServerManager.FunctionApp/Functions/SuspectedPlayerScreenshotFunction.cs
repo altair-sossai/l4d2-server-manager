@@ -38,4 +38,10 @@ public class SuspectedPlayerScreenshotFunction
             return ErrorResult.Build(exception).ResponseMessageResult();
         }
     }
+
+    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(DeleteOldScreenshotsAsync))]
+    public async Task DeleteOldScreenshotsAsync([TimerTrigger("0 */10 * * * *")] TimerInfo timerInfo)
+    {
+        await _suspectedPlayerScreenshotService.DeleteOldScreenshotsAsync();
+    }
 }

@@ -3,4 +3,5 @@
 public interface ISuspectedPlayerScreenshotService
 {
     Task<string> GenerateUploadUrlAsync(long communityId);
+    Task DeleteOldScreenshotsAsync();
 }
