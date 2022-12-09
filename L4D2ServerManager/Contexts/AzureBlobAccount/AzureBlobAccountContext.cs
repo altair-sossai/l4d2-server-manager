@@ -22,11 +22,11 @@ public class AzureBlobAccountContext : IAzureBlobAccountContext
     private string ConnectionString => _configuration.GetValue<string>("AzureWebJobsStorage")!;
     private BlobServiceClient BlobServiceClient => _blobServiceClient ??= new BlobServiceClient(ConnectionString);
 
-    public async Task<string> GenerateSasUrlAsync(string container, string blobName, BlobSasPermissions permissions, DateTimeOffset expiresOn)
+    public async Task<string> GenerateSasUrlAsync(string blobContainerName, string blobName, BlobSasPermissions permissions, DateTimeOffset expiresOn)
     {
-        await CreateContainerIfNotExistsAsync(container);
+        await CreateContainerIfNotExistsAsync(blobContainerName);
 
-        var blobClient = new BlobBaseClient(ConnectionString, container, blobName);
+        var blobClient = new BlobBaseClient(ConnectionString, blobContainerName, blobName);
         var uri = blobClient.GenerateSasUri(permissions, expiresOn);
         var publicUrl = uri.ToString();
 
@@ -43,13 +43,21 @@ public class AzureBlobAccountContext : IAzureBlobAccountContext
         return BlobServiceClient.GetBlobContainerClient(blobContainerName);
     }
 
-    private async Task CreateContainerIfNotExistsAsync(string container)
+    public async Task DeleteBlobContainerAsync(string blobContainerName)
     {
-        if (_containers.ContainsKey(container)) return;
+        await BlobServiceClient.DeleteBlobContainerAsync(blobContainerName);
 
-        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(container);
+        _containers.Remove(blobContainerName);
+    }
+
+    private async Task CreateContainerIfNotExistsAsync(string blobContainerName)
+    {
+        if (_containers.ContainsKey(blobContainerName))
+            return;
+
+        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(blobContainerName);
         await blobContainerClient.CreateIfNotExistsAsync();
 
-        _containers.Add(container, blobContainerClient);
+        _containers.Add(blobContainerName, blobContainerClient);
     }
 }

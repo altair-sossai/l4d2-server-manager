@@ -4,6 +4,8 @@ using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerScreenshot.Services;
+using L4D2ServerManager.Modules.Auth.Users.Enums;
+using L4D2ServerManager.Modules.Auth.Users.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -15,16 +17,19 @@ public class SuspectedPlayerScreenshotFunction
 {
     private readonly ISuspectedPlayerScreenshotService _suspectedPlayerScreenshotService;
     private readonly ISuspectedPlayerService _suspectedPlayerService;
+    private readonly IUserService _userService;
 
-    public SuspectedPlayerScreenshotFunction(ISuspectedPlayerService suspectedPlayerService,
+    public SuspectedPlayerScreenshotFunction(IUserService userService,
+        ISuspectedPlayerService suspectedPlayerService,
         ISuspectedPlayerScreenshotService suspectedPlayerScreenshotService)
     {
+        _userService = userService;
         _suspectedPlayerService = suspectedPlayerService;
         _suspectedPlayerScreenshotService = suspectedPlayerScreenshotService;
     }
 
     [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(GenerateUploadUrlAsync))]
-    public async Task<IActionResult> GenerateUploadUrlAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-Screenshot/generate-upload-url")] HttpRequest httpRequest)
+    public async Task<IActionResult> GenerateUploadUrlAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-screenshot/generate-upload-url")] HttpRequest httpRequest)
     {
         try
         {
@@ -32,6 +37,23 @@ public class SuspectedPlayerScreenshotFunction
             var url = await _suspectedPlayerScreenshotService.GenerateUploadUrlAsync(suspectedPlayer.CommunityId);
 
             return new OkObjectResult(new { url });
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
+
+
+    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(DeleteAllScreenshots))]
+    public IActionResult DeleteAllScreenshots([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players-screenshot/{communityId}/delete-all-screenshots")] HttpRequest httpRequest, long communityId)
+    {
+        try
+        {
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+            _suspectedPlayerScreenshotService.DeleteAllScreenshots(communityId);
+
+            return new OkResult();
         }
         catch (Exception exception)
         {

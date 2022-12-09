@@ -8,6 +8,7 @@ using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Results;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
+using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerScreenshot.Services;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerSecret.Repositories;
 using L4D2ServerManager.Modules.Auth.Users.Enums;
 using L4D2ServerManager.Modules.Auth.Users.Services;
@@ -22,6 +23,7 @@ public class SuspectedPlayerFunction
 {
     private readonly IMapper _mapper;
     private readonly ISuspectedPlayerRepository _suspectedPlayerRepository;
+    private readonly ISuspectedPlayerScreenshotService _suspectedPlayerScreenshotService;
     private readonly ISuspectedPlayerSecretRepository _suspectedPlayerSecretRepository;
     private readonly ISuspectedPlayerService _suspectedPlayerService;
     private readonly IUserService _userService;
@@ -29,12 +31,14 @@ public class SuspectedPlayerFunction
     public SuspectedPlayerFunction(IMapper mapper,
         IUserService userService,
         ISuspectedPlayerService suspectedPlayerService,
+        ISuspectedPlayerScreenshotService suspectedPlayerScreenshotService,
         ISuspectedPlayerRepository suspectedPlayerRepository,
         ISuspectedPlayerSecretRepository suspectedPlayerSecretRepository)
     {
         _mapper = mapper;
         _userService = userService;
         _suspectedPlayerService = suspectedPlayerService;
+        _suspectedPlayerScreenshotService = suspectedPlayerScreenshotService;
         _suspectedPlayerRepository = suspectedPlayerRepository;
         _suspectedPlayerSecretRepository = suspectedPlayerSecretRepository;
     }
@@ -104,6 +108,7 @@ public class SuspectedPlayerFunction
             _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
             _suspectedPlayerRepository.Delete(communityId);
             _suspectedPlayerSecretRepository.Delete(communityId);
+            _suspectedPlayerScreenshotService.DeleteAllScreenshots(communityId);
 
             return new OkResult();
         }
