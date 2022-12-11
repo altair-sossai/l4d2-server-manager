@@ -14,6 +14,12 @@ public class SuspectedPlayerProcess : ITableEntity
     public string? ProcessName { get; set; }
     public string? WindowTitle { get; set; }
     public string? FileName { get; set; }
+    public string? Module { get; set; }
+    public string? CompanyName { get; set; }
+    public string? FileDescription { get; set; }
+    public string? FileVersion { get; set; }
+    public string? OriginalFilename { get; set; }
+    public string? ProductName { get; set; }
 
     public string PartitionKey { get; set; } = default!;
     public string RowKey { get; set; } = default!;
