@@ -22,7 +22,7 @@ public abstract class BaseTableStorageRepository
 
     protected TableClient TableClient => _tableClient ??= _tableContext.GetTableClient(_tableName).Result;
 
-    public void Delete(string partitionKey, string rowKey)
+    protected void Delete(string partitionKey, string rowKey)
     {
         TableClient.DeleteEntity(partitionKey, rowKey);
     }
@@ -46,17 +46,17 @@ public abstract class BaseTableStorageRepository<TEntity> : BaseTableStorageRepo
     {
     }
 
-    public bool Exists(string partitionKey, string rowKey)
+    protected bool Exists(string partitionKey, string rowKey)
     {
         return TableClient.Query<TEntity>(q => q.PartitionKey == partitionKey && q.RowKey == rowKey).Any();
     }
 
-    public TEntity? Find(string partitionKey, string rowKey)
+    protected TEntity? Find(string partitionKey, string rowKey)
     {
         return TableClient.Query<TEntity>(q => q.PartitionKey == partitionKey && q.RowKey == rowKey).FirstOrDefault();
     }
 
-    public IEnumerable<TEntity> GetAll()
+    protected IEnumerable<TEntity> GetAll()
     {
         return TableClient.Query<TEntity>();
     }
