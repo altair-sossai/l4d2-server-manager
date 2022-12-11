@@ -17,7 +17,7 @@ public class SuspectedPlayerScreenshotService : ISuspectedPlayerScreenshotServic
     public Task<string> GenerateUploadUrlAsync(long communityId)
     {
         var blobContainerName = $"screenshot-{communityId}";
-        var blobName = $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.jpg";
+        var blobName = $"{long.MaxValue - DateTime.UtcNow.Ticks}.jpg";
 
         return _blobAccountContext.GenerateSasUrlAsync(blobContainerName, blobName, BlobSasPermissions.Create, DateTimeOffset.Now.AddDays(1));
     }
@@ -59,12 +59,18 @@ public class SuspectedPlayerScreenshotService : ISuspectedPlayerScreenshotServic
 
         await foreach (var blobItem in containerClient.GetBlobsAsync())
         {
+            if (skip-- > 0)
+                continue;
+
             var url = await _blobAccountContext.GenerateSasUrlAsync(blobContainerName, blobItem.Name, BlobSasPermissions.Read, DateTimeOffset.Now.AddHours(8));
             var screenshot = new ScreenshotResult(url, blobItem);
 
             screenshots.Add(screenshot);
+
+            if (screenshots.Count == take)
+                break;
         }
 
-        return screenshots.OrderByDescending(o => o.CreatedOn).Skip(skip).Take(take).ToList();
+        return screenshots;
     }
 }
