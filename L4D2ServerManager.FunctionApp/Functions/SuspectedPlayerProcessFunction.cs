@@ -59,7 +59,7 @@ public class SuspectedPlayerProcessFunction
             var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
             var commands = await httpRequest.DeserializeBodyAsync<List<ProcessCommand>>();
 
-            //_suspectedPlayerProcessService.AddOrUpdate(suspectedPlayer.CommunityId, commands);
+            _suspectedPlayerProcessService.BatchOperation(suspectedPlayer.CommunityId, commands);
 
             return new OkResult();
         }

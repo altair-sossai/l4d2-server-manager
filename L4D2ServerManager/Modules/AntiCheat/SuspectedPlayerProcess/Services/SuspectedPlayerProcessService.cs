@@ -15,7 +15,7 @@ public class SuspectedPlayerProcessService : ISuspectedPlayerProcessService
         _suspectedPlayerProcessRepository = suspectedPlayerProcessRepository;
     }
 
-    public void AddOrUpdate(long communityId, IEnumerable<ProcessCommand> commands)
+    public void BatchOperation(long communityId, IEnumerable<ProcessCommand> commands)
     {
         var processess = _mapper.Map<List<SuspectedPlayerProcess>>(commands);
 

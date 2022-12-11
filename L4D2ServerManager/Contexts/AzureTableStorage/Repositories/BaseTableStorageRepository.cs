@@ -70,4 +70,13 @@ public abstract class BaseTableStorageRepository<TEntity> : BaseTableStorageRepo
     {
         TableClient.UpsertEntity(entity);
     }
+
+    public void AddOrUpdate(IEnumerable<TEntity> entities)
+    {
+        var transaction = entities
+            .Select(entity => new TableTransactionAction(TableTransactionActionType.UpsertMerge, entity))
+            .ToList();
+
+        TableClient.SubmitTransaction(transaction);
+    }
 }
