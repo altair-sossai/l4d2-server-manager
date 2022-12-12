@@ -2,6 +2,6 @@
 
 public interface ISuspectedPlayerPingRepository
 {
-    SuspectedPlayerPing? Find(long communityId);
-    void AddOrUpdate(SuspectedPlayerPing suspectedPlayerPing);
+	SuspectedPlayerPing? Find(long communityId);
+	void AddOrUpdate(SuspectedPlayerPing suspectedPlayerPing);
 }

@@ -10,96 +10,89 @@ namespace L4D2ServerManager.Modules.ServerManager.Server;
 
 public class Server : IServer
 {
-    private readonly IServerService _serverService;
-    private readonly IVirtualMachine _virtualMachine;
+	private readonly IServerService _serverService;
+	private readonly IVirtualMachine _virtualMachine;
 
-    public Server(IServerService serverService, IVirtualMachine virtualMachine, int port)
-    {
-        _serverService = serverService;
-        _virtualMachine = virtualMachine;
-        Port = port;
-    }
+	public Server(IServerService serverService, IVirtualMachine virtualMachine, int port)
+	{
+		_serverService = serverService;
+		_virtualMachine = virtualMachine;
+		Port = port;
+	}
 
-    public string IpAddress => _virtualMachine.IpAddress;
-    public int Port { get; }
-    public bool IsRunning => _serverService.IsRunningAsync(IpAddress, Port).Result;
-    public PortInfo PortInfo => _virtualMachine.GetPortInfoAsync(Port).Result;
-    public HashSet<string> Permissions { get; } = new();
-    public string? StartedBy => _virtualMachine.StartedBy(Port);
-    public DateTime? StartedAt => _virtualMachine.StartedAt(Port);
+	public string IpAddress => _virtualMachine.IpAddress;
+	public int Port { get; }
+	public bool IsRunning => _serverService.IsRunningAsync(IpAddress, Port).Result;
+	public PortInfo PortInfo => _virtualMachine.GetPortInfoAsync(Port).Result;
+	public HashSet<string> Permissions { get; } = new();
+	public string? StartedBy => _virtualMachine.StartedBy(Port);
+	public DateTime? StartedAt => _virtualMachine.StartedAt(Port);
 
-    public async Task RunAsync(User user, Campaign campaign)
-    {
-        var command = new RunServerCommand(Port, campaign);
+	public async Task RunAsync(User user, Campaign campaign)
+	{
+		var command = new RunServerCommand(Port, campaign);
 
-        await RunAsync(user, command);
-    }
+		await RunAsync(user, command);
+	}
 
-    public async Task RunZoneAsync(User user, Campaign campaign)
-    {
-        var command = new RunZoneServerCommand(Port, campaign);
+	public async Task RunZoneAsync(User user, Campaign campaign)
+	{
+		var command = new RunZoneServerCommand(Port, campaign);
 
-        await RunAsync(user, command);
-    }
+		await RunAsync(user, command);
+	}
 
-    public async Task RunDunasaAsync(User user, Campaign campaign)
-    {
-        var command = new RunDunasaServerCommand(Port, campaign);
+	public void Stop()
+	{
+		if (!IsRunning)
+			return;
 
-        await RunAsync(user, command);
-    }
+		var command = new StopServerCommand(Port);
 
-    public void Stop()
-    {
-        if (!IsRunning)
-            return;
+		_virtualMachine.RunCommand(command);
+	}
 
-        var command = new StopServerCommand(Port);
+	public void KickAllPlayers()
+	{
+		if (!IsRunning)
+			return;
 
-        _virtualMachine.RunCommand(command);
-    }
+		var command = new KickAllPlayersCommand(Port);
 
-    public void KickAllPlayers()
-    {
-        if (!IsRunning)
-            return;
+		_virtualMachine.RunCommand(command);
+	}
 
-        var command = new KickAllPlayersCommand(Port);
+	public async Task OpenPortAsync(string ranges)
+	{
+		await _virtualMachine.OpenPortAsync(Port, ranges);
+	}
 
-        _virtualMachine.RunCommand(command);
-    }
+	public async Task ClosePortAsync()
+	{
+		await _virtualMachine.ClosePortAsync(Port);
+	}
 
-    public async Task OpenPortAsync(string ranges)
-    {
-        await _virtualMachine.OpenPortAsync(Port, ranges);
-    }
+	private async Task RunAsync(User user, RunScriptCommand command)
+	{
+		if (IsRunning)
+			return;
 
-    public async Task ClosePortAsync()
-    {
-        await _virtualMachine.ClosePortAsync(Port);
-    }
+		_virtualMachine.RunCommand(command);
 
-    private async Task RunAsync(User user, RunScriptCommand command)
-    {
-        if (IsRunning)
-            return;
+		var values = new Dictionary<string, string>
+		{
+			{ $"port-{Port}-started-by", user.Id },
+			{ $"port-{Port}-started-at", DateTime.UtcNow.ToString("u") }
+		};
 
-        _virtualMachine.RunCommand(command);
+		await _virtualMachine.UpdateTagsAsync(values);
 
-        var values = new Dictionary<string, string>
-        {
-            { $"port-{Port}-started-by", user.Id },
-            { $"port-{Port}-started-at", DateTime.UtcNow.ToString("u") }
-        };
+		WaitUntilItsRunning();
+	}
 
-        await _virtualMachine.UpdateTagsAsync(values);
-
-        WaitUntilItsRunning();
-    }
-
-    private void WaitUntilItsRunning()
-    {
-        for (var attempt = 0; !IsRunning && attempt < 15; attempt++)
-            Thread.Sleep(TimeSpan.FromSeconds(5));
-    }
+	private void WaitUntilItsRunning()
+	{
+		for (var attempt = 0; !IsRunning && attempt < 15; attempt++)
+			Thread.Sleep(TimeSpan.FromSeconds(5));
+	}
 }

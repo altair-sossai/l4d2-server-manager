@@ -7,21 +7,21 @@ namespace L4D2ServerManager.DependencyInjection;
 
 public static class AppInjection
 {
-    public static void AddApp(this IServiceCollection serviceCollection)
-    {
-        var assemblies = new[]
-        {
-            Assembly.Load("L4D2ServerManager")
-        };
+	public static void AddApp(this IServiceCollection serviceCollection)
+	{
+		var assemblies = new[]
+		{
+			Assembly.Load("L4D2ServerManager")
+		};
 
-        serviceCollection.AddAutoMapper(assemblies);
-        serviceCollection.AddValidatorsFromAssemblies(assemblies);
+		serviceCollection.AddAutoMapper(assemblies);
+		serviceCollection.AddValidatorsFromAssemblies(assemblies);
 
-        serviceCollection.Scan(scan => scan
-            .FromAssemblies(assemblies)
-            .AddClasses()
-            .AsImplementedInterfaces(type => assemblies.Contains(type.Assembly)));
+		serviceCollection.Scan(scan => scan
+			.FromAssemblies(assemblies)
+			.AddClasses()
+			.AsImplementedInterfaces(type => assemblies.Contains(type.Assembly)));
 
-        serviceCollection.AddSteamContext();
-    }
+		serviceCollection.AddSteamContext();
+	}
 }

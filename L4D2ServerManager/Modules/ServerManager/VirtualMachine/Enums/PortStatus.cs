@@ -2,6 +2,6 @@
 
 public enum PortStatus
 {
-    Open,
-    Close
+	Open,
+	Close
 }

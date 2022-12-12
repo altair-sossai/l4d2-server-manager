@@ -21,106 +21,106 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class SuspectedPlayerFunction
 {
-    private readonly IMapper _mapper;
-    private readonly ISuspectedPlayerRepository _suspectedPlayerRepository;
-    private readonly ISuspectedPlayerScreenshotService _suspectedPlayerScreenshotService;
-    private readonly ISuspectedPlayerSecretRepository _suspectedPlayerSecretRepository;
-    private readonly ISuspectedPlayerService _suspectedPlayerService;
-    private readonly IUserService _userService;
+	private readonly IMapper _mapper;
+	private readonly ISuspectedPlayerRepository _suspectedPlayerRepository;
+	private readonly ISuspectedPlayerScreenshotService _suspectedPlayerScreenshotService;
+	private readonly ISuspectedPlayerSecretRepository _suspectedPlayerSecretRepository;
+	private readonly ISuspectedPlayerService _suspectedPlayerService;
+	private readonly IUserService _userService;
 
-    public SuspectedPlayerFunction(IMapper mapper,
-        IUserService userService,
-        ISuspectedPlayerService suspectedPlayerService,
-        ISuspectedPlayerScreenshotService suspectedPlayerScreenshotService,
-        ISuspectedPlayerRepository suspectedPlayerRepository,
-        ISuspectedPlayerSecretRepository suspectedPlayerSecretRepository)
-    {
-        _mapper = mapper;
-        _userService = userService;
-        _suspectedPlayerService = suspectedPlayerService;
-        _suspectedPlayerScreenshotService = suspectedPlayerScreenshotService;
-        _suspectedPlayerRepository = suspectedPlayerRepository;
-        _suspectedPlayerSecretRepository = suspectedPlayerSecretRepository;
-    }
+	public SuspectedPlayerFunction(IMapper mapper,
+		IUserService userService,
+		ISuspectedPlayerService suspectedPlayerService,
+		ISuspectedPlayerScreenshotService suspectedPlayerScreenshotService,
+		ISuspectedPlayerRepository suspectedPlayerRepository,
+		ISuspectedPlayerSecretRepository suspectedPlayerSecretRepository)
+	{
+		_mapper = mapper;
+		_userService = userService;
+		_suspectedPlayerService = suspectedPlayerService;
+		_suspectedPlayerScreenshotService = suspectedPlayerScreenshotService;
+		_suspectedPlayerRepository = suspectedPlayerRepository;
+		_suspectedPlayerSecretRepository = suspectedPlayerSecretRepository;
+	}
 
-    [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(GetSuspectedPlayers))]
-    public IActionResult GetSuspectedPlayers([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players")] HttpRequest httpRequest)
-    {
-        try
-        {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+	[FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(GetSuspectedPlayers))]
+	public IActionResult GetSuspectedPlayers([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players")] HttpRequest httpRequest)
+	{
+		try
+		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
-            var suspectedPlayers = _suspectedPlayerRepository.GetSuspectedPlayers();
-            var result = _mapper.Map<List<SuspectedPlayerResult>>(suspectedPlayers);
+			var suspectedPlayers = _suspectedPlayerRepository.GetSuspectedPlayers();
+			var result = _mapper.Map<List<SuspectedPlayerResult>>(suspectedPlayers);
 
-            return new OkObjectResult(result);
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(result);
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(GetSuspectedPlayer))]
-    public IActionResult GetSuspectedPlayer([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players/{communityId:long}")] HttpRequest httpRequest,
-        long communityId)
-    {
-        try
-        {
-            var suspectedPlayer = _suspectedPlayerRepository.GetSuspectedPlayer(communityId);
-            if (suspectedPlayer == null)
-                return new NotFoundResult();
+	[FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(GetSuspectedPlayer))]
+	public IActionResult GetSuspectedPlayer([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players/{communityId:long}")] HttpRequest httpRequest,
+		long communityId)
+	{
+		try
+		{
+			var suspectedPlayer = _suspectedPlayerRepository.GetSuspectedPlayer(communityId);
+			if (suspectedPlayer == null)
+				return new NotFoundResult();
 
-            var result = _mapper.Map<SuspectedPlayerResult>(suspectedPlayer);
+			var result = _mapper.Map<SuspectedPlayerResult>(suspectedPlayer);
 
-            return new OkObjectResult(result);
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(result);
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(AddOrUpdate))]
-    public async Task<IActionResult> AddOrUpdate([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players")] HttpRequest httpRequest)
-    {
-        try
-        {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+	[FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(AddOrUpdate))]
+	public async Task<IActionResult> AddOrUpdate([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players")] HttpRequest httpRequest)
+	{
+		try
+		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
-            var command = await httpRequest.DeserializeBodyAsync<SuspectedPlayerCommand>();
-            var suspectedPlayer = _suspectedPlayerService.AddOrUpdate(command);
-            var result = _mapper.Map<SuspectedPlayerResult>(suspectedPlayer);
+			var command = await httpRequest.DeserializeBodyAsync<SuspectedPlayerCommand>();
+			var suspectedPlayer = _suspectedPlayerService.AddOrUpdate(command);
+			var result = _mapper.Map<SuspectedPlayerResult>(suspectedPlayer);
 
-            return new OkObjectResult(result);
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(result);
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(Delete))]
-    public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/{communityId:long}")] HttpRequest httpRequest, long communityId)
-    {
-        try
-        {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
-            _suspectedPlayerRepository.Delete(communityId);
-            _suspectedPlayerSecretRepository.Delete(communityId);
-            _suspectedPlayerScreenshotService.DeleteAllScreenshots(communityId);
+	[FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(Delete))]
+	public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/{communityId:long}")] HttpRequest httpRequest, long communityId)
+	{
+		try
+		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_suspectedPlayerRepository.Delete(communityId);
+			_suspectedPlayerSecretRepository.Delete(communityId);
+			_suspectedPlayerScreenshotService.DeleteAllScreenshots(communityId);
 
-            return new OkResult();
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkResult();
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(Sync))]
-    public void Sync([TimerTrigger("0 */10 * * * *")] TimerInfo timerInfo)
-    {
-        _suspectedPlayerService.Sync();
-    }
+	[FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(Sync))]
+	public void Sync([TimerTrigger("0 */10 * * * *")] TimerInfo timerInfo)
+	{
+		_suspectedPlayerService.Sync();
+	}
 }

@@ -2,5 +2,5 @@
 
 public class RunScriptCommand
 {
-    public List<string> Script { get; } = new();
+	public List<string> Script { get; } = new();
 }

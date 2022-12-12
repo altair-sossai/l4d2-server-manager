@@ -3,8 +3,8 @@
 namespace L4D2ServerManager.Contexts.Steam.Responses;
 
 public class ResponseData<T>
-    where T : class
+	where T : class
 {
-    [JsonPropertyName("response")]
-    public T? Response { get; set; }
+	[JsonPropertyName("response")]
+	public T? Response { get; set; }
 }

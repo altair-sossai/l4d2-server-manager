@@ -5,8 +5,8 @@ namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerProcess.Profiles;
 
 public class SuspectedPlayerProcessProfile : Profile
 {
-    public SuspectedPlayerProcessProfile()
-    {
-        CreateMap<ProcessCommand, SuspectedPlayerProcess>();
-    }
+	public SuspectedPlayerProcessProfile()
+	{
+		CreateMap<ProcessCommand, SuspectedPlayerProcess>();
+	}
 }

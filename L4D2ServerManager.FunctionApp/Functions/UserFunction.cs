@@ -13,62 +13,62 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class UserFunction
 {
-    private readonly IUserService _userService;
+	private readonly IUserService _userService;
 
-    public UserFunction(IUserService userService)
-    {
-        _userService = userService;
-    }
+	public UserFunction(IUserService userService)
+	{
+		_userService = userService;
+	}
 
-    [FunctionName(nameof(UserFunction) + "_" + nameof(Me))]
-    public IActionResult Me([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "me")] HttpRequest httpRequest)
-    {
-        try
-        {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+	[FunctionName(nameof(UserFunction) + "_" + nameof(Me))]
+	public IActionResult Me([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "me")] HttpRequest httpRequest)
+	{
+		try
+		{
+			var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
-            return new OkObjectResult(user.Info());
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(user.Info());
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(UserFunction) + "_" + nameof(Get))]
-    public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users")] HttpRequest httpRequest)
-    {
-        try
-        {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+	[FunctionName(nameof(UserFunction) + "_" + nameof(Get))]
+	public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users")] HttpRequest httpRequest)
+	{
+		try
+		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
-            var users = _userService.GetUsers().Select(user => user.Info()).ToList();
+			var users = _userService.GetUsers().Select(user => user.Info()).ToList();
 
-            return new OkObjectResult(users);
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(users);
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(UserFunction) + "_" + nameof(GetById))]
-    public IActionResult GetById([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{userId}")] HttpRequest httpRequest,
-        string userId)
-    {
-        try
-        {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+	[FunctionName(nameof(UserFunction) + "_" + nameof(GetById))]
+	public IActionResult GetById([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{userId}")] HttpRequest httpRequest,
+		string userId)
+	{
+		try
+		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
-            var user = _userService.GetUser(userId);
-            if (user == null)
-                return new NotFoundResult();
+			var user = _userService.GetUser(userId);
+			if (user == null)
+				return new NotFoundResult();
 
-            return new OkObjectResult(user.Info());
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(user.Info());
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 }

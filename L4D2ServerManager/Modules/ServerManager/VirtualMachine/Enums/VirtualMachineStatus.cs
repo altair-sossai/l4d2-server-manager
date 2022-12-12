@@ -2,7 +2,7 @@
 
 public enum VirtualMachineStatus
 {
-    On,
-    Off,
-    Unknown
+	On,
+	Off,
+	Unknown
 }

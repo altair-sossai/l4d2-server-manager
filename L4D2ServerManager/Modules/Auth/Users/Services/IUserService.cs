@@ -6,9 +6,9 @@ namespace L4D2ServerManager.Modules.Auth.Users.Services;
 
 public interface IUserService
 {
-    User EnsureAuthentication(string token, AccessLevel accessLevel);
-    User? GetUser(string userId);
-    IEnumerable<User> GetUsers();
-    void ApplyPermissions(User user, IVirtualMachine virtualMachine);
-    void ApplyPermissions(User user, IServer server);
+	User EnsureAuthentication(string token, AccessLevel accessLevel);
+	User? GetUser(string userId);
+	IEnumerable<User> GetUsers();
+	void ApplyPermissions(User user, IVirtualMachine virtualMachine);
+	void ApplyPermissions(User user, IServer server);
 }

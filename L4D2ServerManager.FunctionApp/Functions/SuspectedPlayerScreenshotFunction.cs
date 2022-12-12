@@ -15,75 +15,75 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class SuspectedPlayerScreenshotFunction
 {
-    private readonly ISuspectedPlayerScreenshotService _suspectedPlayerScreenshotService;
-    private readonly ISuspectedPlayerService _suspectedPlayerService;
-    private readonly IUserService _userService;
+	private readonly ISuspectedPlayerScreenshotService _suspectedPlayerScreenshotService;
+	private readonly ISuspectedPlayerService _suspectedPlayerService;
+	private readonly IUserService _userService;
 
-    public SuspectedPlayerScreenshotFunction(IUserService userService,
-        ISuspectedPlayerService suspectedPlayerService,
-        ISuspectedPlayerScreenshotService suspectedPlayerScreenshotService)
-    {
-        _userService = userService;
-        _suspectedPlayerService = suspectedPlayerService;
-        _suspectedPlayerScreenshotService = suspectedPlayerScreenshotService;
-    }
+	public SuspectedPlayerScreenshotFunction(IUserService userService,
+		ISuspectedPlayerService suspectedPlayerService,
+		ISuspectedPlayerScreenshotService suspectedPlayerScreenshotService)
+	{
+		_userService = userService;
+		_suspectedPlayerService = suspectedPlayerService;
+		_suspectedPlayerScreenshotService = suspectedPlayerScreenshotService;
+	}
 
-    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(GenerateUploadUrlAsync))]
-    public async Task<IActionResult> GenerateUploadUrlAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-screenshot/generate-upload-url")] HttpRequest httpRequest)
-    {
-        try
-        {
-            var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
-            var url = await _suspectedPlayerScreenshotService.GenerateUploadUrlAsync(suspectedPlayer.CommunityId);
+	[FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(GenerateUploadUrlAsync))]
+	public async Task<IActionResult> GenerateUploadUrlAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-screenshot/generate-upload-url")] HttpRequest httpRequest)
+	{
+		try
+		{
+			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
+			var url = await _suspectedPlayerScreenshotService.GenerateUploadUrlAsync(suspectedPlayer.CommunityId);
 
-            return new OkObjectResult(new { url });
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(new { url });
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(GetAsync))]
-    public async Task<IActionResult> GetAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-screenshot/{communityId:long}")] HttpRequest httpRequest, long communityId)
-    {
-        try
-        {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+	[FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(GetAsync))]
+	public async Task<IActionResult> GetAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-screenshot/{communityId:long}")] HttpRequest httpRequest, long communityId)
+	{
+		try
+		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
-            var parameters = httpRequest.GetQueryParameterDictionary();
-            var skip = parameters.ContainsKey("skip") && int.TryParse(parameters["skip"], out var skipValue) ? skipValue : 0;
-            var take = parameters.ContainsKey("take") && int.TryParse(parameters["take"], out var takeValue) ? takeValue : 100;
-            var screenshots = await _suspectedPlayerScreenshotService.ScreenshotsAsync(communityId, skip, take);
+			var parameters = httpRequest.GetQueryParameterDictionary();
+			var skip = parameters.ContainsKey("skip") && int.TryParse(parameters["skip"], out var skipValue) ? skipValue : 0;
+			var take = parameters.ContainsKey("take") && int.TryParse(parameters["take"], out var takeValue) ? takeValue : 100;
+			var screenshots = await _suspectedPlayerScreenshotService.ScreenshotsAsync(communityId, skip, take);
 
-            return new OkObjectResult(screenshots);
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(screenshots);
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(DeleteAsync))]
-    public async Task<IActionResult> DeleteAsync([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players-screenshot/{communityId:long}")] HttpRequest httpRequest, long communityId)
-    {
-        try
-        {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+	[FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(DeleteAsync))]
+	public async Task<IActionResult> DeleteAsync([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players-screenshot/{communityId:long}")] HttpRequest httpRequest, long communityId)
+	{
+		try
+		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
-            await _suspectedPlayerScreenshotService.DeleteAllScreenshots(communityId);
+			await _suspectedPlayerScreenshotService.DeleteAllScreenshots(communityId);
 
-            return new OkResult();
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkResult();
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(DeleteOldScreenshotsAsync))]
-    public async Task DeleteOldScreenshotsAsync([TimerTrigger("0 */10 * * * *")] TimerInfo timerInfo)
-    {
-        await _suspectedPlayerScreenshotService.DeleteOldScreenshotsAsync();
-    }
+	[FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(DeleteOldScreenshotsAsync))]
+	public async Task DeleteOldScreenshotsAsync([TimerTrigger("0 */10 * * * *")] TimerInfo timerInfo)
+	{
+		await _suspectedPlayerScreenshotService.DeleteOldScreenshotsAsync();
+	}
 }

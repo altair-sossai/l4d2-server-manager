@@ -17,56 +17,56 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class SuspectedPlayerPingFunction
 {
-    private readonly ISuspectedPlayerPingRepository _suspectedPlayerPingRepository;
-    private readonly ISuspectedPlayerPingService _suspectedPlayerPingService;
-    private readonly ISuspectedPlayerService _suspectedPlayerService;
-    private readonly IUserService _userService;
+	private readonly ISuspectedPlayerPingRepository _suspectedPlayerPingRepository;
+	private readonly ISuspectedPlayerPingService _suspectedPlayerPingService;
+	private readonly ISuspectedPlayerService _suspectedPlayerService;
+	private readonly IUserService _userService;
 
-    public SuspectedPlayerPingFunction(IUserService userService,
-        ISuspectedPlayerService suspectedPlayerService,
-        ISuspectedPlayerPingService suspectedPlayerPingService,
-        ISuspectedPlayerPingRepository suspectedPlayerPingRepository)
-    {
-        _userService = userService;
-        _suspectedPlayerService = suspectedPlayerService;
-        _suspectedPlayerPingService = suspectedPlayerPingService;
-        _suspectedPlayerPingRepository = suspectedPlayerPingRepository;
-    }
+	public SuspectedPlayerPingFunction(IUserService userService,
+		ISuspectedPlayerService suspectedPlayerService,
+		ISuspectedPlayerPingService suspectedPlayerPingService,
+		ISuspectedPlayerPingRepository suspectedPlayerPingRepository)
+	{
+		_userService = userService;
+		_suspectedPlayerService = suspectedPlayerService;
+		_suspectedPlayerPingService = suspectedPlayerPingService;
+		_suspectedPlayerPingRepository = suspectedPlayerPingRepository;
+	}
 
-    [FunctionName(nameof(SuspectedPlayerPingFunction) + "_" + nameof(Find))]
-    public IActionResult Find([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-ping/{communityId:long}")] HttpRequest httpRequest, long communityId)
-    {
-        try
-        {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+	[FunctionName(nameof(SuspectedPlayerPingFunction) + "_" + nameof(Find))]
+	public IActionResult Find([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-ping/{communityId:long}")] HttpRequest httpRequest, long communityId)
+	{
+		try
+		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
-            var ping = _suspectedPlayerPingRepository.Find(communityId);
-            if (ping == null)
-                return new NotFoundResult();
+			var ping = _suspectedPlayerPingRepository.Find(communityId);
+			if (ping == null)
+				return new NotFoundResult();
 
-            return new OkObjectResult(ping);
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(ping);
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(SuspectedPlayerPingFunction) + "_" + nameof(Ping))]
-    public async Task<IActionResult> Ping([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players-ping")] HttpRequest httpRequest)
-    {
-        try
-        {
-            var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
-            var command = await httpRequest.DeserializeBodyAsync<PingCommand>();
+	[FunctionName(nameof(SuspectedPlayerPingFunction) + "_" + nameof(Ping))]
+	public async Task<IActionResult> Ping([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players-ping")] HttpRequest httpRequest)
+	{
+		try
+		{
+			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
+			var command = await httpRequest.DeserializeBodyAsync<PingCommand>();
 
-            _suspectedPlayerPingService.Ping(suspectedPlayer.CommunityId, command);
+			_suspectedPlayerPingService.Ping(suspectedPlayer.CommunityId, command);
 
-            return new OkResult();
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkResult();
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 }

@@ -19,141 +19,141 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class VirtualMachineFunction
 {
-    private readonly IConfiguration _configuration;
-    private readonly IPortServer _portServer;
-    private readonly IUserService _userService;
-    private readonly IVirtualMachineService _virtualMachineService;
+	private readonly IConfiguration _configuration;
+	private readonly IPortServer _portServer;
+	private readonly IUserService _userService;
+	private readonly IVirtualMachineService _virtualMachineService;
 
-    public VirtualMachineFunction(IConfiguration configuration,
-        IUserService userService,
-        IVirtualMachineService virtualMachineService,
-        IPortServer portServer)
-    {
-        _configuration = configuration;
-        _userService = userService;
-        _virtualMachineService = virtualMachineService;
-        _portServer = portServer;
-    }
+	public VirtualMachineFunction(IConfiguration configuration,
+		IUserService userService,
+		IVirtualMachineService virtualMachineService,
+		IPortServer portServer)
+	{
+		_configuration = configuration;
+		_userService = userService;
+		_virtualMachineService = virtualMachineService;
+		_portServer = portServer;
+	}
 
-    private string VirtualMachineName => _configuration.GetValue<string>(nameof(VirtualMachineName));
-    private int AttemptsToShutdown => _configuration.GetValue(nameof(AttemptsToShutdown), 3);
+	private string VirtualMachineName => _configuration.GetValue<string>(nameof(VirtualMachineName));
+	private int AttemptsToShutdown => _configuration.GetValue(nameof(AttemptsToShutdown), 3);
 
-    [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(Get))]
-    public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "virtual-machine")] HttpRequest httpRequest)
-    {
-        try
-        {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
-            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+	[FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(Get))]
+	public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "virtual-machine")] HttpRequest httpRequest)
+	{
+		try
+		{
+			var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+			var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
 
-            _userService.ApplyPermissions(user, virtualMachine);
+			_userService.ApplyPermissions(user, virtualMachine);
 
-            return new OkObjectResult(virtualMachine);
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(virtualMachine);
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(Info))]
-    public IActionResult Info([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "virtual-machine/info")] HttpRequest httpRequest)
-    {
-        try
-        {
-            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+	[FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(Info))]
+	public IActionResult Info([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "virtual-machine/info")] HttpRequest httpRequest)
+	{
+		try
+		{
+			var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
 
-            return new OkObjectResult(virtualMachine);
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(virtualMachine);
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOnAsync))]
-    public async Task<IActionResult> PowerOnAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-on")] HttpRequest httpRequest)
-    {
-        try
-        {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
-            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
-            await virtualMachine.PowerOnAsync(user);
+	[FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOnAsync))]
+	public async Task<IActionResult> PowerOnAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-on")] HttpRequest httpRequest)
+	{
+		try
+		{
+			var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+			var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+			await virtualMachine.PowerOnAsync(user);
 
-            _ = Task.Run(() =>
-            {
-                var ports = _portServer.GetPorts(virtualMachine.IpAddress);
-                var command = new IpTablesRulesCommand(ports);
-                virtualMachine.RunCommand(command);
+			_ = Task.Run(() =>
+			{
+				var ports = _portServer.GetPorts(virtualMachine.IpAddress);
+				var command = new IpTablesRulesCommand(ports);
+				virtualMachine.RunCommand(command);
 
-                _userService.ApplyPermissions(user, virtualMachine);
-            });
+				_userService.ApplyPermissions(user, virtualMachine);
+			});
 
-            return new OkObjectResult(virtualMachine);
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(virtualMachine);
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOffAsync))]
-    public async Task<IActionResult> PowerOffAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-off")] HttpRequest httpRequest)
-    {
-        try
-        {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
-            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+	[FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOffAsync))]
+	public async Task<IActionResult> PowerOffAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-off")] HttpRequest httpRequest)
+	{
+		try
+		{
+			var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+			var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
 
-            _userService.ApplyPermissions(user, virtualMachine);
+			_userService.ApplyPermissions(user, virtualMachine);
 
-            if (!virtualMachine.CanPowerOff())
-                throw new UnauthorizedAccessException();
+			if (!virtualMachine.CanPowerOff())
+				throw new UnauthorizedAccessException();
 
-            await virtualMachine.PowerOffAsync();
+			await virtualMachine.PowerOffAsync();
 
-            return new OkObjectResult(virtualMachine);
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(virtualMachine);
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 
-    [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(TryPowerOffAsync))]
-    public async Task<IActionResult> TryPowerOffAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/try-power-off")] HttpRequest httpRequest)
-    {
-        try
-        {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+	[FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(TryPowerOffAsync))]
+	public async Task<IActionResult> TryPowerOffAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/try-power-off")] HttpRequest httpRequest)
+	{
+		try
+		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
-            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
-            if (virtualMachine.IsOff)
-            {
-                await virtualMachine.ClearShutdownAttemptAsync();
-                return new OkObjectResult(virtualMachine);
-            }
+			var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+			if (virtualMachine.IsOff)
+			{
+				await virtualMachine.ClearShutdownAttemptAsync();
+				return new OkObjectResult(virtualMachine);
+			}
 
-            var ports = _portServer.GetPorts(virtualMachine.IpAddress);
-            if (ports.HasAnyPlayerConnected())
-            {
-                await virtualMachine.ClearShutdownAttemptAsync();
-                return new OkObjectResult(virtualMachine);
-            }
+			var ports = _portServer.GetPorts(virtualMachine.IpAddress);
+			if (ports.HasAnyPlayerConnected())
+			{
+				await virtualMachine.ClearShutdownAttemptAsync();
+				return new OkObjectResult(virtualMachine);
+			}
 
-            if (virtualMachine.ShutdownAttempt >= AttemptsToShutdown)
-            {
-                await virtualMachine.PowerOffAsync();
-                return new OkObjectResult(virtualMachine);
-            }
+			if (virtualMachine.ShutdownAttempt >= AttemptsToShutdown)
+			{
+				await virtualMachine.PowerOffAsync();
+				return new OkObjectResult(virtualMachine);
+			}
 
-            await virtualMachine.IncrementShutdownAttemptAsync();
+			await virtualMachine.IncrementShutdownAttemptAsync();
 
-            return new OkObjectResult(virtualMachine);
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
+			return new OkObjectResult(virtualMachine);
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
 }

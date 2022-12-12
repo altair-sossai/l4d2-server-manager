@@ -4,5 +4,5 @@ namespace L4D2ServerManager.Contexts.AzureSubscription;
 
 public interface IAzureSubscriptionContext
 {
-    SubscriptionResource SubscriptionResource { get; }
+	SubscriptionResource SubscriptionResource { get; }
 }

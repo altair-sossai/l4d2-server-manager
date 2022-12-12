@@ -2,5 +2,5 @@
 
 public interface IPlayerService
 {
-    List<Player> GetPlayers(string ip, int port);
+	List<Player> GetPlayers(string ip, int port);
 }

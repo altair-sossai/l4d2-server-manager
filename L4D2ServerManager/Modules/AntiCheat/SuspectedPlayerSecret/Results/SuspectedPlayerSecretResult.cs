@@ -2,5 +2,5 @@
 
 public class SuspectedPlayerSecretResult
 {
-    public string? Secret { get; set; }
+	public string? Secret { get; set; }
 }

@@ -2,5 +2,5 @@
 
 public interface ISteamIdService
 {
-    Task<long?> ResolveSteamIdAsync(string? customUrl);
+	Task<long?> ResolveSteamIdAsync(string? customUrl);
 }

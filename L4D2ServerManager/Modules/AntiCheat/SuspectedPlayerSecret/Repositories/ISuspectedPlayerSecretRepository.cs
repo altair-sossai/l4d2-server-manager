@@ -2,8 +2,8 @@
 
 public interface ISuspectedPlayerSecretRepository
 {
-    bool Exists(long communityId);
-    bool Validate(long communityId, string secret);
-    void Add(SuspectedPlayerSecret suspectedPlayerSecret);
-    void Delete(long communityId);
+	bool Exists(long communityId);
+	bool Validate(long communityId, string secret);
+	void Add(SuspectedPlayerSecret suspectedPlayerSecret);
+	void Delete(long communityId);
 }

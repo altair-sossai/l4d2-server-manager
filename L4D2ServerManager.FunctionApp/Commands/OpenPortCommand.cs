@@ -2,5 +2,5 @@
 
 public class OpenPortCommand
 {
-    public string Ranges { get; set; }
+	public string Ranges { get; set; }
 }
