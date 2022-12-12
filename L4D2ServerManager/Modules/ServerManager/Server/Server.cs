@@ -30,16 +30,20 @@ public class Server : IServer
 
 	public async Task RunAsync(User user, Campaign campaign)
 	{
-		var command = new RunServerCommand(Port, campaign);
+		var command = new RunServerCommand(Port);
 
 		await RunAsync(user, command);
+
+		ChangeMap(campaign);
 	}
 
 	public async Task RunZoneAsync(User user, Campaign campaign)
 	{
-		var command = new RunZoneServerCommand(Port, campaign);
+		var command = new RunZoneServerCommand(Port);
 
 		await RunAsync(user, command);
+
+		ChangeMap(campaign);
 	}
 
 	public void Stop()
@@ -86,6 +90,18 @@ public class Server : IServer
 		};
 
 		await _virtualMachine.UpdateTagsAsync(values);
+
+		WaitUntilItsRunning();
+	}
+
+	private void ChangeMap(Campaign campaign)
+	{
+		if (!IsRunning)
+			return;
+
+		var command = new ChangeMapCommand(Port, campaign);
+
+		_virtualMachine.RunCommand(command);
 
 		WaitUntilItsRunning();
 	}
