@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
@@ -43,7 +44,7 @@ public class SuspectedPlayerProcessFunction
 
 			var processes = _suspectedPlayerProcessRepository.GetAllProcesses(communityId);
 
-			return new OkObjectResult(processes);
+			return new OkObjectResult(processes.OrderBy(o => o.ProcessName).ToList());
 		}
 		catch (Exception exception)
 		{
