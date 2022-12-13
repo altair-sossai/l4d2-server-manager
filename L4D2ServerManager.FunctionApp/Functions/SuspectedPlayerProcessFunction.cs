@@ -68,4 +68,26 @@ public class SuspectedPlayerProcessFunction
 			return ErrorResult.Build(exception).ResponseMessageResult();
 		}
 	}
+
+	[FunctionName(nameof(SuspectedPlayerProcessFunction) + "_" + nameof(Delete))]
+	public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players-process/{communityId:long}")] HttpRequest httpRequest, long communityId)
+	{
+		try
+		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_suspectedPlayerProcessRepository.Delete(communityId);
+
+			return new OkResult();
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
+
+	[FunctionName(nameof(SuspectedPlayerProcessFunction) + "_" + nameof(DeleteOldProcesses))]
+	public void DeleteOldProcesses([TimerTrigger("0 */10 * * * *")] TimerInfo timerInfo)
+	{
+		_suspectedPlayerProcessRepository.DeleteOldProcesses();
+	}
 }

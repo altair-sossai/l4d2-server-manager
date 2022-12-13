@@ -15,4 +15,18 @@ public class SuspectedPlayerProcessRepository : BaseTableStorageRepository<Suspe
 	{
 		return TableClient.Query<SuspectedPlayerProcess>(q => q.PartitionKey == communityId.ToString());
 	}
+
+	public void Delete(long communityId)
+	{
+		foreach (var process in GetAllProcesses(communityId))
+			Delete(process.PartitionKey, process.RowKey);
+	}
+
+	public void DeleteOldProcesses()
+	{
+		var limit = DateTimeOffset.UtcNow.AddDays(-7);
+
+		foreach (var process in TableClient.Query<SuspectedPlayerProcess>(q => q.Timestamp < limit))
+			Delete(process.PartitionKey, process.RowKey);
+	}
 }

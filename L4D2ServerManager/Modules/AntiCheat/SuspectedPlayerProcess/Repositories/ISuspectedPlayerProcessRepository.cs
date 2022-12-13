@@ -6,4 +6,6 @@ public interface ISuspectedPlayerProcessRepository
 {
 	Pageable<SuspectedPlayerProcess> GetAllProcesses(long communityId);
 	void AddOrUpdate(IEnumerable<SuspectedPlayerProcess> processes);
+	void Delete(long communityId);
+	void DeleteOldProcesses();
 }

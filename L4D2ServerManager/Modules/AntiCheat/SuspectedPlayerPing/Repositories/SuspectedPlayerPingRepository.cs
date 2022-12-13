@@ -14,4 +14,9 @@ public class SuspectedPlayerPingRepository : BaseTableStorageRepository<Suspecte
 	{
 		return Find("shared", communityId.ToString());
 	}
+
+	public void Delete(long communityId)
+	{
+		Delete("shared", communityId.ToString());
+	}
 }
