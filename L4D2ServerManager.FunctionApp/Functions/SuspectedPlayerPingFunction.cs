@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
+using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerPing.Commands;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerPing.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerPing.Services;
@@ -17,6 +18,7 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class SuspectedPlayerPingFunction
 {
+	private readonly ISuspectedPlayerActivityRepository _suspectedPlayerActivityRepository;
 	private readonly ISuspectedPlayerPingRepository _suspectedPlayerPingRepository;
 	private readonly ISuspectedPlayerPingService _suspectedPlayerPingService;
 	private readonly ISuspectedPlayerService _suspectedPlayerService;
@@ -25,12 +27,14 @@ public class SuspectedPlayerPingFunction
 	public SuspectedPlayerPingFunction(IUserService userService,
 		ISuspectedPlayerService suspectedPlayerService,
 		ISuspectedPlayerPingService suspectedPlayerPingService,
-		ISuspectedPlayerPingRepository suspectedPlayerPingRepository)
+		ISuspectedPlayerPingRepository suspectedPlayerPingRepository,
+		ISuspectedPlayerActivityRepository suspectedPlayerActivityRepository)
 	{
 		_userService = userService;
 		_suspectedPlayerService = suspectedPlayerService;
 		_suspectedPlayerPingService = suspectedPlayerPingService;
 		_suspectedPlayerPingRepository = suspectedPlayerPingRepository;
+		_suspectedPlayerActivityRepository = suspectedPlayerActivityRepository;
 	}
 
 	[FunctionName(nameof(SuspectedPlayerPingFunction) + "_" + nameof(Find))]
@@ -61,6 +65,7 @@ public class SuspectedPlayerPingFunction
 			var command = await httpRequest.DeserializeBodyAsync<PingCommand>();
 
 			_suspectedPlayerPingService.Ping(suspectedPlayer.CommunityId, command);
+			_suspectedPlayerActivityRepository.Ping(suspectedPlayer.CommunityId, command);
 
 			return new OkResult();
 		}

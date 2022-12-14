@@ -8,6 +8,7 @@ using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Results;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
+using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerPing.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerProcess.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerScreenshot.Services;
@@ -24,6 +25,7 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 public class SuspectedPlayerFunction
 {
 	private readonly IMapper _mapper;
+	private readonly ISuspectedPlayerActivityRepository _suspectedPlayerActivityRepository;
 	private readonly ISuspectedPlayerPingRepository _suspectedPlayerPingRepository;
 	private readonly ISuspectedPlayerProcessRepository _suspectedPlayerProcessRepository;
 	private readonly ISuspectedPlayerRepository _suspectedPlayerRepository;
@@ -39,7 +41,8 @@ public class SuspectedPlayerFunction
 		ISuspectedPlayerRepository suspectedPlayerRepository,
 		ISuspectedPlayerSecretRepository suspectedPlayerSecretRepository,
 		ISuspectedPlayerPingRepository suspectedPlayerPingRepository,
-		ISuspectedPlayerProcessRepository suspectedPlayerProcessRepository)
+		ISuspectedPlayerProcessRepository suspectedPlayerProcessRepository,
+		ISuspectedPlayerActivityRepository suspectedPlayerActivityRepository)
 	{
 		_mapper = mapper;
 		_userService = userService;
@@ -49,6 +52,7 @@ public class SuspectedPlayerFunction
 		_suspectedPlayerSecretRepository = suspectedPlayerSecretRepository;
 		_suspectedPlayerPingRepository = suspectedPlayerPingRepository;
 		_suspectedPlayerProcessRepository = suspectedPlayerProcessRepository;
+		_suspectedPlayerActivityRepository = suspectedPlayerActivityRepository;
 	}
 
 	[FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(GetSuspectedPlayers))]
@@ -119,6 +123,7 @@ public class SuspectedPlayerFunction
 			_suspectedPlayerScreenshotService.DeleteAllScreenshots(communityId);
 			_suspectedPlayerPingRepository.Delete(communityId);
 			_suspectedPlayerProcessRepository.Delete(communityId);
+			_suspectedPlayerActivityRepository.Delete(communityId);
 
 			return new OkResult();
 		}

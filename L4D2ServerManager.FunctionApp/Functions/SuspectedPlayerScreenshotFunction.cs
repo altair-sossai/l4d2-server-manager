@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
+using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerScreenshot.Services;
 using L4D2ServerManager.Modules.Auth.Users.Enums;
 using L4D2ServerManager.Modules.Auth.Users.Services;
@@ -15,17 +16,20 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class SuspectedPlayerScreenshotFunction
 {
+	private readonly ISuspectedPlayerActivityRepository _suspectedPlayerActivityRepository;
 	private readonly ISuspectedPlayerScreenshotService _suspectedPlayerScreenshotService;
 	private readonly ISuspectedPlayerService _suspectedPlayerService;
 	private readonly IUserService _userService;
 
 	public SuspectedPlayerScreenshotFunction(IUserService userService,
 		ISuspectedPlayerService suspectedPlayerService,
-		ISuspectedPlayerScreenshotService suspectedPlayerScreenshotService)
+		ISuspectedPlayerScreenshotService suspectedPlayerScreenshotService,
+		ISuspectedPlayerActivityRepository suspectedPlayerActivityRepository)
 	{
 		_userService = userService;
 		_suspectedPlayerService = suspectedPlayerService;
 		_suspectedPlayerScreenshotService = suspectedPlayerScreenshotService;
+		_suspectedPlayerActivityRepository = suspectedPlayerActivityRepository;
 	}
 
 	[FunctionName(nameof(SuspectedPlayerScreenshotFunction) + "_" + nameof(GenerateUploadUrlAsync))]
@@ -35,6 +39,8 @@ public class SuspectedPlayerScreenshotFunction
 		{
 			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
 			var url = await _suspectedPlayerScreenshotService.GenerateUploadUrlAsync(suspectedPlayer.CommunityId);
+
+			_suspectedPlayerActivityRepository.Screenshot(suspectedPlayer.CommunityId);
 
 			return new OkObjectResult(new { url });
 		}

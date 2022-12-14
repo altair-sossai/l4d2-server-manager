@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
+using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerProcess.Commands;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerProcess.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerProcess.Services;
@@ -19,6 +20,7 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class SuspectedPlayerProcessFunction
 {
+	private readonly ISuspectedPlayerActivityRepository _suspectedPlayerActivityRepository;
 	private readonly ISuspectedPlayerProcessRepository _suspectedPlayerProcessRepository;
 	private readonly ISuspectedPlayerProcessService _suspectedPlayerProcessService;
 	private readonly ISuspectedPlayerService _suspectedPlayerService;
@@ -27,12 +29,14 @@ public class SuspectedPlayerProcessFunction
 	public SuspectedPlayerProcessFunction(IUserService userService,
 		ISuspectedPlayerService suspectedPlayerService,
 		ISuspectedPlayerProcessService suspectedPlayerProcessService,
-		ISuspectedPlayerProcessRepository suspectedPlayerProcessRepository)
+		ISuspectedPlayerProcessRepository suspectedPlayerProcessRepository,
+		ISuspectedPlayerActivityRepository suspectedPlayerActivityRepository)
 	{
 		_userService = userService;
 		_suspectedPlayerService = suspectedPlayerService;
 		_suspectedPlayerProcessService = suspectedPlayerProcessService;
 		_suspectedPlayerProcessRepository = suspectedPlayerProcessRepository;
+		_suspectedPlayerActivityRepository = suspectedPlayerActivityRepository;
 	}
 
 	[FunctionName(nameof(SuspectedPlayerProcessFunction) + "_" + nameof(GetAllProcesses))]
@@ -61,6 +65,7 @@ public class SuspectedPlayerProcessFunction
 			var commands = await httpRequest.DeserializeBodyAsync<List<ProcessCommand>>();
 
 			_suspectedPlayerProcessService.BatchOperation(suspectedPlayer.CommunityId, commands);
+			_suspectedPlayerActivityRepository.Process(suspectedPlayer.CommunityId);
 
 			return new OkResult();
 		}
