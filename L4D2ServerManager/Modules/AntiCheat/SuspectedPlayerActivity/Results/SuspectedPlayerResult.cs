@@ -11,7 +11,7 @@ public class SuspectedPlayerResult
 		_steamIdentifiers = steamIdentifiers;
 	}
 
-	public long? CommunityId => _steamIdentifiers?.CommunityId;
+	public string? CommunityId => _steamIdentifiers?.CommunityId?.ToString();
 	public string? SteamId => _steamIdentifiers?.SteamId;
 	public string? Steam3 => _steamIdentifiers?.Steam3;
 }
