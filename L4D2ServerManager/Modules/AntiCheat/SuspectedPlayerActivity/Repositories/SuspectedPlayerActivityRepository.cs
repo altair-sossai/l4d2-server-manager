@@ -13,6 +13,11 @@ public class SuspectedPlayerActivityRepository : BaseTableStorageRepository<Susp
 	{
 	}
 
+	public IEnumerable<SuspectedPlayerActivity> GetAllActivities()
+	{
+		return GetAll();
+	}
+
 	public void Ping(long communityId, PingCommand command)
 	{
 		Activity activity = command.Focused ? new PingFocusedActivity(communityId) : new PingUnfocusedActivity(communityId);

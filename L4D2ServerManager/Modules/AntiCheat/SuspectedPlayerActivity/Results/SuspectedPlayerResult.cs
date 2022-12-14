@@ -1,0 +1,17 @@
+﻿using L4D2ServerManager.Contexts.Steam.Structures;
+
+namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.Results;
+
+public class SuspectedPlayerResult
+{
+	private readonly SteamIdentifiers? _steamIdentifiers;
+
+	public SuspectedPlayerResult(SteamIdentifiers steamIdentifiers)
+	{
+		_steamIdentifiers = steamIdentifiers;
+	}
+
+	public long? CommunityId => _steamIdentifiers?.CommunityId;
+	public string? SteamId => _steamIdentifiers?.SteamId;
+	public string? Steam3 => _steamIdentifiers?.Steam3;
+}
