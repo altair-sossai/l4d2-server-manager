@@ -30,7 +30,7 @@ public static class SuspectedPlayerActivityExtensions
 		if (activity.Process == null)
 			return true;
 
-		var limit = DateTime.UtcNow.AddMinutes(-5);
+		var limit = DateTime.UtcNow.AddMinutes(-4);
 
 		return limit > activity.Process;
 	}
@@ -40,7 +40,7 @@ public static class SuspectedPlayerActivityExtensions
 		if (activity.Screenshot == null)
 			return true;
 
-		var limit = DateTime.UtcNow.AddMinutes(-5);
+		var limit = DateTime.UtcNow.AddMinutes(-2.5);
 
 		return limit > activity.Screenshot;
 	}
