@@ -13,6 +13,17 @@ public static class SteamIdHelper
 	private static readonly Regex SteamIdRegex = new(SteamIdPattern);
 	private static readonly Regex Steam3Regex = new(Steam3Pattern);
 
+	public static string? CustomUrl(string value)
+	{
+		var patterns = new[]
+		{
+			@"(^[^\/ ]+$)",
+			@"https?:\/\/steamcommunity.com\/id\/([^\/ ]+)/?$"
+		};
+
+		return value.MatchValue(patterns);
+	}
+
 	public static long? SteamIdToCommunityId(string value)
 	{
 		var match = SteamIdRegex.Match(value);

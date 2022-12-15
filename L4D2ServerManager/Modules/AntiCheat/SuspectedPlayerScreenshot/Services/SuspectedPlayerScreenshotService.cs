@@ -22,7 +22,7 @@ public class SuspectedPlayerScreenshotService : ISuspectedPlayerScreenshotServic
 		return _blobAccountContext.GenerateSasUrlAsync(blobContainerName, blobName, BlobSasPermissions.Create, DateTimeOffset.Now.AddDays(1));
 	}
 
-	public async Task DeleteAllScreenshots(long communityId)
+	public async Task DeleteAllScreenshotsAsync(long communityId)
 	{
 		var blobContainerName = $"screenshot-{communityId}";
 

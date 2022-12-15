@@ -20,7 +20,7 @@ public static class SuspectedPlayerActivityExtensions
 		var focused = activity.PingFocused ?? DateTime.MinValue;
 		var unfocused = activity.PingUnfocused ?? DateTime.MinValue;
 		var ping = focused > unfocused ? focused : unfocused;
-		var limit = DateTime.UtcNow.AddMinutes(-5);
+		var limit = DateTime.UtcNow.AddMinutes(-1);
 
 		return limit > ping;
 	}

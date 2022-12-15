@@ -77,7 +77,7 @@ public class SuspectedPlayerScreenshotFunction
 		{
 			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
-			await _suspectedPlayerScreenshotService.DeleteAllScreenshots(communityId);
+			await _suspectedPlayerScreenshotService.DeleteAllScreenshotsAsync(communityId);
 
 			return new OkResult();
 		}

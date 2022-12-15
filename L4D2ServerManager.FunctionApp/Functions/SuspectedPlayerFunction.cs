@@ -113,17 +113,18 @@ public class SuspectedPlayerFunction
 	}
 
 	[FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(Delete))]
-	public IActionResult Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/{communityId:long}")] HttpRequest httpRequest, long communityId)
+	public async Task<IActionResult> Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/delete")] HttpRequest httpRequest)
 	{
 		try
 		{
 			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
-			_suspectedPlayerRepository.Delete(communityId);
-			_suspectedPlayerSecretRepository.Delete(communityId);
-			_suspectedPlayerScreenshotService.DeleteAllScreenshots(communityId);
-			_suspectedPlayerPingRepository.Delete(communityId);
-			_suspectedPlayerProcessRepository.Delete(communityId);
-			_suspectedPlayerActivityRepository.Delete(communityId);
+
+			var command = await httpRequest.DeserializeBodyAsync<SuspectedPlayerCommand>();
+			var suspectedPlayer = _suspectedPlayerService.Find(command.Account);
+			if (suspectedPlayer == null)
+				return new NotFoundResult();
+
+			await DeleteAllSuspectedPlayerData(suspectedPlayer.CommunityId);
 
 			return new OkResult();
 		}
@@ -131,6 +132,34 @@ public class SuspectedPlayerFunction
 		{
 			return ErrorResult.Build(exception).ResponseMessageResult();
 		}
+	}
+
+	[FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(DeleteUsingCommunityId))]
+	public async Task<IActionResult> DeleteUsingCommunityId([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/{communityId:long}")] HttpRequest httpRequest, long communityId)
+	{
+		try
+		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+
+			await DeleteAllSuspectedPlayerData(communityId);
+
+			return new OkResult();
+		}
+		catch (Exception exception)
+		{
+			return ErrorResult.Build(exception).ResponseMessageResult();
+		}
+	}
+
+	private async Task DeleteAllSuspectedPlayerData(long communityId)
+	{
+		_suspectedPlayerRepository.Delete(communityId);
+		_suspectedPlayerSecretRepository.Delete(communityId);
+		_suspectedPlayerPingRepository.Delete(communityId);
+		_suspectedPlayerProcessRepository.Delete(communityId);
+		_suspectedPlayerActivityRepository.Delete(communityId);
+
+		await _suspectedPlayerScreenshotService.DeleteAllScreenshotsAsync(communityId);
 	}
 
 	[FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(Sync))]

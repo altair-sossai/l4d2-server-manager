@@ -1,6 +1,8 @@
 using AutoMapper;
 using FluentValidation;
+using L4D2ServerManager.Contexts.Steam.Helpers;
 using L4D2ServerManager.Contexts.Steam.Services;
+using L4D2ServerManager.Contexts.Steam.Structures;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerSecret.Repositories;
@@ -28,10 +30,23 @@ public class SuspectedPlayerService : ISuspectedPlayerService
 		_validator = validator;
 	}
 
+	public SuspectedPlayer? Find(string? account)
+	{
+		if (string.IsNullOrEmpty(account))
+			return null;
+
+		SteamIdentifiers.TryParse(account, out var steamIdentifiers);
+
+		var customUrl = SteamIdHelper.CustomUrl(account);
+		var steamId = _steamIdService.ResolveSteamIdAsync(customUrl).Result ?? steamIdentifiers.CommunityId ?? 0;
+		var suspectedPlayer = _suspectedPlayerRepository.GetSuspectedPlayer(steamId);
+
+		return suspectedPlayer;
+	}
+
 	public SuspectedPlayer AddOrUpdate(SuspectedPlayerCommand command)
 	{
-		var steamId = _steamIdService.ResolveSteamIdAsync(command.CustomUrl).Result ?? command.CommunityId ?? 0;
-		var suspectedPlayer = _suspectedPlayerRepository.GetSuspectedPlayer(steamId) ?? SuspectedPlayer.Default;
+		var suspectedPlayer = Find(command.Account) ?? SuspectedPlayer.Default;
 
 		_mapper.Map(command, suspectedPlayer);
 		_validator.ValidateAndThrowAsync(suspectedPlayer).Wait();
