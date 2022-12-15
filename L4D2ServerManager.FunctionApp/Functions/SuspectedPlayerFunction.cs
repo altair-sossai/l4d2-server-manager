@@ -113,7 +113,7 @@ public class SuspectedPlayerFunction
 	}
 
 	[FunctionName(nameof(SuspectedPlayerFunction) + "_" + nameof(Delete))]
-	public async Task<IActionResult> Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "suspected-players/delete")] HttpRequest httpRequest)
+	public async Task<IActionResult> Delete([HttpTrigger(AuthorizationLevel.Anonymous, "post,delete", Route = "suspected-players/delete")] HttpRequest httpRequest)
 	{
 		try
 		{
