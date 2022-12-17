@@ -31,7 +31,7 @@ public class SuspectedPlayerScreenshotService : ISuspectedPlayerScreenshotServic
 
 	public async Task DeleteOldScreenshotsAsync()
 	{
-		var limit = DateTime.UtcNow.AddDays(-7);
+		var limit = DateTime.UtcNow.AddDays(-3);
 
 		await foreach (var containerItem in _blobAccountContext.GetBlobContainersAsync("screenshot-", CancellationToken.None))
 		{

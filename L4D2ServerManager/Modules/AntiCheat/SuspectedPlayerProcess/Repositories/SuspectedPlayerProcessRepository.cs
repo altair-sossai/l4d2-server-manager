@@ -24,7 +24,7 @@ public class SuspectedPlayerProcessRepository : BaseTableStorageRepository<Suspe
 
 	public void DeleteOldProcesses()
 	{
-		var limit = DateTimeOffset.UtcNow.AddDays(-7);
+		var limit = DateTimeOffset.UtcNow.AddDays(-3);
 
 		foreach (var process in TableClient.Query<SuspectedPlayerProcess>(q => q.Timestamp < limit))
 			Delete(process.PartitionKey, process.RowKey);
