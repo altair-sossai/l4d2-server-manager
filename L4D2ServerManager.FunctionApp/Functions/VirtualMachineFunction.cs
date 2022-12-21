@@ -61,6 +61,8 @@ public class VirtualMachineFunction
 	{
 		try
 		{
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+
 			var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
 
 			return new OkObjectResult(virtualMachine);
