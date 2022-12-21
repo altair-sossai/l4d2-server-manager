@@ -15,6 +15,8 @@ public class SuspectedPlayerActivity : ITableEntity
 	public DateTime? PingUnfocused { get; set; }
 	public DateTime? Process { get; set; }
 	public DateTime? Screenshot { get; set; }
+	public DateTime? FileCheckSuccess { get; set; }
+	public DateTime? FileCheckFail { get; set; }
 
 	public string PartitionKey { get; set; } = "shared";
 	public string RowKey { get; set; } = default!;

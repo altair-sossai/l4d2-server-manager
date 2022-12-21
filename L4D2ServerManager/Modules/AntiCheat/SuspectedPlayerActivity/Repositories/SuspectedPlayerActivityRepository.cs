@@ -13,6 +13,11 @@ public class SuspectedPlayerActivityRepository : BaseTableStorageRepository<Susp
 	{
 	}
 
+	public SuspectedPlayerActivity? Find(long communityId)
+	{
+		return Find("shared", communityId.ToString());
+	}
+
 	public IEnumerable<SuspectedPlayerActivity> GetAllActivities()
 	{
 		return GetAll();
@@ -35,6 +40,20 @@ public class SuspectedPlayerActivityRepository : BaseTableStorageRepository<Susp
 	public void Screenshot(long communityId)
 	{
 		var activity = new ScreenshotActivity(communityId);
+
+		TableClient.UpsertEntity(activity);
+	}
+
+	public void FileCheckSuccess(long communityId)
+	{
+		var activity = new FileCheckSuccessActivity(communityId);
+
+		TableClient.UpsertEntity(activity);
+	}
+
+	public void FileCheckFail(long communityId)
+	{
+		var activity = new FileCheckFailActivity(communityId);
 
 		TableClient.UpsertEntity(activity);
 	}
