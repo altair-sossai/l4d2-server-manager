@@ -90,7 +90,7 @@ public class PlayerIpFunction
 			var playerIps = _playerIpRepository.GetAllPlayersWithIp(command.Ip!, command.CommunityId);
 			var withSameIp = _mapper.Map<List<PlayerResult>>(playerIps);
 
-			return new OkObjectResult(new { player, withSameIp });
+			return new OkObjectResult(new { player, ip = command.Ip, withSameIp });
 		}
 		catch (Exception exception)
 		{
