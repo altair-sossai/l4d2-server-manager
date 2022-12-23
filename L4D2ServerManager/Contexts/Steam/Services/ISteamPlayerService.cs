@@ -4,7 +4,7 @@ using Refit;
 
 namespace L4D2ServerManager.Contexts.Steam.Services;
 
-public interface IPlayerService
+public interface ISteamPlayerService
 {
 	[Get("/IPlayerService/GetOwnedGames/v0001")]
 	Task<ResponseData<GamesInfo>> GetOwnedGamesAsync([AliasAs("key")] string key, [AliasAs("steamid")] string steamId);

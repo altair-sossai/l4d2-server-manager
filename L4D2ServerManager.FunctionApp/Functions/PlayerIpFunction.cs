@@ -5,6 +5,7 @@ using AutoMapper;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
 using L4D2ServerManager.Modules.AntiCheat.Player.Results;
+using L4D2ServerManager.Modules.AntiCheat.Player.Services;
 using L4D2ServerManager.Modules.AntiCheat.PlayerIp.Commands;
 using L4D2ServerManager.Modules.AntiCheat.PlayerIp.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.PlayerIp.Results;
@@ -23,15 +24,18 @@ public class PlayerIpFunction
 	private readonly IMapper _mapper;
 	private readonly IPlayerIpRepository _playerIpRepository;
 	private readonly IPlayerIpService _playerIpService;
+	private readonly IPlayerService _playerService;
 	private readonly IUserService _userService;
 
 	public PlayerIpFunction(IMapper mapper,
 		IUserService userService,
+		IPlayerService playerService,
 		IPlayerIpService playerIpService,
 		IPlayerIpRepository playerIpRepository)
 	{
 		_mapper = mapper;
 		_userService = userService;
+		_playerService = playerService;
 		_playerIpService = playerIpService;
 		_playerIpRepository = playerIpRepository;
 	}
@@ -80,10 +84,13 @@ public class PlayerIpFunction
 			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
 			var command = await httpRequest.DeserializeBodyAsync<PlayerIpCommand>();
-
 			_playerIpService.AddOrUpdate(command);
 
-			return new OkResult();
+			var player = _playerService.Find(command.CommunityId);
+			var playerIps = _playerIpRepository.GetAllPlayersWithIp(command.Ip!, command.CommunityId);
+			var withSameIp = _mapper.Map<List<PlayerResult>>(playerIps);
+
+			return new OkObjectResult(new { player, withSameIp });
 		}
 		catch (Exception exception)
 		{

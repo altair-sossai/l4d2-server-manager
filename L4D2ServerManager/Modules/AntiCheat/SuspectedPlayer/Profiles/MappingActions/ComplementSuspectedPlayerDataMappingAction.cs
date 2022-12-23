@@ -8,20 +8,20 @@ namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Profiles.MappingAc
 
 public class ComplementSuspectedPlayerDataMappingAction : IMappingAction<SuspectedPlayerCommand, SuspectedPlayer>
 {
-	private readonly IPlayerService _playerService;
 	private readonly ISteamContext _steamContext;
 	private readonly ISteamIdService _steamIdService;
+	private readonly ISteamPlayerService _steamPlayerService;
 	private readonly ISteamUserService _steamUserService;
 
 	public ComplementSuspectedPlayerDataMappingAction(ISteamContext steamContext,
 		ISteamUserService steamUserService,
 		ISteamIdService steamIdService,
-		IPlayerService playerService)
+		ISteamPlayerService steamPlayerService)
 	{
 		_steamContext = steamContext;
 		_steamUserService = steamUserService;
 		_steamIdService = steamIdService;
-		_playerService = playerService;
+		_steamPlayerService = steamPlayerService;
 	}
 
 	public void Process(SuspectedPlayerCommand command, SuspectedPlayer suspectedPlayer, ResolutionContext context)
@@ -35,7 +35,7 @@ public class ComplementSuspectedPlayerDataMappingAction : IMappingAction<Suspect
 		var playerSummariesResponse = _steamUserService.GetPlayerSummariesAsync(_steamContext.SteamApiKey, suspectedPlayer.CommunityId.ToString()).Result;
 		suspectedPlayer.Update(playerSummariesResponse.Response);
 
-		var ownedGamesResponse = _playerService.GetOwnedGamesAsync(_steamContext.SteamApiKey, suspectedPlayer.CommunityId.ToString()).Result;
+		var ownedGamesResponse = _steamPlayerService.GetOwnedGamesAsync(_steamContext.SteamApiKey, suspectedPlayer.CommunityId.ToString()).Result;
 		suspectedPlayer.Update(ownedGamesResponse.Response);
 	}
 }

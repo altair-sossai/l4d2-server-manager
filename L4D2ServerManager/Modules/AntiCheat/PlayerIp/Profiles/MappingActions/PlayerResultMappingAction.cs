@@ -8,17 +8,17 @@ namespace L4D2ServerManager.Modules.AntiCheat.PlayerIp.Profiles.MappingActions;
 
 public class PlayerResultMappingAction : IMappingAction<PlayerIp, PlayerResult>
 {
-	private readonly IPlayerService _playerService;
 	private readonly ISteamContext _steamContext;
+	private readonly ISteamPlayerService _steamPlayerService;
 	private readonly ISteamUserService _steamUserService;
 
 	public PlayerResultMappingAction(ISteamContext steamContext,
 		ISteamUserService steamUserService,
-		IPlayerService playerService)
+		ISteamPlayerService steamPlayerService)
 	{
 		_steamContext = steamContext;
 		_steamUserService = steamUserService;
-		_playerService = playerService;
+		_steamPlayerService = steamPlayerService;
 	}
 
 
@@ -27,7 +27,7 @@ public class PlayerResultMappingAction : IMappingAction<PlayerIp, PlayerResult>
 		var playerSummariesResponse = _steamUserService.GetPlayerSummariesAsync(_steamContext.SteamApiKey, playerIp.CommunityId.ToString()).Result;
 		result.Update(playerSummariesResponse.Response);
 
-		var ownedGamesResponse = _playerService.GetOwnedGamesAsync(_steamContext.SteamApiKey, playerIp.CommunityId.ToString()).Result;
+		var ownedGamesResponse = _steamPlayerService.GetOwnedGamesAsync(_steamContext.SteamApiKey, playerIp.CommunityId.ToString()).Result;
 		result.Update(ownedGamesResponse.Response);
 	}
 }

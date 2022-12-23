@@ -26,6 +26,14 @@ public class PlayerIpRepository : BaseTableStorageRepository<PlayerIp>, IPlayerI
 			.ToList();
 	}
 
+	public List<PlayerIp> GetAllPlayersWithIp(string ip, long ignore)
+	{
+		return TableClient
+			.Query<PlayerIp>(q => q.PartitionKey == ip && q.RowKey != ignore.ToString())
+			.OrderByDescending(w => w.When)
+			.ToList();
+	}
+
 	public void Delete(long communityId)
 	{
 		foreach (var playerIp in TableClient.Query<PlayerIp>(q => q.RowKey == communityId.ToString()))
