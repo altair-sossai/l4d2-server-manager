@@ -1,6 +1,6 @@
-﻿namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Results;
+﻿namespace L4D2ServerManager.Modules.AntiCheat.Player.Results;
 
-public class SuspectedPlayerResult
+public class PlayerResult
 {
 	public string? CommunityId { get; set; }
 	public string? SteamId { get; set; }

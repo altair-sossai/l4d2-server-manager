@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using L4D2ServerManager.Contexts.Steam;
 using L4D2ServerManager.Contexts.Steam.Services;
+using L4D2ServerManager.Modules.AntiCheat.Player.Extensions;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
-using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Extensions;
 
 namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Profiles.MappingActions;
 

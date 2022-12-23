@@ -14,9 +14,9 @@ public class ServerPingResultTests
 		{
 			When = DateTime.UtcNow
 		};
-		
+
 		var result = new ServerPingResult(serverPing);
-		
+
 		result.IsOn.Should().BeTrue();
 
 		serverPing = new L4D2ServerManager.Modules.AntiCheat.ServerPing.ServerPing

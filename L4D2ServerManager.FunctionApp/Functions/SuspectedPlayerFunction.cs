@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using AutoMapper;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
+using L4D2ServerManager.Modules.AntiCheat.Player.Results;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Repositories;
-using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Results;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerPing.Repositories;
@@ -63,7 +63,7 @@ public class SuspectedPlayerFunction
 			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
 
 			var suspectedPlayers = _suspectedPlayerRepository.GetSuspectedPlayers();
-			var result = _mapper.Map<List<SuspectedPlayerResult>>(suspectedPlayers);
+			var result = _mapper.Map<List<PlayerResult>>(suspectedPlayers);
 
 			return new OkObjectResult(result);
 		}
@@ -83,7 +83,7 @@ public class SuspectedPlayerFunction
 			if (suspectedPlayer == null)
 				return new NotFoundResult();
 
-			var result = _mapper.Map<SuspectedPlayerResult>(suspectedPlayer);
+			var result = _mapper.Map<PlayerResult>(suspectedPlayer);
 
 			return new OkObjectResult(result);
 		}
@@ -102,7 +102,7 @@ public class SuspectedPlayerFunction
 
 			var command = await httpRequest.DeserializeBodyAsync<SuspectedPlayerCommand>();
 			var suspectedPlayer = _suspectedPlayerService.AddOrUpdate(command);
-			var result = _mapper.Map<SuspectedPlayerResult>(suspectedPlayer);
+			var result = _mapper.Map<PlayerResult>(suspectedPlayer);
 
 			return new OkObjectResult(result);
 		}
