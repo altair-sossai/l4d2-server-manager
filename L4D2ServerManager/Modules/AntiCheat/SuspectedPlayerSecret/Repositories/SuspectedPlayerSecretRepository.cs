@@ -1,37 +1,28 @@
 ﻿using L4D2ServerManager.Contexts.AzureTableStorage;
 using L4D2ServerManager.Contexts.AzureTableStorage.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerCache.Services;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerSecret.Repositories;
 
 public class SuspectedPlayerSecretRepository : BaseTableStorageRepository<SuspectedPlayerSecret>, ISuspectedPlayerSecretRepository
 {
 	private const string PartitionKey = "shared";
-	private readonly IMemoryCache _memoryCache;
 	private readonly ISuspectedPlayerCache _suspectedPlayerCache;
 
-	public SuspectedPlayerSecretRepository(IMemoryCache memoryCache,
-		IAzureTableStorageContext tableContext,
-		ISuspectedPlayerCache suspectedPlayerCache)
+	public SuspectedPlayerSecretRepository(IAzureTableStorageContext tableContext, ISuspectedPlayerCache suspectedPlayerCache)
 		: base("SuspectedPlayerSecret", tableContext)
 	{
-		_memoryCache = memoryCache;
 		_suspectedPlayerCache = suspectedPlayerCache;
 	}
 
 	public bool Exists(long communityId)
 	{
-		var suspectedPlayerSecret = Find(communityId);
-
-		return suspectedPlayerSecret != null;
+		return Exists(PartitionKey, communityId.ToString());
 	}
 
 	public bool Validate(long communityId, string secret)
 	{
-		var suspectedPlayerSecret = Find(communityId);
-
-		return suspectedPlayerSecret != null && suspectedPlayerSecret.Secret == secret;
+		return TableClient.Query<SuspectedPlayerSecret>(q => q.PartitionKey == PartitionKey && q.RowKey == communityId.ToString() && q.Secret == secret).Any();
 	}
 
 	public override void Add(SuspectedPlayerSecret suspectedPlayerSecret)
@@ -46,15 +37,5 @@ public class SuspectedPlayerSecretRepository : BaseTableStorageRepository<Suspec
 		Delete(PartitionKey, communityId.ToString());
 
 		_suspectedPlayerCache.ClearAllKeys(communityId);
-	}
-
-	private SuspectedPlayerSecret? Find(long communityId)
-	{
-		return _memoryCache.GetOrCreate($"SuspectedPlayerSecret_{communityId}", factory =>
-		{
-			factory.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
-
-			return TableClient.Query<SuspectedPlayerSecret>(q => q.PartitionKey == PartitionKey && q.RowKey == communityId.ToString()).FirstOrDefault();
-		});
 	}
 }
