@@ -61,12 +61,12 @@ public abstract class BaseTableStorageRepository<TEntity> : BaseTableStorageRepo
 		return TableClient.Query<TEntity>();
 	}
 
-	public void Add(TEntity entity)
+	public virtual void Add(TEntity entity)
 	{
 		TableClient.AddEntity(entity);
 	}
 
-	public void AddOrUpdate(TEntity entity)
+	public virtual void AddOrUpdate(TEntity entity)
 	{
 		TableClient.UpsertEntity(entity);
 	}
