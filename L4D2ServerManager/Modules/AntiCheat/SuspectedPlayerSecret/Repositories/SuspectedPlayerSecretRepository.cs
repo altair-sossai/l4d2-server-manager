@@ -22,22 +22,16 @@ public class SuspectedPlayerSecretRepository : BaseTableStorageRepository<Suspec
 
 	public bool Exists(long communityId)
 	{
-		return _memoryCache.GetOrCreate($"SuspectedPlayerSecret_Exists_{communityId}", factory =>
-		{
-			factory.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+		var suspectedPlayerSecret = Find(communityId);
 
-			return Exists(PartitionKey, communityId.ToString());
-		});
+		return suspectedPlayerSecret != null;
 	}
 
 	public bool Validate(long communityId, string secret)
 	{
-		return _memoryCache.GetOrCreate($"SuspectedPlayerSecret_Validate_{communityId}", factory =>
-		{
-			factory.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+		var suspectedPlayerSecret = Find(communityId);
 
-			return TableClient.Query<SuspectedPlayerSecret>(q => q.PartitionKey == PartitionKey && q.RowKey == communityId.ToString() && q.Secret == secret).Any();
-		});
+		return suspectedPlayerSecret != null && suspectedPlayerSecret.Secret == secret;
 	}
 
 	public override void Add(SuspectedPlayerSecret suspectedPlayerSecret)
@@ -52,5 +46,15 @@ public class SuspectedPlayerSecretRepository : BaseTableStorageRepository<Suspec
 		Delete(PartitionKey, communityId.ToString());
 
 		_suspectedPlayerCache.ClearAllKeys(communityId);
+	}
+
+	private SuspectedPlayerSecret? Find(long communityId)
+	{
+		return _memoryCache.GetOrCreate($"SuspectedPlayerSecret_{communityId}", factory =>
+		{
+			factory.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
+
+			return TableClient.Query<SuspectedPlayerSecret>(q => q.PartitionKey == PartitionKey && q.RowKey == communityId.ToString()).FirstOrDefault();
+		});
 	}
 }

@@ -15,7 +15,6 @@ public class SuspectedPlayerCache : ISuspectedPlayerCache
 	{
 		_memoryCache.Remove($"SuspectedPlayer_Exists_{communityId}");
 		_memoryCache.Remove($"SuspectedPlayer_GetSuspectedPlayer_{communityId}");
-		_memoryCache.Remove($"SuspectedPlayerSecret_Exists_{communityId}");
-		_memoryCache.Remove($"SuspectedPlayerSecret_Validate_{communityId}");
+		_memoryCache.Remove($"SuspectedPlayerSecret_{communityId}");
 	}
 }

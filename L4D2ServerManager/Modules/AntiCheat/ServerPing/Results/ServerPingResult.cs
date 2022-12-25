@@ -10,6 +10,6 @@ public class ServerPingResult
 	}
 
 	public DateTime? When => _serverPing?.When;
-	public bool IsOn => When.HasValue && When > DateTime.UtcNow.AddMinutes(-5);
+	public bool IsOn => When.HasValue && When > DateTime.UtcNow.AddMinutes(-30);
 	public bool IsOff => !IsOn;
 }
