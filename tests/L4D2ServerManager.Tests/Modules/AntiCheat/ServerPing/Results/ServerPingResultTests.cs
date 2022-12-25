@@ -30,7 +30,7 @@ public class ServerPingResultTests
 
 		serverPing = new L4D2ServerManager.Modules.AntiCheat.ServerPing.ServerPing
 		{
-			When = DateTime.UtcNow.AddMinutes(-6)
+			When = DateTime.UtcNow.AddMinutes(-40)
 		};
 
 		result = new ServerPingResult(serverPing);
