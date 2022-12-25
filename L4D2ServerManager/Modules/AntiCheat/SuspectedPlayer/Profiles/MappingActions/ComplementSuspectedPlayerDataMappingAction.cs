@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using L4D2ServerManager.Contexts.Steam;
 using L4D2ServerManager.Contexts.Steam.Services;
 using L4D2ServerManager.Modules.AntiCheat.Player.Extensions;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
@@ -9,19 +8,12 @@ namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Profiles.MappingAc
 
 public class ComplementSuspectedPlayerDataMappingAction : IMappingAction<SuspectedPlayerCommand, SuspectedPlayer>
 {
-	private readonly ISteamContext _steamContext;
 	private readonly ISteamIdService _steamIdService;
 	private readonly ISteamService _steamService;
-	private readonly ISteamUserService _steamUserService;
 
-	public ComplementSuspectedPlayerDataMappingAction(ISteamService steamService,
-		ISteamContext steamContext,
-		ISteamUserService steamUserService,
-		ISteamIdService steamIdService)
+	public ComplementSuspectedPlayerDataMappingAction(ISteamService steamService, ISteamIdService steamIdService)
 	{
 		_steamService = steamService;
-		_steamContext = steamContext;
-		_steamUserService = steamUserService;
 		_steamIdService = steamIdService;
 	}
 
@@ -33,8 +25,8 @@ public class ComplementSuspectedPlayerDataMappingAction : IMappingAction<Suspect
 		if (suspectedPlayer.CommunityId == 0)
 			return;
 
-		var playerSummariesResponse = _steamUserService.GetPlayerSummariesAsync(_steamContext.SteamApiKey, suspectedPlayer.CommunityId.ToString()).Result;
-		suspectedPlayer.Update(playerSummariesResponse.Response);
+		var playersInfo = _steamService.GetPlayerSummariesAsync(suspectedPlayer.CommunityId).Result;
+		suspectedPlayer.Update(playersInfo);
 
 		var gamesInfo = _steamService.GetOwnedGamesAsync(suspectedPlayer.CommunityId).Result;
 		suspectedPlayer.Update(gamesInfo);
