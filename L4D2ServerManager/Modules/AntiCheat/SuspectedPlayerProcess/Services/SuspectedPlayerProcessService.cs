@@ -19,7 +19,9 @@ public class SuspectedPlayerProcessService : ISuspectedPlayerProcessService
 
 	public void BatchOperation(long communityId, IEnumerable<ProcessCommand> commands)
 	{
-		var processess = _mapper.Map<List<SuspectedPlayerProcess>>(commands);
+		var processessCommands = commands.GroupBy(g => g.RowKey).Select(s => s.First());
+		var processess = _mapper.Map<List<SuspectedPlayerProcess>>(processessCommands);
+
 		processess.ForEach(process => process.CommunityId = communityId);
 
 		if (processess.Count == 0)
