@@ -8,23 +8,34 @@ using L4D2ServerManager.Modules.ServerManager.Server;
 using L4D2ServerManager.Modules.ServerManager.Server.Extensions;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Extensions;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace L4D2ServerManager.Modules.Auth.Users.Services;
 
 public class UserService : IUserService
 {
 	private readonly IAzureTableStorageContext _context;
+	private readonly IMemoryCache _memoryCache;
 	private readonly IPortServer _portServer;
 	private TableClient? _userTable;
 
 	public UserService(IAzureTableStorageContext context,
+		IMemoryCache memoryCache,
 		IPortServer portServer)
 	{
 		_context = context;
+		_memoryCache = memoryCache;
 		_portServer = portServer;
 	}
 
 	private TableClient UserTable => _userTable ??= _context.GetTableClient("Users").Result;
+
+	private List<User> Users => _memoryCache.GetOrCreate(nameof(Users), factory =>
+	{
+		factory.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+
+		return UserTable.Query<User>().ToList();
+	});
 
 	public User EnsureAuthentication(string token, AccessLevel accessLevel)
 	{
@@ -32,7 +43,7 @@ public class UserService : IUserService
 		if (!command.Valid)
 			throw new UnauthorizedAccessException();
 
-		var user = UserTable.Query<User>(user => user.Id == command.UserId && user.Secret == command.UserSecret).FirstOrDefault();
+		var user = Users.FirstOrDefault(user => user.RowKey == command.UserId && user.Secret == command.UserSecret);
 		if (user == null || !user.AccessLevel.HasFlag(accessLevel))
 			throw new UnauthorizedAccessException();
 
@@ -41,12 +52,12 @@ public class UserService : IUserService
 
 	public User? GetUser(string userId)
 	{
-		return UserTable.Query<User>(user => user.Id == userId).FirstOrDefault();
+		return Users.FirstOrDefault(user => user.RowKey == userId);
 	}
 
 	public IEnumerable<User> GetUsers()
 	{
-		return UserTable.Query<User>();
+		return Users;
 	}
 
 	public void ApplyPermissions(User user, IVirtualMachine virtualMachine)

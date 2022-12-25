@@ -16,6 +16,7 @@ public static class AppInjection
 
 		serviceCollection.AddAutoMapper(assemblies);
 		serviceCollection.AddValidatorsFromAssemblies(assemblies);
+		serviceCollection.AddMemoryCache();
 
 		serviceCollection.Scan(scan => scan
 			.FromAssemblies(assemblies)
