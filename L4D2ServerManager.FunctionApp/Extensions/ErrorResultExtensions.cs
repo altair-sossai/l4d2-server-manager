@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using L4D2ServerManager.FunctionApp.Errors;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,10 @@ public static class ErrorResultExtensions
 		{
 			HttpStatusCode.BadRequest => new BadRequestObjectResult(errorResult),
 			HttpStatusCode.Unauthorized => new UnauthorizedObjectResult(errorResult),
-			_ => new InternalServerErrorResult()
+			_ => new ResponseMessageResult(new HttpResponseMessage(HttpStatusCode.InternalServerError))
+			{
+				Response = { Content = new StringContent(errorResult.Message) }
+			}
 		};
 	}
 }
