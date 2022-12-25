@@ -1,14 +1,17 @@
 ﻿using L4D2ServerManager.Contexts.Steam.Extensions;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace L4D2ServerManager.Contexts.Steam.Services;
 
 public class SteamIdService : ISteamIdService
 {
+	private readonly IMemoryCache _memoryCache;
 	private readonly ISteamContext _steamContext;
 	private readonly ISteamUserService _steamUserService;
 
-	public SteamIdService(ISteamContext steamContext, ISteamUserService steamUserService)
+	public SteamIdService(IMemoryCache memoryCache, ISteamContext steamContext, ISteamUserService steamUserService)
 	{
+		_memoryCache = memoryCache;
 		_steamContext = steamContext;
 		_steamUserService = steamUserService;
 	}
@@ -18,8 +21,13 @@ public class SteamIdService : ISteamIdService
 		if (string.IsNullOrEmpty(customUrl))
 			return await Task.FromResult((long?)null);
 
-		var responseData = await _steamUserService.ResolveVanityUrlAsync(_steamContext.SteamApiKey, customUrl);
+		return await _memoryCache.GetOrCreateAsync($"ResolveVanityURL_{customUrl}", async factory =>
+		{
+			factory.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
 
-		return responseData.Response?.SteamId();
+			var responseData = await _steamUserService.ResolveVanityUrlAsync(_steamContext.SteamApiKey, customUrl);
+
+			return responseData.Response?.SteamId();
+		});
 	}
 }
