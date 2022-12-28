@@ -34,7 +34,7 @@ public class SuspectedPlayerActivityFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 
 			var activity = _suspectedPlayerActivityRepository.Find(communityId);
 			if (activity == null)

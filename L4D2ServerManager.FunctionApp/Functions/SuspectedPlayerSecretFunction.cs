@@ -74,7 +74,7 @@ public class SuspectedPlayerSecretFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 			_suspectedPlayerSecretRepository.Delete(communityId);
 
 			return new OkResult();

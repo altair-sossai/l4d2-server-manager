@@ -55,7 +55,7 @@ public class SuspectedPlayerScreenshotFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 
 			var parameters = httpRequest.GetQueryParameterDictionary();
 			var skip = parameters.ContainsKey("skip") && int.TryParse(parameters["skip"], out var skipValue) ? skipValue : 0;
@@ -75,7 +75,7 @@ public class SuspectedPlayerScreenshotFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 
 			await _suspectedPlayerScreenshotService.DeleteAllScreenshotsAsync(communityId);
 

@@ -44,7 +44,7 @@ public class SuspectedPlayerProcessFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 
 			var processes = _suspectedPlayerProcessRepository.GetAllProcesses(communityId);
 
@@ -80,7 +80,7 @@ public class SuspectedPlayerProcessFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 			_suspectedPlayerProcessRepository.Delete(communityId);
 
 			return new OkResult();

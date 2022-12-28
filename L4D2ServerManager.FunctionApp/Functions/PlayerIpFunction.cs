@@ -45,7 +45,7 @@ public class PlayerIpFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 
 			var playerIps = _playerIpRepository.GetAllPlayerIps(communityId);
 			var result = _mapper.Map<List<IpResult>>(playerIps);
@@ -63,7 +63,7 @@ public class PlayerIpFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 
 			var playerIps = _playerIpRepository.GetAllPlayersWithIp(ip);
 			var result = _mapper.Map<List<PlayerResult>>(playerIps);
@@ -103,7 +103,7 @@ public class PlayerIpFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 			_playerIpRepository.Delete(communityId);
 
 			return new OkResult();

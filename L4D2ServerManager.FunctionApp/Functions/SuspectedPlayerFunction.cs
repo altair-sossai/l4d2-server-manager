@@ -60,7 +60,7 @@ public class SuspectedPlayerFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 
 			var suspectedPlayers = _suspectedPlayerRepository.GetSuspectedPlayers();
 			var result = _mapper.Map<List<PlayerResult>>(suspectedPlayers);

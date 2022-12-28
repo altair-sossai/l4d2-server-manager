@@ -42,7 +42,7 @@ public class SuspectedPlayerPingFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheat);
+			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 
 			var ping = _suspectedPlayerPingRepository.Find(communityId);
 			if (ping == null)
