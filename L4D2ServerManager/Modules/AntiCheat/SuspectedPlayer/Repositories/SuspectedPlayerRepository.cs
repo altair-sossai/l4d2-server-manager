@@ -42,7 +42,12 @@ public class SuspectedPlayerRepository : BaseTableStorageRepository<SuspectedPla
 
 	public IEnumerable<SuspectedPlayer> GetSuspectedPlayers()
 	{
-		return GetAll().OrderBy(o => o.Name);
+		return _memoryCache.GetOrCreate("SuspectedPlayer_All", factory =>
+		{
+			factory.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
+
+			return GetAll().OrderBy(o => o.Name);
+		});
 	}
 
 	public override void AddOrUpdate(SuspectedPlayer entity)

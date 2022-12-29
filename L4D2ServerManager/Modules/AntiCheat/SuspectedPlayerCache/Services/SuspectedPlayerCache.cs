@@ -13,6 +13,7 @@ public class SuspectedPlayerCache : ISuspectedPlayerCache
 
 	public void ClearAllKeys(long communityId)
 	{
+		_memoryCache.Remove("SuspectedPlayer_All");
 		_memoryCache.Remove($"SuspectedPlayer_Exists_{communityId}");
 		_memoryCache.Remove($"SuspectedPlayer_GetSuspectedPlayer_{communityId}");
 		_memoryCache.Remove($"SuspectedPlayerSecret_{communityId}");
