@@ -61,7 +61,9 @@ public class SuspectedPlayerPingFunction
 	{
 		try
 		{
-			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
+			var accessToken = httpRequest.AuthorizationToken();
+			var appId = httpRequest.AppId();
+			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(accessToken, appId);
 			var command = await httpRequest.DeserializeBodyAsync<PingCommand>();
 
 			_suspectedPlayerPingService.Ping(suspectedPlayer.CommunityId, command);

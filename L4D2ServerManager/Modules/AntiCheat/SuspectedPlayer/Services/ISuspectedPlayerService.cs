@@ -6,6 +6,6 @@ public interface ISuspectedPlayerService
 {
 	SuspectedPlayer? Find(string? account);
 	SuspectedPlayer AddOrUpdate(SuspectedPlayerCommand command);
-	SuspectedPlayer EnsureAuthentication(string accessToken);
+	SuspectedPlayer EnsureAuthentication(string accessToken, string appId);
 	void Sync();
 }

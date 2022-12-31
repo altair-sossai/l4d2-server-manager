@@ -44,7 +44,9 @@ public class SuspectedPlayerFileCheckFailFunction
 	{
 		try
 		{
-			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
+			var accessToken = httpRequest.AuthorizationToken();
+			var appId = httpRequest.AppId();
+			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(accessToken, appId);
 			_suspectedPlayerActivityRepository.FileCheckFail(suspectedPlayer.CommunityId);
 
 			var commands = await httpRequest.DeserializeBodyAsync<List<SuspectedPlayerFileFailCommand>>();

@@ -32,7 +32,9 @@ public class ServerPingFunction
 	{
 		try
 		{
-			_suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
+			var accessToken = httpRequest.AuthorizationToken();
+			var appId = httpRequest.AppId();
+			_suspectedPlayerService.EnsureAuthentication(accessToken, appId);
 
 			var result = _serverPingService.Get();
 

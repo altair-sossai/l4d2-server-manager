@@ -27,7 +27,9 @@ public class SuspectedPlayerFileCheckSuccessFunction
 	{
 		try
 		{
-			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
+			var accessToken = httpRequest.AuthorizationToken();
+			var appId = httpRequest.AppId();
+			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(accessToken, appId);
 			_suspectedPlayerActivityRepository.FileCheckSuccess(suspectedPlayer.CommunityId);
 
 			return new OkResult();

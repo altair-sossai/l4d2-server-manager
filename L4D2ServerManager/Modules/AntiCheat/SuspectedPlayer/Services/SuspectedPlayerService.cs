@@ -6,29 +6,35 @@ using L4D2ServerManager.Contexts.Steam.Structures;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Commands;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Repositories;
 using L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerSecret.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
 
 public class SuspectedPlayerService : ISuspectedPlayerService
 {
+	private readonly IConfiguration _configuration;
 	private readonly IMapper _mapper;
 	private readonly ISteamIdService _steamIdService;
 	private readonly ISuspectedPlayerRepository _suspectedPlayerRepository;
 	private readonly ISuspectedPlayerSecretRepository _suspectedPlayerSecretRepository;
 	private readonly IValidator<SuspectedPlayer> _validator;
 
-	public SuspectedPlayerService(IMapper mapper,
+	public SuspectedPlayerService(IConfiguration configuration,
+		IMapper mapper,
 		ISuspectedPlayerRepository suspectedPlayerRepository,
 		ISuspectedPlayerSecretRepository suspectedPlayerSecretRepository,
 		IValidator<SuspectedPlayer> validator,
 		ISteamIdService steamIdService)
 	{
+		_configuration = configuration;
 		_mapper = mapper;
 		_suspectedPlayerRepository = suspectedPlayerRepository;
 		_suspectedPlayerSecretRepository = suspectedPlayerSecretRepository;
 		_steamIdService = steamIdService;
 		_validator = validator;
 	}
+
+	private string AppId => _configuration.GetValue<string>(nameof(AppId));
 
 	public SuspectedPlayer? Find(string? account)
 	{
@@ -55,8 +61,11 @@ public class SuspectedPlayerService : ISuspectedPlayerService
 		return suspectedPlayer;
 	}
 
-	public SuspectedPlayer EnsureAuthentication(string accessToken)
+	public SuspectedPlayer EnsureAuthentication(string accessToken, string appId)
 	{
+		if (string.IsNullOrEmpty(AppId) || string.IsNullOrEmpty(appId) || AppId != appId)
+			throw new UnauthorizedAccessException();
+
 		var command = new SuspectedPlayerAuthenticationCommand(accessToken);
 		if (!command.Valid)
 			throw new UnauthorizedAccessException();

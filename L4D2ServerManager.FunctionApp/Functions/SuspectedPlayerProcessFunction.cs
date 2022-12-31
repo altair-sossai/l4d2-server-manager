@@ -61,7 +61,9 @@ public class SuspectedPlayerProcessFunction
 	{
 		try
 		{
-			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
+			var accessToken = httpRequest.AuthorizationToken();
+			var appId = httpRequest.AppId();
+			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(accessToken, appId);
 			var commands = await httpRequest.DeserializeBodyAsync<List<ProcessCommand>>();
 
 			_suspectedPlayerProcessService.BatchOperation(suspectedPlayer.CommunityId, commands);

@@ -37,7 +37,9 @@ public class SuspectedPlayerScreenshotFunction
 	{
 		try
 		{
-			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(httpRequest.AuthorizationToken());
+			var accessToken = httpRequest.AuthorizationToken();
+			var appId = httpRequest.AppId();
+			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(accessToken, appId);
 			var url = await _suspectedPlayerScreenshotService.GenerateUploadUrlAsync(suspectedPlayer.CommunityId);
 
 			_suspectedPlayerActivityRepository.Screenshot(suspectedPlayer.CommunityId);

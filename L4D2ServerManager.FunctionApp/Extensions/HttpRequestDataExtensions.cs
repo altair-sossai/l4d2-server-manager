@@ -29,4 +29,9 @@ public static class HttpRequestDataExtensions
 	{
 		return httpRequest.Headers["Authorization"].ToString();
 	}
+
+	public static string AppId(this HttpRequest httpRequest)
+	{
+		return httpRequest.Headers["X-AppId"].ToString();
+	}
 }
