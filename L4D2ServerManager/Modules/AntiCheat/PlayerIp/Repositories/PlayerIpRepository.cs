@@ -42,7 +42,7 @@ public class PlayerIpRepository : BaseTableStorageRepository<PlayerIp>, IPlayerI
 
 	public void DeleteOldIps()
 	{
-		var limit = DateTimeOffset.UtcNow.AddDays(-10);
+		var limit = DateTimeOffset.UtcNow.AddDays(-7);
 
 		foreach (var playerIp in TableClient.Query<PlayerIp>(q => q.Timestamp < limit))
 			Delete(playerIp.PartitionKey, playerIp.RowKey);
