@@ -14,7 +14,6 @@ public interface IServer
 	string? StartedBy { get; }
 	DateTime? StartedAt { get; }
 	Task RunAsync(User user, Campaign campaign);
-	Task RunZoneAsync(User user, Campaign campaign);
 	void Stop();
 	void KickAllPlayers();
 	Task OpenPortAsync(string ranges);
