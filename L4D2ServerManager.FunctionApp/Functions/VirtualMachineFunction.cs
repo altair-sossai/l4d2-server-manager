@@ -112,7 +112,7 @@ public class VirtualMachineFunction
 			if (!virtualMachine.CanPowerOff())
 				throw new UnauthorizedAccessException();
 
-			await virtualMachine.PowerOffAsync();
+			await virtualMachine.PowerOffAsync(user);
 
 			return new OkObjectResult(virtualMachine);
 		}
@@ -127,7 +127,7 @@ public class VirtualMachineFunction
 	{
 		try
 		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+			var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
 			var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
 			if (virtualMachine.IsOff)
@@ -145,7 +145,7 @@ public class VirtualMachineFunction
 
 			if (virtualMachine.ShutdownAttempt >= AttemptsToShutdown)
 			{
-				await virtualMachine.PowerOffAsync();
+				await virtualMachine.PowerOffAsync(user);
 				return new OkObjectResult(virtualMachine);
 			}
 

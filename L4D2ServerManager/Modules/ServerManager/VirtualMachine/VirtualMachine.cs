@@ -156,6 +156,33 @@ public class VirtualMachine : IVirtualMachine
 		}
 	}
 
+	public string? PowerOffBy
+	{
+		get
+		{
+			const string key = "power-off-by";
+
+			var tags = VirtualMachineResource.Data.Tags;
+
+			return tags.ContainsKey(key) ? tags[key] : null;
+		}
+	}
+
+	public DateTime? PowerOffAt
+	{
+		get
+		{
+			const string key = "power-off-at";
+
+			var tags = VirtualMachineResource.Data.Tags;
+
+			if (!tags.ContainsKey(key))
+				return null;
+
+			return DateTime.TryParse(tags[key], out var date) ? date : null;
+		}
+	}
+
 	public int ShutdownAttempt
 	{
 		get
@@ -190,7 +217,7 @@ public class VirtualMachine : IVirtualMachine
 		await UpdateTagsAsync(values);
 	}
 
-	public async Task PowerOffAsync()
+	public async Task PowerOffAsync(User user)
 	{
 		if (IsOff)
 			return;
@@ -198,7 +225,15 @@ public class VirtualMachine : IVirtualMachine
 		_virtualMachineInstanceView = null;
 
 		await VirtualMachineResource.DeallocateAsync(WaitUntil.Completed);
-		await ClearShutdownAttemptAsync();
+
+		var values = new Dictionary<string, string>
+		{
+			{ "power-off-by", user.Id },
+			{ "power-off-at", DateTime.UtcNow.ToString("u") },
+			{ "shutdown-attempt", "0" }
+		};
+
+		await UpdateTagsAsync(values);
 	}
 
 	public void RunCommand(RunScriptCommand command)

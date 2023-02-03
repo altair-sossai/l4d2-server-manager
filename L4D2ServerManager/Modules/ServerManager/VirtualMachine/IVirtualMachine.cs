@@ -14,9 +14,11 @@ public interface IVirtualMachine
 	HashSet<string> Permissions { get; }
 	string? PowerOnBy { get; }
 	DateTime? PowerOnAt { get; }
+	string? PowerOffBy { get; }
+	DateTime? PowerOffAt { get; }
 	int ShutdownAttempt { get; }
 	Task PowerOnAsync(User user);
-	Task PowerOffAsync();
+	Task PowerOffAsync(User user);
 	void RunCommand(RunScriptCommand command);
 	Task<PortInfo> GetPortInfoAsync(int port);
 	Task OpenPortAsync(int port, string ranges);
