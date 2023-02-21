@@ -2,8 +2,8 @@
 
 public static class SuspectedPlayerActivityExtensions
 {
-	private const double PingLimiteInMinutes = 1;
-	private const double ProcessLimiteInMinutes = 5;
+	private const double PingLimiteInMinutes = 3;
+	private const double ProcessLimiteInMinutes = 6;
 	private const double ScreenshotLimiteInMinutes = 4;
 
 	public static Dictionary<long, SuspectedPlayerActivity> ToDictionary(this IEnumerable<SuspectedPlayerActivity> activities)
