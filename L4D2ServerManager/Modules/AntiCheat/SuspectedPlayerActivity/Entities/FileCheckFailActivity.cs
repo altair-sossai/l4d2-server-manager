@@ -4,10 +4,10 @@ namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.Entities;
 
 public class FileCheckFailActivity : Activity
 {
-	public FileCheckFailActivity(long communityId)
-		: base(communityId)
-	{
-	}
+    public FileCheckFailActivity(long communityId)
+        : base(communityId)
+    {
+    }
 
-	public DateTime? FileCheckFail { get; set; } = DateTime.UtcNow;
+    public DateTime? FileCheckFail { get; set; } = DateTime.UtcNow;
 }

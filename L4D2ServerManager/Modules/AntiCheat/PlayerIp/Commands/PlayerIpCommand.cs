@@ -2,6 +2,6 @@
 
 public class PlayerIpCommand
 {
-	public string? Ip { get; set; }
-	public long CommunityId { get; set; }
+    public string? Ip { get; set; }
+    public long CommunityId { get; set; }
 }

@@ -4,8 +4,8 @@ namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayer.Services;
 
 public interface ISuspectedPlayerService
 {
-	SuspectedPlayer? Find(string? account);
-	SuspectedPlayer AddOrUpdate(SuspectedPlayerCommand command);
-	SuspectedPlayer EnsureAuthentication(string accessToken, string appId);
-	void Sync();
+    SuspectedPlayer? Find(string? account);
+    SuspectedPlayer AddOrUpdate(SuspectedPlayerCommand command);
+    SuspectedPlayer EnsureAuthentication(string accessToken, string appId);
+    void Sync();
 }

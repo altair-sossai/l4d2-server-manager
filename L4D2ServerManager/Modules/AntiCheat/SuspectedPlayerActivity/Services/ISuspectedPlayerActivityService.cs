@@ -5,5 +5,5 @@ namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.Services;
 
 public interface ISuspectedPlayerActivityService
 {
-	CheckAntiCheatUsageResult CheckAntiCheatUsage(CheckAntiCheatUsageCommand command);
+    CheckAntiCheatUsageResult CheckAntiCheatUsage(CheckAntiCheatUsageCommand command);
 }

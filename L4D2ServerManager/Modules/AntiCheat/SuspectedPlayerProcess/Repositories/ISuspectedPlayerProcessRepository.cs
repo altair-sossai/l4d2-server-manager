@@ -4,8 +4,8 @@ namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerProcess.Repositorie
 
 public interface ISuspectedPlayerProcessRepository
 {
-	Pageable<SuspectedPlayerProcess> GetAllProcesses(long communityId);
-	void AddOrUpdate(IEnumerable<SuspectedPlayerProcess> processes);
-	void Delete(long communityId);
-	void DeleteOldProcesses();
+    Pageable<SuspectedPlayerProcess> GetAllProcesses(long communityId);
+    void AddOrUpdate(IEnumerable<SuspectedPlayerProcess> processes);
+    void Delete(long communityId);
+    void DeleteOldProcesses();
 }

@@ -6,29 +6,29 @@ namespace L4D2ServerManager.Modules.AntiCheat.ServerPing.Repositories;
 
 public class ServerPingRepository : BaseTableStorageRepository<ServerPing>, IServerPingRepository
 {
-	private readonly IMemoryCache _memoryCache;
+    private readonly IMemoryCache _memoryCache;
 
-	public ServerPingRepository(IMemoryCache memoryCache,
-		IAzureTableStorageContext tableContext)
-		: base("ServerPing", tableContext)
-	{
-		_memoryCache = memoryCache;
-	}
+    public ServerPingRepository(IMemoryCache memoryCache,
+        IAzureTableStorageContext tableContext)
+        : base("ServerPing", tableContext)
+    {
+        _memoryCache = memoryCache;
+    }
 
-	public ServerPing? Get()
-	{
-		return _memoryCache.GetOrCreate("ServerPing", factory =>
-		{
-			factory.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+    public ServerPing? Get()
+    {
+        return _memoryCache.GetOrCreate("ServerPing", factory =>
+        {
+            factory.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
 
-			return Find("shared", "shared");
-		});
-	}
+            return Find("shared", "shared");
+        });
+    }
 
-	public override void AddOrUpdate(ServerPing entity)
-	{
-		base.AddOrUpdate(entity);
+    public override void AddOrUpdate(ServerPing entity)
+    {
+        base.AddOrUpdate(entity);
 
-		_memoryCache.Remove("ServerPing");
-	}
+        _memoryCache.Remove("ServerPing");
+    }
 }

@@ -2,6 +2,6 @@
 
 public class IpResult
 {
-	public string? Ip { get; set; }
-	public DateTime When { get; set; }
+    public string? Ip { get; set; }
+    public DateTime When { get; set; }
 }

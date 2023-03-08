@@ -2,5 +2,5 @@
 
 public class PingCommand
 {
-	public bool Focused { get; set; }
+    public bool Focused { get; set; }
 }

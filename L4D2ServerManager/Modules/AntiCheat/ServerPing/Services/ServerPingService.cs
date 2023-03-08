@@ -5,24 +5,24 @@ namespace L4D2ServerManager.Modules.AntiCheat.ServerPing.Services;
 
 public class ServerPingService : IServerPingService
 {
-	private readonly IServerPingRepository _serverPingRepository;
+    private readonly IServerPingRepository _serverPingRepository;
 
-	public ServerPingService(IServerPingRepository serverPingRepository)
-	{
-		_serverPingRepository = serverPingRepository;
-	}
+    public ServerPingService(IServerPingRepository serverPingRepository)
+    {
+        _serverPingRepository = serverPingRepository;
+    }
 
-	public ServerPingResult Get()
-	{
-		var serverPing = _serverPingRepository.Get();
+    public ServerPingResult Get()
+    {
+        var serverPing = _serverPingRepository.Get();
 
-		return new ServerPingResult(serverPing);
-	}
+        return new ServerPingResult(serverPing);
+    }
 
-	public void Ping()
-	{
-		var ping = new ServerPing();
+    public void Ping()
+    {
+        var ping = new ServerPing();
 
-		_serverPingRepository.AddOrUpdate(ping);
-	}
+        _serverPingRepository.AddOrUpdate(ping);
+    }
 }

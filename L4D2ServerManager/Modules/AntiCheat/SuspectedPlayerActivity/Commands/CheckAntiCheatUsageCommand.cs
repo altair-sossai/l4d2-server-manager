@@ -2,5 +2,5 @@
 
 public class CheckAntiCheatUsageCommand
 {
-	public HashSet<string> Suspecteds { get; set; } = new();
+    public HashSet<string> Suspecteds { get; set; } = new();
 }

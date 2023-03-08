@@ -2,5 +2,5 @@
 
 public interface IPlayerService
 {
-	IPlayer Find(long communityId);
+    IPlayer Find(long communityId);
 }

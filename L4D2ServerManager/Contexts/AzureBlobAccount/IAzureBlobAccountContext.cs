@@ -7,8 +7,8 @@ namespace L4D2ServerManager.Contexts.AzureBlobAccount;
 
 public interface IAzureBlobAccountContext
 {
-	Task<string> GenerateSasUrlAsync(string blobContainerName, string blobName, BlobSasPermissions permissions, DateTimeOffset expiresOn);
-	AsyncPageable<BlobContainerItem> GetBlobContainersAsync(string prefix, CancellationToken cancellationToken);
-	BlobContainerClient GetBlobContainerClient(string blobContainerName);
-	Task DeleteBlobContainerAsync(string blobContainerName);
+    Task<string> GenerateSasUrlAsync(string blobContainerName, string blobName, BlobSasPermissions permissions, DateTimeOffset expiresOn);
+    AsyncPageable<BlobContainerItem> GetBlobContainersAsync(string prefix, CancellationToken cancellationToken);
+    BlobContainerClient GetBlobContainerClient(string blobContainerName);
+    Task DeleteBlobContainerAsync(string blobContainerName);
 }

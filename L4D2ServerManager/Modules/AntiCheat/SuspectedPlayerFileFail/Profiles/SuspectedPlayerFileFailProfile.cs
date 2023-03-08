@@ -5,8 +5,8 @@ namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerFileFail.Profiles;
 
 public class SuspectedPlayerFileFailProfile : Profile
 {
-	public SuspectedPlayerFileFailProfile()
-	{
-		CreateMap<SuspectedPlayerFileFailCommand, SuspectedPlayerFileFail>();
-	}
+    public SuspectedPlayerFileFailProfile()
+    {
+        CreateMap<SuspectedPlayerFileFailCommand, SuspectedPlayerFileFail>();
+    }
 }

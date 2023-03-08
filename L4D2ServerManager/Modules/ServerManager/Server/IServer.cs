@@ -6,16 +6,16 @@ namespace L4D2ServerManager.Modules.ServerManager.Server;
 
 public interface IServer
 {
-	string IpAddress { get; }
-	int Port { get; }
-	bool IsRunning { get; }
-	PortInfo PortInfo { get; }
-	HashSet<string> Permissions { get; }
-	string? StartedBy { get; }
-	DateTime? StartedAt { get; }
-	Task RunAsync(User user, Campaign campaign);
-	void Stop();
-	void KickAllPlayers();
-	Task OpenPortAsync(string ranges);
-	Task ClosePortAsync();
+    string IpAddress { get; }
+    int Port { get; }
+    bool IsRunning { get; }
+    PortInfo PortInfo { get; }
+    HashSet<string> Permissions { get; }
+    string? StartedBy { get; }
+    DateTime? StartedAt { get; }
+    Task RunAsync(User user, Campaign campaign);
+    void Stop();
+    void KickAllPlayers();
+    Task OpenPortAsync(string ranges);
+    Task ClosePortAsync();
 }

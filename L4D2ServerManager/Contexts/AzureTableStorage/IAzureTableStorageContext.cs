@@ -4,5 +4,5 @@ namespace L4D2ServerManager.Contexts.AzureTableStorage;
 
 public interface IAzureTableStorageContext
 {
-	Task<TableClient> GetTableClient(string tableName);
+    Task<TableClient> GetTableClient(string tableName);
 }

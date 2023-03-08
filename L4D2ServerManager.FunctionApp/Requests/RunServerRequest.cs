@@ -4,5 +4,5 @@ namespace L4D2ServerManager.FunctionApp.Requests;
 
 public class RunServerRequest
 {
-	public Campaign Campaign { get; set; }
+    public Campaign Campaign { get; set; }
 }

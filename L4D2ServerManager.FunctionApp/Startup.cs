@@ -8,8 +8,8 @@ namespace L4D2ServerManager.FunctionApp;
 
 public class Startup : FunctionsStartup
 {
-	public override void Configure(IFunctionsHostBuilder builder)
-	{
-		builder.Services.AddApp();
-	}
+    public override void Configure(IFunctionsHostBuilder builder)
+    {
+        builder.Services.AddApp();
+    }
 }

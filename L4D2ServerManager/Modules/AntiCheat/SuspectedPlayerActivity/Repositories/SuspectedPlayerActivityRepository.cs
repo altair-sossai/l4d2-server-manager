@@ -8,58 +8,58 @@ namespace L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.Repositori
 
 public class SuspectedPlayerActivityRepository : BaseTableStorageRepository<SuspectedPlayerActivity>, ISuspectedPlayerActivityRepository
 {
-	public SuspectedPlayerActivityRepository(IAzureTableStorageContext tableContext)
-		: base("SuspectedPlayerActivity", tableContext)
-	{
-	}
+    public SuspectedPlayerActivityRepository(IAzureTableStorageContext tableContext)
+        : base("SuspectedPlayerActivity", tableContext)
+    {
+    }
 
-	public SuspectedPlayerActivity? Find(long communityId)
-	{
-		return Find("shared", communityId.ToString());
-	}
+    public SuspectedPlayerActivity? Find(long communityId)
+    {
+        return Find("shared", communityId.ToString());
+    }
 
-	public IEnumerable<SuspectedPlayerActivity> GetAllActivities()
-	{
-		return GetAll();
-	}
+    public IEnumerable<SuspectedPlayerActivity> GetAllActivities()
+    {
+        return GetAll();
+    }
 
-	public void Ping(long communityId, PingCommand command)
-	{
-		Activity activity = command.Focused ? new PingFocusedActivity(communityId) : new PingUnfocusedActivity(communityId);
+    public void Ping(long communityId, PingCommand command)
+    {
+        Activity activity = command.Focused ? new PingFocusedActivity(communityId) : new PingUnfocusedActivity(communityId);
 
-		TableClient.UpsertEntity(activity);
-	}
+        TableClient.UpsertEntity(activity);
+    }
 
-	public void Process(long communityId)
-	{
-		var activity = new ProcessActivity(communityId);
+    public void Process(long communityId)
+    {
+        var activity = new ProcessActivity(communityId);
 
-		TableClient.UpsertEntity(activity);
-	}
+        TableClient.UpsertEntity(activity);
+    }
 
-	public void Screenshot(long communityId)
-	{
-		var activity = new ScreenshotActivity(communityId);
+    public void Screenshot(long communityId)
+    {
+        var activity = new ScreenshotActivity(communityId);
 
-		TableClient.UpsertEntity(activity);
-	}
+        TableClient.UpsertEntity(activity);
+    }
 
-	public void FileCheckSuccess(long communityId)
-	{
-		var activity = new FileCheckSuccessActivity(communityId);
+    public void FileCheckSuccess(long communityId)
+    {
+        var activity = new FileCheckSuccessActivity(communityId);
 
-		TableClient.UpsertEntity(activity);
-	}
+        TableClient.UpsertEntity(activity);
+    }
 
-	public void FileCheckFail(long communityId)
-	{
-		var activity = new FileCheckFailActivity(communityId);
+    public void FileCheckFail(long communityId)
+    {
+        var activity = new FileCheckFailActivity(communityId);
 
-		TableClient.UpsertEntity(activity);
-	}
+        TableClient.UpsertEntity(activity);
+    }
 
-	public void Delete(long communityId)
-	{
-		Delete("shared", communityId.ToString());
-	}
+    public void Delete(long communityId)
+    {
+        Delete("shared", communityId.ToString());
+    }
 }

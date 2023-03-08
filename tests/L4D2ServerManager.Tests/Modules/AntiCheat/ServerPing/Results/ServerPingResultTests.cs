@@ -7,34 +7,34 @@ namespace L4D2ServerManager.Tests.Modules.AntiCheat.ServerPing.Results;
 [TestClass]
 public class ServerPingResultTests
 {
-	[TestMethod]
-	public void IsOn()
-	{
-		var serverPing = new L4D2ServerManager.Modules.AntiCheat.ServerPing.ServerPing
-		{
-			When = DateTime.UtcNow
-		};
+    [TestMethod]
+    public void IsOn()
+    {
+        var serverPing = new L4D2ServerManager.Modules.AntiCheat.ServerPing.ServerPing
+        {
+            When = DateTime.UtcNow
+        };
 
-		var result = new ServerPingResult(serverPing);
+        var result = new ServerPingResult(serverPing);
 
-		result.IsOn.Should().BeTrue();
+        result.IsOn.Should().BeTrue();
 
-		serverPing = new L4D2ServerManager.Modules.AntiCheat.ServerPing.ServerPing
-		{
-			When = DateTime.UtcNow.AddMinutes(-4)
-		};
+        serverPing = new L4D2ServerManager.Modules.AntiCheat.ServerPing.ServerPing
+        {
+            When = DateTime.UtcNow.AddMinutes(-4)
+        };
 
-		result = new ServerPingResult(serverPing);
+        result = new ServerPingResult(serverPing);
 
-		result.IsOn.Should().BeTrue();
+        result.IsOn.Should().BeTrue();
 
-		serverPing = new L4D2ServerManager.Modules.AntiCheat.ServerPing.ServerPing
-		{
-			When = DateTime.UtcNow.AddMinutes(-40)
-		};
+        serverPing = new L4D2ServerManager.Modules.AntiCheat.ServerPing.ServerPing
+        {
+            When = DateTime.UtcNow.AddMinutes(-40)
+        };
 
-		result = new ServerPingResult(serverPing);
+        result = new ServerPingResult(serverPing);
 
-		result.IsOn.Should().BeFalse();
-	}
+        result.IsOn.Should().BeFalse();
+    }
 }

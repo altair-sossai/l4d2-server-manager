@@ -13,31 +13,31 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class PortFunction
 {
-	private readonly IPortServer _portServer;
-	private readonly IUserService _userService;
+    private readonly IPortServer _portServer;
+    private readonly IUserService _userService;
 
-	public PortFunction(IUserService userService,
-		IPortServer portServer)
-	{
-		_userService = userService;
-		_portServer = portServer;
-	}
+    public PortFunction(IUserService userService,
+        IPortServer portServer)
+    {
+        _userService = userService;
+        _portServer = portServer;
+    }
 
-	[FunctionName(nameof(PortFunction) + "_" + nameof(Get))]
-	public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ports/{ip}")] HttpRequest httpRequest,
-		string ip)
-	{
-		try
-		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+    [FunctionName(nameof(PortFunction) + "_" + nameof(Get))]
+    public IActionResult Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ports/{ip}")] HttpRequest httpRequest,
+        string ip)
+    {
+        try
+        {
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
 
-			var ports = _portServer.GetPorts(ip);
+            var ports = _portServer.GetPorts(ip);
 
-			return new OkObjectResult(ports);
-		}
-		catch (Exception exception)
-		{
-			return ErrorResult.Build(exception).ResponseMessageResult();
-		}
-	}
+            return new OkObjectResult(ports);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
 }

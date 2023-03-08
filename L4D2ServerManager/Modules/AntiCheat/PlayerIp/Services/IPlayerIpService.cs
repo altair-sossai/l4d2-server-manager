@@ -4,5 +4,5 @@ namespace L4D2ServerManager.Modules.AntiCheat.PlayerIp.Services;
 
 public interface IPlayerIpService
 {
-	PlayerIp AddOrUpdate(PlayerIpCommand command);
+    PlayerIp AddOrUpdate(PlayerIpCommand command);
 }

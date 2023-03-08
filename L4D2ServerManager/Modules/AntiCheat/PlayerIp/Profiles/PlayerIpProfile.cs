@@ -8,12 +8,12 @@ namespace L4D2ServerManager.Modules.AntiCheat.PlayerIp.Profiles;
 
 public class PlayerIpProfile : Profile
 {
-	public PlayerIpProfile()
-	{
-		CreateMap<PlayerIpCommand, PlayerIp>();
+    public PlayerIpProfile()
+    {
+        CreateMap<PlayerIpCommand, PlayerIp>();
 
-		CreateMap<PlayerIp, IpResult>();
-		CreateMap<PlayerIp, PlayerResult>()
-			.AfterMap<PlayerResultMappingAction>();
-	}
+        CreateMap<PlayerIp, IpResult>();
+        CreateMap<PlayerIp, PlayerResult>()
+            .AfterMap<PlayerResultMappingAction>();
+    }
 }

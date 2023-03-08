@@ -2,5 +2,5 @@
 
 public interface IVirtualMachineService
 {
-	IVirtualMachine GetByName(string name);
+    IVirtualMachine GetByName(string name);
 }

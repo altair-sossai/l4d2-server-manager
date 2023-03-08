@@ -4,6 +4,6 @@ namespace L4D2ServerManager.Modules.AntiCheat.ServerPing.Services;
 
 public interface IServerPingService
 {
-	ServerPingResult Get();
-	void Ping();
+    ServerPingResult Get();
+    void Ping();
 }

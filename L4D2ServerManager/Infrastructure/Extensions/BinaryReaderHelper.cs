@@ -4,17 +4,17 @@ namespace L4D2ServerManager.Infrastructure.Extensions;
 
 public static class BinaryReaderHelper
 {
-	public static string ReadNullTerminatedString(this BinaryReader binaryReader)
-	{
-		var stringBuilder = new StringBuilder();
-		var value = binaryReader.ReadChar();
+    public static string ReadNullTerminatedString(this BinaryReader binaryReader)
+    {
+        var stringBuilder = new StringBuilder();
+        var value = binaryReader.ReadChar();
 
-		while (value != '\x00')
-		{
-			stringBuilder.Append(value);
-			value = binaryReader.ReadChar();
-		}
+        while (value != '\x00')
+        {
+            stringBuilder.Append(value);
+            value = binaryReader.ReadChar();
+        }
 
-		return stringBuilder.ToString();
-	}
+        return stringBuilder.ToString();
+    }
 }

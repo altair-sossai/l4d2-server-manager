@@ -2,6 +2,6 @@
 
 public enum FailReason
 {
-	FileChanged,
-	FileDeleted
+    FileChanged,
+    FileDeleted
 }

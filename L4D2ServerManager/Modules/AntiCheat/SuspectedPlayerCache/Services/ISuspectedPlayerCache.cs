@@ -2,5 +2,5 @@
 
 public interface ISuspectedPlayerCache
 {
-	void ClearAllKeys(long communityId);
+    void ClearAllKeys(long communityId);
 }

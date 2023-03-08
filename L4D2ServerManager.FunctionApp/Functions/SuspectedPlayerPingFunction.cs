@@ -18,62 +18,62 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class SuspectedPlayerPingFunction
 {
-	private readonly ISuspectedPlayerActivityRepository _suspectedPlayerActivityRepository;
-	private readonly ISuspectedPlayerPingRepository _suspectedPlayerPingRepository;
-	private readonly ISuspectedPlayerPingService _suspectedPlayerPingService;
-	private readonly ISuspectedPlayerService _suspectedPlayerService;
-	private readonly IUserService _userService;
+    private readonly ISuspectedPlayerActivityRepository _suspectedPlayerActivityRepository;
+    private readonly ISuspectedPlayerPingRepository _suspectedPlayerPingRepository;
+    private readonly ISuspectedPlayerPingService _suspectedPlayerPingService;
+    private readonly ISuspectedPlayerService _suspectedPlayerService;
+    private readonly IUserService _userService;
 
-	public SuspectedPlayerPingFunction(IUserService userService,
-		ISuspectedPlayerService suspectedPlayerService,
-		ISuspectedPlayerPingService suspectedPlayerPingService,
-		ISuspectedPlayerPingRepository suspectedPlayerPingRepository,
-		ISuspectedPlayerActivityRepository suspectedPlayerActivityRepository)
-	{
-		_userService = userService;
-		_suspectedPlayerService = suspectedPlayerService;
-		_suspectedPlayerPingService = suspectedPlayerPingService;
-		_suspectedPlayerPingRepository = suspectedPlayerPingRepository;
-		_suspectedPlayerActivityRepository = suspectedPlayerActivityRepository;
-	}
+    public SuspectedPlayerPingFunction(IUserService userService,
+        ISuspectedPlayerService suspectedPlayerService,
+        ISuspectedPlayerPingService suspectedPlayerPingService,
+        ISuspectedPlayerPingRepository suspectedPlayerPingRepository,
+        ISuspectedPlayerActivityRepository suspectedPlayerActivityRepository)
+    {
+        _userService = userService;
+        _suspectedPlayerService = suspectedPlayerService;
+        _suspectedPlayerPingService = suspectedPlayerPingService;
+        _suspectedPlayerPingRepository = suspectedPlayerPingRepository;
+        _suspectedPlayerActivityRepository = suspectedPlayerActivityRepository;
+    }
 
-	[FunctionName(nameof(SuspectedPlayerPingFunction) + "_" + nameof(Find))]
-	public IActionResult Find([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-ping/{communityId:long}")] HttpRequest httpRequest, long communityId)
-	{
-		try
-		{
-			_userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
+    [FunctionName(nameof(SuspectedPlayerPingFunction) + "_" + nameof(Find))]
+    public IActionResult Find([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "suspected-players-ping/{communityId:long}")] HttpRequest httpRequest, long communityId)
+    {
+        try
+        {
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.AntiCheatManager);
 
-			var ping = _suspectedPlayerPingRepository.Find(communityId);
-			if (ping == null)
-				return new NotFoundResult();
+            var ping = _suspectedPlayerPingRepository.Find(communityId);
+            if (ping == null)
+                return new NotFoundResult();
 
-			return new OkObjectResult(ping);
-		}
-		catch (Exception exception)
-		{
-			return ErrorResult.Build(exception).ResponseMessageResult();
-		}
-	}
+            return new OkObjectResult(ping);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
 
-	[FunctionName(nameof(SuspectedPlayerPingFunction) + "_" + nameof(Ping))]
-	public async Task<IActionResult> Ping([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players-ping")] HttpRequest httpRequest)
-	{
-		try
-		{
-			var accessToken = httpRequest.AuthorizationToken();
-			var appId = httpRequest.AppId();
-			var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(accessToken, appId);
-			var command = await httpRequest.DeserializeBodyAsync<PingCommand>();
+    [FunctionName(nameof(SuspectedPlayerPingFunction) + "_" + nameof(Ping))]
+    public async Task<IActionResult> Ping([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "suspected-players-ping")] HttpRequest httpRequest)
+    {
+        try
+        {
+            var accessToken = httpRequest.AuthorizationToken();
+            var appId = httpRequest.AppId();
+            var suspectedPlayer = _suspectedPlayerService.EnsureAuthentication(accessToken, appId);
+            var command = await httpRequest.DeserializeBodyAsync<PingCommand>();
 
-			_suspectedPlayerPingService.Ping(suspectedPlayer.CommunityId, command);
-			_suspectedPlayerActivityRepository.Ping(suspectedPlayer.CommunityId, command);
+            _suspectedPlayerPingService.Ping(suspectedPlayer.CommunityId, command);
+            _suspectedPlayerActivityRepository.Ping(suspectedPlayer.CommunityId, command);
 
-			return new OkResult();
-		}
-		catch (Exception exception)
-		{
-			return ErrorResult.Build(exception).ResponseMessageResult();
-		}
-	}
+            return new OkResult();
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
 }

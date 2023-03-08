@@ -7,125 +7,125 @@ namespace L4D2ServerManager.Tests.Modules.AntiCheat.SuspectedPlayerActivity.Exte
 [TestClass]
 public class SuspectedPlayerActivityExtensionsTests
 {
-	[TestMethod]
-	public void PingExpired_Expired()
-	{
-		var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			PingFocused = null,
-			PingUnfocused = null
-		};
+    [TestMethod]
+    public void PingExpired_Expired()
+    {
+        var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            PingFocused = null,
+            PingUnfocused = null
+        };
 
-		activity.PingExpired().Should().BeTrue();
+        activity.PingExpired().Should().BeTrue();
 
-		activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			PingFocused = null,
-			PingUnfocused = DateTime.UtcNow.AddMinutes(-6)
-		};
+        activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            PingFocused = null,
+            PingUnfocused = DateTime.UtcNow.AddMinutes(-6)
+        };
 
-		activity.PingExpired().Should().BeTrue();
+        activity.PingExpired().Should().BeTrue();
 
-		activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			PingFocused = DateTime.UtcNow.AddMinutes(-6),
-			PingUnfocused = null
-		};
+        activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            PingFocused = DateTime.UtcNow.AddMinutes(-6),
+            PingUnfocused = null
+        };
 
-		activity.PingExpired().Should().BeTrue();
+        activity.PingExpired().Should().BeTrue();
 
-		activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			PingFocused = DateTime.UtcNow.AddMinutes(-6),
-			PingUnfocused = DateTime.UtcNow.AddMinutes(-6)
-		};
+        activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            PingFocused = DateTime.UtcNow.AddMinutes(-6),
+            PingUnfocused = DateTime.UtcNow.AddMinutes(-6)
+        };
 
-		activity.PingExpired().Should().BeTrue();
-	}
+        activity.PingExpired().Should().BeTrue();
+    }
 
-	[TestMethod]
-	public void PingExpired_Unexpired()
-	{
-		var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			PingFocused = null,
-			PingUnfocused = DateTime.UtcNow
-		};
+    [TestMethod]
+    public void PingExpired_Unexpired()
+    {
+        var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            PingFocused = null,
+            PingUnfocused = DateTime.UtcNow
+        };
 
-		activity.PingExpired().Should().BeFalse();
+        activity.PingExpired().Should().BeFalse();
 
-		activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			PingFocused = DateTime.UtcNow,
-			PingUnfocused = null
-		};
+        activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            PingFocused = DateTime.UtcNow,
+            PingUnfocused = null
+        };
 
-		activity.PingExpired().Should().BeFalse();
+        activity.PingExpired().Should().BeFalse();
 
-		activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			PingFocused = DateTime.UtcNow,
-			PingUnfocused = DateTime.UtcNow
-		};
+        activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            PingFocused = DateTime.UtcNow,
+            PingUnfocused = DateTime.UtcNow
+        };
 
-		activity.PingExpired().Should().BeFalse();
-	}
+        activity.PingExpired().Should().BeFalse();
+    }
 
-	[TestMethod]
-	public void ProcessExpired_Expired()
-	{
-		var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			Process = null
-		};
+    [TestMethod]
+    public void ProcessExpired_Expired()
+    {
+        var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            Process = null
+        };
 
-		activity.ProcessExpired().Should().BeTrue();
+        activity.ProcessExpired().Should().BeTrue();
 
-		activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			Process = DateTime.UtcNow.AddMinutes(-6)
-		};
+        activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            Process = DateTime.UtcNow.AddMinutes(-6)
+        };
 
-		activity.ProcessExpired().Should().BeTrue();
-	}
+        activity.ProcessExpired().Should().BeTrue();
+    }
 
-	[TestMethod]
-	public void ProcessExpired_Unexpired()
-	{
-		var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			Process = DateTime.UtcNow
-		};
+    [TestMethod]
+    public void ProcessExpired_Unexpired()
+    {
+        var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            Process = DateTime.UtcNow
+        };
 
-		activity.ProcessExpired().Should().BeFalse();
-	}
+        activity.ProcessExpired().Should().BeFalse();
+    }
 
-	[TestMethod]
-	public void ScreenshotExpired_Expired()
-	{
-		var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			Screenshot = null
-		};
+    [TestMethod]
+    public void ScreenshotExpired_Expired()
+    {
+        var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            Screenshot = null
+        };
 
-		activity.ScreenshotExpired().Should().BeTrue();
+        activity.ScreenshotExpired().Should().BeTrue();
 
-		activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			Screenshot = DateTime.UtcNow.AddMinutes(-6)
-		};
+        activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            Screenshot = DateTime.UtcNow.AddMinutes(-6)
+        };
 
-		activity.ScreenshotExpired().Should().BeTrue();
-	}
+        activity.ScreenshotExpired().Should().BeTrue();
+    }
 
-	[TestMethod]
-	public void ScreenshotExpired_Unexpired()
-	{
-		var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
-		{
-			Screenshot = DateTime.UtcNow
-		};
+    [TestMethod]
+    public void ScreenshotExpired_Unexpired()
+    {
+        var activity = new L4D2ServerManager.Modules.AntiCheat.SuspectedPlayerActivity.SuspectedPlayerActivity
+        {
+            Screenshot = DateTime.UtcNow
+        };
 
-		activity.ScreenshotExpired().Should().BeFalse();
-	}
+        activity.ScreenshotExpired().Should().BeFalse();
+    }
 }
