@@ -37,6 +37,11 @@ public class UserService : IUserService
         return UserTable.Query<User>().ToList();
     });
 
+    public User? GetUser(string userId)
+    {
+        return Users.FirstOrDefault(user => user.RowKey == userId);
+    }
+
     public User EnsureAuthentication(string token)
     {
         var command = new AuthenticationCommand(token);

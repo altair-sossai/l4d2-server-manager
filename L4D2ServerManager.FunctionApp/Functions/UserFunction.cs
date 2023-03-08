@@ -32,4 +32,24 @@ public class UserFunction
             return ErrorResult.Build(exception).ResponseMessageResult();
         }
     }
+
+    [FunctionName(nameof(UserFunction) + "_" + nameof(GetById))]
+    public IActionResult GetById([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{userId}")] HttpRequest httpRequest,
+        string userId)
+    {
+        try
+        {
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken());
+
+            var user = _userService.GetUser(userId);
+            if (user == null)
+                return new NotFoundResult();
+
+            return new OkObjectResult(user.Info());
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
 }
