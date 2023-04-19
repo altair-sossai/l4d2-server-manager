@@ -24,7 +24,7 @@ public class SuspectedPlayerFileFailRepository : BaseTableStorageRepository<Susp
 
     public void DeleteOldFiles()
     {
-        var limit = DateTimeOffset.UtcNow.AddDays(-3);
+        var limit = DateTimeOffset.UtcNow.AddDays(-7);
 
         foreach (var file in TableClient.Query<SuspectedPlayerFileFail>(q => q.Timestamp < limit))
             Delete(file.PartitionKey, file.RowKey);
