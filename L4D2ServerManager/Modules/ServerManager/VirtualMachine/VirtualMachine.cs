@@ -267,6 +267,7 @@ public class VirtualMachine : IVirtualMachine
 
         securityRuleData.Access = SecurityRuleAccess.Allow;
         securityRuleData.SourceAddressPrefix = "*";
+        securityRuleData.SourceAddressPrefixes.Clear();
 
         await securityRule.Value.UpdateAsync(WaitUntil.Completed, securityRuleData);
 
