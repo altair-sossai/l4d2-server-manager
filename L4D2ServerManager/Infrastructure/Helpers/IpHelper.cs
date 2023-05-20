@@ -2,8 +2,10 @@
 
 public static class IpHelper
 {
-    public static bool IsValidIpv4(string ip)
+    public static bool IsValidIpv4(string? ip)
     {
+        ip = ip?.Trim();
+
         if (string.IsNullOrWhiteSpace(ip))
             return false;
 

@@ -4,6 +4,7 @@ using Azure.ResourceManager.Compute.Models;
 using Azure.ResourceManager.Network;
 using Azure.ResourceManager.Network.Models;
 using L4D2ServerManager.Contexts.AzureSubscription;
+using L4D2ServerManager.Infrastructure.Helpers;
 using L4D2ServerManager.Modules.Auth.Users;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Enums;
@@ -278,7 +279,7 @@ public class VirtualMachine : IVirtualMachine
         var securityRuleData = securityRule.Value.Data;
 
         securityRuleData.Access = SecurityRuleAccess.Allow;
-        securityRuleData.SourceAddressPrefix = string.Join(',', allowedIps);
+        securityRuleData.SourceAddressPrefix = string.Join(',', allowedIps.Where(IpHelper.IsValidIpv4));
 
         await securityRule.Value.UpdateAsync(WaitUntil.Completed, securityRuleData);
 
