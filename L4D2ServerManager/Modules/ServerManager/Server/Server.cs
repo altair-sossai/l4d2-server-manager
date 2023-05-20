@@ -10,6 +10,8 @@ namespace L4D2ServerManager.Modules.ServerManager.Server;
 
 public class Server : IServer
 {
+    private static readonly HashSet<int> ServersInStartup = new();
+
     private readonly IServerService _serverService;
     private readonly IVirtualMachine _virtualMachine;
 
@@ -30,9 +32,25 @@ public class Server : IServer
 
     public async Task RunAsync(User user, Campaign campaign)
     {
-        var command = new RunServerCommand(Port, campaign);
+        try
+        {
+            if (ServersInStartup.Contains(Port))
+                return;
 
-        await RunAsync(user, command);
+            ServersInStartup.Add(Port);
+
+            var command = new RunServerCommand(Port, campaign);
+
+            await RunAsync(user, command);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(exception);
+        }
+        finally
+        {
+            ServersInStartup.Remove(Port);
+        }
     }
 
     public void Stop()
