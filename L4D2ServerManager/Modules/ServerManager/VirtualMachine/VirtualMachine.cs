@@ -275,11 +275,24 @@ public class VirtualMachine : IVirtualMachine
 
     public async Task ClosePortAsync(int port, IEnumerable<string> allowedIps)
     {
+        var ips = allowedIps.Where(IpHelper.IsValidIpv4).ToList();
+        if (ips.Count == 0)
+            throw new Exception("Provide at least one IP");
+
         var securityRule = await NetworkSecurityGroupResource.GetSecurityRuleAsync(port.ToString());
         var securityRuleData = securityRule.Value.Data;
 
         securityRuleData.Access = SecurityRuleAccess.Allow;
-        securityRuleData.SourceAddressPrefix = string.Join(',', allowedIps.Where(IpHelper.IsValidIpv4));
+        securityRuleData.SourceAddressPrefix = null;
+        securityRuleData.SourceAddressPrefixes.Clear();
+
+        if (ips.Count == 1)
+            securityRuleData.SourceAddressPrefix = ips.First();
+        else
+        {
+            foreach (var ip in ips)
+                securityRuleData.SourceAddressPrefixes.Add(ip);
+        }
 
         await securityRule.Value.UpdateAsync(WaitUntil.Completed, securityRuleData);
 
