@@ -181,7 +181,6 @@ public class ServerFunction
         try
         {
             var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
-            var command = await httpRequest.DeserializeBodyAsync<OpenPortCommand>();
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             var server = _serverService.GetByPort(virtualMachine, port);
 
@@ -190,7 +189,7 @@ public class ServerFunction
             if (!server.CanOpenPort())
                 throw new UnauthorizedAccessException();
 
-            await server.OpenPortAsync(command.Ranges);
+            await server.OpenPortAsync();
 
             return new OkResult();
         }
@@ -215,7 +214,9 @@ public class ServerFunction
             if (!server.CanClosePort())
                 throw new UnauthorizedAccessException();
 
-            await server.ClosePortAsync();
+            var command = await httpRequest.DeserializeBodyAsync<ClosePortCommand>();
+
+            await server.ClosePortAsync(command.AllowedIps);
 
             return new OkResult();
         }

@@ -55,14 +55,14 @@ public class Server : IServer
         _virtualMachine.RunCommand(command);
     }
 
-    public async Task OpenPortAsync(string ranges)
+    public async Task OpenPortAsync()
     {
-        await _virtualMachine.OpenPortAsync(Port, ranges);
+        await _virtualMachine.OpenPortAsync(Port);
     }
 
-    public async Task ClosePortAsync()
+    public async Task ClosePortAsync(IEnumerable<string> allowedIps)
     {
-        await _virtualMachine.ClosePortAsync(Port);
+        await _virtualMachine.ClosePortAsync(Port, allowedIps);
     }
 
     private async Task RunAsync(User user, RunScriptCommand command)

@@ -16,6 +16,6 @@ public interface IServer
     Task RunAsync(User user, Campaign campaign);
     void Stop();
     void KickAllPlayers();
-    Task OpenPortAsync(string ranges);
-    Task ClosePortAsync();
+    Task OpenPortAsync();
+    Task ClosePortAsync(IEnumerable<string> allowedIps);
 }

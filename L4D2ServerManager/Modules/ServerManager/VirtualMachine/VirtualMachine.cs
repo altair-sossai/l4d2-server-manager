@@ -137,7 +137,7 @@ public class VirtualMachine : IVirtualMachine
 
             var tags = VirtualMachineResource.Data.Tags;
 
-            return tags.ContainsKey(key) ? tags[key] : null;
+            return tags.TryGetValue(key, out var tag) ? tag : null;
         }
     }
 
@@ -164,7 +164,7 @@ public class VirtualMachine : IVirtualMachine
 
             var tags = VirtualMachineResource.Data.Tags;
 
-            return tags.ContainsKey(key) ? tags[key] : null;
+            return tags.TryGetValue(key, out var tag) ? tag : null;
         }
     }
 
@@ -215,6 +215,8 @@ public class VirtualMachine : IVirtualMachine
         };
 
         await UpdateTagsAsync(values);
+
+        UpdateIpTablesRules();
     }
 
     public async Task PowerOffAsync(User user)
@@ -257,26 +259,30 @@ public class VirtualMachine : IVirtualMachine
         return new PortInfo(securityRuleData);
     }
 
-    public async Task OpenPortAsync(int port, string ranges)
+    public async Task OpenPortAsync(int port)
     {
         var securityRule = await NetworkSecurityGroupResource.GetSecurityRuleAsync(port.ToString());
         var securityRuleData = securityRule.Value.Data;
 
         securityRuleData.Access = SecurityRuleAccess.Allow;
-        securityRuleData.SourceAddressPrefix = ranges;
+        securityRuleData.SourceAddressPrefix = "*";
 
         await securityRule.Value.UpdateAsync(WaitUntil.Completed, securityRuleData);
+
+        UpdateIpTablesRules();
     }
 
-    public async Task ClosePortAsync(int port)
+    public async Task ClosePortAsync(int port, IEnumerable<string> allowedIps)
     {
         var securityRule = await NetworkSecurityGroupResource.GetSecurityRuleAsync(port.ToString());
         var securityRuleData = securityRule.Value.Data;
 
-        securityRuleData.Access = SecurityRuleAccess.Deny;
-        securityRuleData.SourceAddressPrefix = "*";
+        securityRuleData.Access = SecurityRuleAccess.Allow;
+        securityRuleData.SourceAddressPrefix = string.Join(',', allowedIps);
 
         await securityRule.Value.UpdateAsync(WaitUntil.Completed, securityRuleData);
+
+        UpdateIpTablesRules();
     }
 
     public async Task UpdateTagsAsync(IDictionary<string, string> values)
@@ -291,7 +297,7 @@ public class VirtualMachine : IVirtualMachine
         var key = $"port-{port}-started-by";
         var tags = VirtualMachineResource.Data.Tags;
 
-        return tags.ContainsKey(key) ? tags[key] : null;
+        return tags.TryGetValue(key, out var tag) ? tag : null;
     }
 
     public DateTime? StartedAt(int port)
@@ -335,6 +341,16 @@ public class VirtualMachine : IVirtualMachine
         _publicIpAddress = null;
         _virtualMachineInstanceView = null;
         _virtualMachineResource = null;
+    }
+
+    private void UpdateIpTablesRules()
+    {
+        ClearVirtualMachineCache();
+
+        var securityRules = NetworkSecurityGroupResource.GetSecurityRules();
+        var command = new IpTablesRulesCommand(securityRules);
+
+        RunCommand(command);
     }
 
     private void RunCommandLocked(RunCommandInput runCommandInput)

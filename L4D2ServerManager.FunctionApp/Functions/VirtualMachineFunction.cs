@@ -6,7 +6,6 @@ using L4D2ServerManager.Modules.Auth.Users.Enums;
 using L4D2ServerManager.Modules.Auth.Users.Services;
 using L4D2ServerManager.Modules.ServerManager.Port.Extensions;
 using L4D2ServerManager.Modules.ServerManager.Port.Services;
-using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Extensions;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Services;
 using Microsoft.AspNetCore.Http;
@@ -82,14 +81,7 @@ public class VirtualMachineFunction
             var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
             await virtualMachine.PowerOnAsync(user);
 
-            _ = Task.Run(() =>
-            {
-                var ports = _portServer.GetPorts(virtualMachine.IpAddress);
-                var command = new IpTablesRulesCommand(ports);
-                virtualMachine.RunCommand(command);
-
-                _userService.ApplyPermissions(user, virtualMachine);
-            });
+            _userService.ApplyPermissions(user, virtualMachine);
 
             return new OkObjectResult(virtualMachine);
         }

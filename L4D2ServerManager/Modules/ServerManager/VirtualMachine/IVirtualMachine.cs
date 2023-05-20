@@ -21,8 +21,8 @@ public interface IVirtualMachine
     Task PowerOffAsync(User user);
     void RunCommand(RunScriptCommand command);
     Task<PortInfo> GetPortInfoAsync(int port);
-    Task OpenPortAsync(int port, string ranges);
-    Task ClosePortAsync(int port);
+    Task OpenPortAsync(int port);
+    Task ClosePortAsync(int port, IEnumerable<string> allowedIps);
     Task UpdateTagsAsync(IDictionary<string, string> values);
     string? StartedBy(int port);
     DateTime? StartedAt(int port);
