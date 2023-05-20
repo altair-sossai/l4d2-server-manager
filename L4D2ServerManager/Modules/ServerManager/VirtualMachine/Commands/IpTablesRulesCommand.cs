@@ -30,7 +30,5 @@ public class IpTablesRulesCommand : RunScriptCommand
 
             Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -j DROP");
         }
-
-        Script.Add("sudo iptables -A INPUT -p udp -j DROP");
     }
 }
