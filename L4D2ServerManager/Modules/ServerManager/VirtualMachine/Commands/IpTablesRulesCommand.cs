@@ -10,9 +10,6 @@ public class IpTablesRulesCommand : RunScriptCommand
     {
         Script.Add("sudo iptables -F");
         Script.Add("sudo iptables -X");
-        Script.Add("sudo iptables -P INPUT ACCEPT");
-        Script.Add("sudo iptables -P OUTPUT ACCEPT");
-        Script.Add("sudo iptables -P FORWARD ACCEPT");
 
         foreach (var securityRule in securityRules.Select(r => r.Data))
         {
