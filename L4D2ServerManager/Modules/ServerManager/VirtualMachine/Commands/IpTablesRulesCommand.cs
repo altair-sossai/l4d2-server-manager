@@ -19,6 +19,7 @@ public class IpTablesRulesCommand : RunScriptCommand
             Script.Add($"sudo iptables -A INPUT -p tcp --dport {port} -j DROP");
             Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -m length --length 0:32 -j DROP");
             Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -m length --length 2521:65535 -j DROP");
+            Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -m hashlimit --hashlimit-upto 200/sec --hashlimit-burst 250 --hashlimit-mode srcip --hashlimit-srcmask 32 --hashlimit-name packet_limit_{port} --hashlimit-htable-size 65536 --hashlimit-htable-expire 60000 --hashlimit-htable-max 200000 -j ACCEPT");
 
             if (securityRule.SourceAddressPrefix == "*")
                 continue;
