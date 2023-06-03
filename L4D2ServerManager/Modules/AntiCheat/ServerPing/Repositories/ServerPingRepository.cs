@@ -19,7 +19,7 @@ public class ServerPingRepository : BaseTableStorageRepository<ServerPing>, ISer
     {
         return _memoryCache.GetOrCreate("ServerPing", factory =>
         {
-            factory.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+            factory.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2);
 
             return Find("shared", "shared");
         });
