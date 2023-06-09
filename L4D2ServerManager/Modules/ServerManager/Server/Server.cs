@@ -63,16 +63,6 @@ public class Server : IServer
         _virtualMachine.RunCommand(command);
     }
 
-    public void KickAllPlayers()
-    {
-        if (!IsRunning)
-            return;
-
-        var command = new KickAllPlayersCommand(Port);
-
-        _virtualMachine.RunCommand(command);
-    }
-
     public async Task OpenPortAsync()
     {
         await _virtualMachine.OpenPortAsync(Port);

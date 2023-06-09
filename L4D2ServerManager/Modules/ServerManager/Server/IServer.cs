@@ -15,7 +15,6 @@ public interface IServer
     DateTime? StartedAt { get; }
     Task RunAsync(User user, Campaign campaign);
     void Stop();
-    void KickAllPlayers();
     Task OpenPortAsync();
     Task ClosePortAsync(IEnumerable<string> allowedIps);
 }

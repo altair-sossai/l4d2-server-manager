@@ -149,31 +149,6 @@ public class ServerFunction
         }
     }
 
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(KickAllPlayers))]
-    public IActionResult KickAllPlayers([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/kick-all-players")] HttpRequest httpRequest,
-        int port)
-    {
-        try
-        {
-            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
-            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
-            var server = _serverService.GetByPort(virtualMachine, port);
-
-            _userService.ApplyPermissions(user, server);
-
-            if (!server.CanKickAllPlayers())
-                throw new UnauthorizedAccessException();
-
-            server.KickAllPlayers();
-
-            return new OkResult();
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
-
     [FunctionName(nameof(ServerFunction) + "_" + nameof(OpenPortAsync))]
     public async Task<IActionResult> OpenPortAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/open-port")] HttpRequest httpRequest,
         int port)
