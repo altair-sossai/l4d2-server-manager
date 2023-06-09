@@ -88,7 +88,6 @@ public class UserService : IUserService
         }
 
         ApplyStopPermission(user, server);
-        ApplyKickAllPlayersPermission(user, server);
         ApplyOpenPortPermission(user, server);
         ApplyClosePortPermission(user, server);
     }
@@ -118,11 +117,6 @@ public class UserService : IUserService
     private static void ApplyStopPermission(User user, IServer server)
     {
         ApplyServerPermission(user, server, ServerPermissions.Stop);
-    }
-
-    private static void ApplyKickAllPlayersPermission(User user, IServer server)
-    {
-        ApplyServerPermission(user, server, ServerPermissions.KickAllPlayers);
     }
 
     private static void ApplyOpenPortPermission(User user, IServer server)

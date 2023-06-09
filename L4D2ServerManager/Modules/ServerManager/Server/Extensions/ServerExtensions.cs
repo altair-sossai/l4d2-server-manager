@@ -15,11 +15,6 @@ public static class ServerExtensions
         return server.Permissions.Contains(ServerPermissions.Stop);
     }
 
-    public static bool CanKickAllPlayers(this IServer server)
-    {
-        return server.Permissions.Contains(ServerPermissions.KickAllPlayers);
-    }
-
     public static bool CanOpenPort(this IServer server)
     {
         return server.Permissions.Contains(ServerPermissions.OpenPort);
