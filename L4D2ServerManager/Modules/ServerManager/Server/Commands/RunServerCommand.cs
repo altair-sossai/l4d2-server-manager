@@ -7,6 +7,6 @@ public class RunServerCommand : RunScriptCommand
 {
     public RunServerCommand(int port, Campaign campaign)
     {
-        Script.Add($"sudo screen -d -m -S \"{port}\" /home/steam/l4d2z/srcds_run -game left4dead2 -port {port} +sv_clockcorrection_msecs 25 -timeout 10 -tickrate 100 +map {campaign} -maxplayers 32 +servercfgfile server.cfg");
+        Script.Add($"sudo screen -d -m -S \"{port}\" /home/steam/l4d2/srcds_run -game left4dead2 -port {port} +sv_clockcorrection_msecs 25 -timeout 10 -tickrate 100 +map {campaign} -maxplayers 32 +servercfgfile server.cfg");
     }
 }
