@@ -124,6 +124,28 @@ public class ServerFunction
         }
     }
 
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(ResetMatch))]
+    public IActionResult ResetMatch([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/reset-match")] HttpRequest httpRequest,
+        int port)
+    {
+        try
+        {
+            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+            var server = _serverService.GetByPort(virtualMachine, port);
+            var request = httpRequest.DeserializeBody<ResetMatchRequest>();
+
+            server.ResetMatch(request.MatchName);
+
+            return new OkResult();
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
+
     [FunctionName(nameof(ServerFunction) + "_" + nameof(Stop))]
     public IActionResult Stop([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/stop")] HttpRequest httpRequest,
         int port)
