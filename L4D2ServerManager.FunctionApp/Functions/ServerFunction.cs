@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Commands;
 using L4D2ServerManager.FunctionApp.Errors;
@@ -124,8 +125,8 @@ public class ServerFunction
         }
     }
 
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(ResetMatch))]
-    public IActionResult ResetMatch([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/reset-match")] HttpRequest httpRequest,
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(Match))]
+    public IActionResult Match([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/match")] HttpRequest httpRequest,
         int port)
     {
         try
@@ -136,7 +137,9 @@ public class ServerFunction
             var server = _serverService.GetByPort(virtualMachine, port);
             var request = httpRequest.DeserializeBody<ResetMatchRequest>();
 
-            server.ResetMatch(request.MatchName);
+            Thread.Sleep(TimeSpan.FromSeconds(15));
+
+            server.Match(request.MatchName);
 
             return new OkResult();
         }

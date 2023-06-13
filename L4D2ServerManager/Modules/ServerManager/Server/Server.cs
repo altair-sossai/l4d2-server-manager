@@ -35,9 +35,9 @@ public class Server : IServer
         await RunAsync(user, command);
     }
 
-    public void ResetMatch(string matchName)
+    public void Match(string matchName)
     {
-        var command = new ResetMatchCommand(Port, matchName);
+        var command = new MatchCommand(Port, matchName);
 
         _virtualMachine.RunCommand(command);
     }
