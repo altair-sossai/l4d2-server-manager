@@ -137,7 +137,7 @@ public class ServerFunction
             var server = _serverService.GetByPort(virtualMachine, port);
             var request = httpRequest.DeserializeBody<ResetMatchRequest>();
 
-            Thread.Sleep(TimeSpan.FromSeconds(15));
+            Thread.Sleep(TimeSpan.FromSeconds(20));
 
             server.Match(request.MatchName);
 
