@@ -9,10 +9,7 @@ public static class VirtualMachineResourceExtensions
         var tags = virtualMachine.Data.Tags;
 
         foreach (var (key, value) in values)
-            if (tags.ContainsKey(key))
-                tags[key] = value;
-            else
-                tags.Add(key, value);
+            tags[key] = value;
 
         await virtualMachine.SetTagsAsync(tags);
     }

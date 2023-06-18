@@ -21,7 +21,6 @@ namespace L4D2ServerManager.FunctionApp.Functions;
 
 public class ServerFunction
 {
-    private static readonly object Lock = new();
     private readonly IConfiguration _configuration;
     private readonly IPlayerService _playerService;
     private readonly IServerService _serverService;
@@ -101,23 +100,20 @@ public class ServerFunction
         }
     }
 
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(RunLocked))]
-    public IActionResult RunLocked([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(RunAsync))]
+    public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/run")] HttpRequest httpRequest,
         int port)
     {
         try
         {
-            lock (Lock)
-            {
-                var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
-                var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
-                var server = _serverService.GetByPort(virtualMachine, port);
-                var request = httpRequest.DeserializeBody<RunServerRequest>();
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+            var server = _serverService.GetByPort(virtualMachine, port);
+            var request = httpRequest.DeserializeBody<RunServerRequest>();
 
-                server.RunAsync(user, request.Campaign).Wait();
+            await server.RunAsync(user, request.Campaign);
 
-                return new OkResult();
-            }
+            return new OkResult();
         }
         catch (Exception exception)
         {
@@ -125,8 +121,8 @@ public class ServerFunction
         }
     }
 
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(Match))]
-    public IActionResult Match([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/match")] HttpRequest httpRequest,
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(MatchAsync))]
+    public async Task<IActionResult> MatchAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/match")] HttpRequest httpRequest,
         int port)
     {
         try
@@ -147,7 +143,7 @@ public class ServerFunction
                     break;
             }
 
-            server.Match(request.MatchName);
+            await server.MatchAsync(request.MatchName);
 
             return new OkResult();
         }
@@ -157,8 +153,8 @@ public class ServerFunction
         }
     }
 
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(Stop))]
-    public IActionResult Stop([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/stop")] HttpRequest httpRequest,
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(StopAsync))]
+    public async Task<IActionResult> StopAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/stop")] HttpRequest httpRequest,
         int port)
     {
         try
@@ -172,7 +168,7 @@ public class ServerFunction
             if (!server.CanStop())
                 throw new UnauthorizedAccessException();
 
-            server.Stop();
+            await server.StopAsync();
 
             return new OkResult();
         }

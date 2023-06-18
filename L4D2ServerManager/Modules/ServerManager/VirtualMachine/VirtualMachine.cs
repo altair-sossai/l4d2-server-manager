@@ -15,7 +15,6 @@ namespace L4D2ServerManager.Modules.ServerManager.VirtualMachine;
 
 public class VirtualMachine : IVirtualMachine
 {
-    private static readonly object Lock = new();
     private readonly IAzureSubscriptionContext _context;
     private readonly string _virtualMachineName;
     private NetworkInterfaceResource? _networkInterfaceResource;
@@ -216,8 +215,7 @@ public class VirtualMachine : IVirtualMachine
         };
 
         await UpdateTagsAsync(values);
-
-        UpdateIpTablesRules();
+        await UpdateIpTablesRulesAsync();
     }
 
     public async Task PowerOffAsync(User user)
@@ -239,7 +237,7 @@ public class VirtualMachine : IVirtualMachine
         await UpdateTagsAsync(values);
     }
 
-    public void RunCommand(RunScriptCommand command)
+    public async Task RunCommandAsync(RunScriptCommand command)
     {
         if (!IsOn)
             return;
@@ -249,7 +247,7 @@ public class VirtualMachine : IVirtualMachine
         foreach (var line in command.Script)
             runCommandInput.Script.Add(line);
 
-        RunCommandLocked(runCommandInput);
+        await VirtualMachineResource.RunCommandAsync(WaitUntil.Completed, runCommandInput);
     }
 
     public async Task<PortInfo> GetPortInfoAsync(int port)
@@ -271,7 +269,7 @@ public class VirtualMachine : IVirtualMachine
 
         await securityRule.Value.UpdateAsync(WaitUntil.Completed, securityRuleData);
 
-        UpdateIpTablesRules();
+        await UpdateIpTablesRulesAsync();
     }
 
     public async Task ClosePortAsync(int port, IEnumerable<string> allowedIps)
@@ -297,7 +295,7 @@ public class VirtualMachine : IVirtualMachine
 
         await securityRule.Value.UpdateAsync(WaitUntil.Completed, securityRuleData);
 
-        UpdateIpTablesRules();
+        await UpdateIpTablesRulesAsync();
     }
 
     public async Task UpdateTagsAsync(IDictionary<string, string> values)
@@ -358,21 +356,13 @@ public class VirtualMachine : IVirtualMachine
         _virtualMachineResource = null;
     }
 
-    private void UpdateIpTablesRules()
+    private async Task UpdateIpTablesRulesAsync()
     {
         ClearVirtualMachineCache();
 
         var securityRules = NetworkSecurityGroupResource.GetSecurityRules();
         var command = new IpTablesRulesCommand(securityRules);
 
-        RunCommand(command);
-    }
-
-    private void RunCommandLocked(RunCommandInput runCommandInput)
-    {
-        lock (Lock)
-        {
-            VirtualMachineResource.RunCommandAsync(WaitUntil.Completed, runCommandInput).Wait();
-        }
+        await RunCommandAsync(command);
     }
 }

@@ -19,7 +19,7 @@ public interface IVirtualMachine
     int ShutdownAttempt { get; }
     Task PowerOnAsync(User user);
     Task PowerOffAsync(User user);
-    void RunCommand(RunScriptCommand command);
+    Task RunCommandAsync(RunScriptCommand command);
     Task<PortInfo> GetPortInfoAsync(int port);
     Task OpenPortAsync(int port);
     Task ClosePortAsync(int port, IEnumerable<string> allowedIps);

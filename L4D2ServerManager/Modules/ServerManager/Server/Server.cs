@@ -35,21 +35,21 @@ public class Server : IServer
         await RunAsync(user, command);
     }
 
-    public void Match(string matchName)
+    public async Task MatchAsync(string matchName)
     {
         var command = new MatchCommand(Port, matchName);
 
-        _virtualMachine.RunCommand(command);
+        await _virtualMachine.RunCommandAsync(command);
     }
 
-    public void Stop()
+    public async Task StopAsync()
     {
         if (!IsRunning)
             return;
 
         var command = new StopServerCommand(Port);
 
-        _virtualMachine.RunCommand(command);
+        await _virtualMachine.RunCommandAsync(command);
     }
 
     public async Task OpenPortAsync()
@@ -67,7 +67,7 @@ public class Server : IServer
         if (IsRunning)
             return;
 
-        _virtualMachine.RunCommand(command);
+        await _virtualMachine.RunCommandAsync(command);
 
         var values = new Dictionary<string, string>
         {
