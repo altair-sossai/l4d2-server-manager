@@ -72,6 +72,29 @@ public class VirtualMachineFunction
         }
     }
 
+    [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(RestartAsync))]
+    public async Task<IActionResult> RestartAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/restart")] HttpRequest httpRequest)
+    {
+        try
+        {
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+
+            _userService.ApplyPermissions(user, virtualMachine);
+
+            if (!virtualMachine.CanPowerOff())
+                throw new UnauthorizedAccessException();
+
+            await virtualMachine.RestartAsync(user);
+
+            return new OkObjectResult(virtualMachine);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
+
     [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOnAsync))]
     public async Task<IActionResult> PowerOnAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-on")] HttpRequest httpRequest)
     {

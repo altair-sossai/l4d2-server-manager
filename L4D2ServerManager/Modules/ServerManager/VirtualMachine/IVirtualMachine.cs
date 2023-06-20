@@ -17,6 +17,7 @@ public interface IVirtualMachine
     string? PowerOffBy { get; }
     DateTime? PowerOffAt { get; }
     int ShutdownAttempt { get; }
+    Task RestartAsync(User user);
     Task PowerOnAsync(User user);
     Task PowerOffAsync(User user);
     Task RunCommandAsync(RunScriptCommand command);
