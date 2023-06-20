@@ -10,11 +10,17 @@ using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Enums;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Extensions;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.ValueObjects;
+using Polly;
+using Polly.Retry;
 
 namespace L4D2ServerManager.Modules.ServerManager.VirtualMachine;
 
 public class VirtualMachine : IVirtualMachine
 {
+    private static readonly AsyncRetryPolicy RetryPolicy = Policy
+        .Handle<Exception>()
+        .WaitAndRetryAsync(4, attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)));
+
     private readonly IAzureSubscriptionContext _context;
     private readonly string _virtualMachineName;
     private NetworkInterfaceResource? _networkInterfaceResource;
@@ -242,12 +248,12 @@ public class VirtualMachine : IVirtualMachine
         if (!IsOn)
             return;
 
-        var runCommandInput = new RunCommandInput("RunShellScript");
+        var input = new RunCommandInput("RunShellScript");
 
         foreach (var line in command.Script)
-            runCommandInput.Script.Add(line);
+            input.Script.Add(line);
 
-        await VirtualMachineResource.RunCommandAsync(WaitUntil.Completed, runCommandInput);
+        await RunCommandWithRetryAsync(input);
     }
 
     public async Task<PortInfo> GetPortInfoAsync(int port)
@@ -345,6 +351,11 @@ public class VirtualMachine : IVirtualMachine
         };
 
         await UpdateTagsAsync(values);
+    }
+
+    private async Task RunCommandWithRetryAsync(RunCommandInput command)
+    {
+        await RetryPolicy.ExecuteAsync(async () => { await VirtualMachineResource.RunCommandAsync(WaitUntil.Completed, command); });
     }
 
     private void ClearVirtualMachineCache()
