@@ -14,7 +14,6 @@ public interface IServer
     string? StartedBy { get; }
     DateTime? StartedAt { get; }
     Task RunAsync(User user, Campaign campaign);
-    Task MatchAsync(string matchName);
     Task StopAsync();
     Task OpenPortAsync();
     Task ClosePortAsync(IEnumerable<string> allowedIps);

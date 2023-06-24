@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Commands;
 using L4D2ServerManager.FunctionApp.Errors;
@@ -112,38 +111,6 @@ public class ServerFunction
             var request = httpRequest.DeserializeBody<RunServerRequest>();
 
             await server.RunAsync(user, request.Campaign);
-
-            return new OkResult();
-        }
-        catch (Exception exception)
-        {
-            return ErrorResult.Build(exception).ResponseMessageResult();
-        }
-    }
-
-    [FunctionName(nameof(ServerFunction) + "_" + nameof(MatchAsync))]
-    public async Task<IActionResult> MatchAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/match")] HttpRequest httpRequest,
-        int port)
-    {
-        try
-        {
-            _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
-
-            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
-            var server = _serverService.GetByPort(virtualMachine, port);
-            var request = httpRequest.DeserializeBody<ResetMatchRequest>();
-
-            for (var seconds = 15; seconds > 0; seconds -= 5)
-            {
-                var timeSpan = TimeSpan.FromSeconds(seconds);
-
-                Thread.Sleep(timeSpan);
-
-                if (server.IsRunning)
-                    break;
-            }
-
-            await server.MatchAsync(request.MatchName);
 
             return new OkResult();
         }

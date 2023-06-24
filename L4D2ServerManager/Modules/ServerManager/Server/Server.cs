@@ -35,13 +35,6 @@ public class Server : IServer
         await RunAsync(user, command);
     }
 
-    public async Task MatchAsync(string matchName)
-    {
-        var command = new MatchCommand(Port, matchName);
-
-        await _virtualMachine.RunCommandAsync(command);
-    }
-
     public async Task StopAsync()
     {
         if (!IsRunning)

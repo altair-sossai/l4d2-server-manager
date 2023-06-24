@@ -207,9 +207,6 @@ public class VirtualMachine : IVirtualMachine
     public async Task RestartAsync(User user)
     {
         await PowerOffAsync(user);
-
-        Thread.Sleep(TimeSpan.FromSeconds(5));
-
         await PowerOnAsync(user);
     }
 
