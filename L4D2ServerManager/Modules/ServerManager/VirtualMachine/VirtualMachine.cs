@@ -19,7 +19,7 @@ public class VirtualMachine : IVirtualMachine
 {
     private static readonly AsyncRetryPolicy RetryPolicy = Policy
         .Handle<Exception>()
-        .WaitAndRetryAsync(4, attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)));
+        .WaitAndRetryAsync(5, attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)));
 
     private readonly IAzureSubscriptionContext _context;
     private readonly string _virtualMachineName;
