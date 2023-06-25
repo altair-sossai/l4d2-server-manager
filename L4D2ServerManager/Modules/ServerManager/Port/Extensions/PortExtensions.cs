@@ -4,6 +4,6 @@ public static class PortExtensions
 {
     public static bool HasAnyPlayerConnected(this IEnumerable<Port> ports)
     {
-        return ports.Any(port => port.IsRunning && port is { ConnectedPlayers: > 0, MaxPlayers: > 10 });
+        return ports.Any(port => port.ConnectedPlayers > 0);
     }
 }
