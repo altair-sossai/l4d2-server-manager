@@ -14,4 +14,5 @@ public class Port
     public ServerInfo? ServerInfo { get; }
     public bool IsRunning => ServerInfo != null;
     public int ConnectedPlayers => ServerInfo?.Players ?? 0;
+    public int MaxPlayers => ServerInfo?.MaxPlayers ?? 0;
 }
