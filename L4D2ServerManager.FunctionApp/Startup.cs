@@ -1,5 +1,4 @@
-﻿using L4D2ServerManager.DependencyInjection;
-using L4D2ServerManager.FunctionApp;
+﻿using L4D2ServerManager.FunctionApp;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 
 [assembly: FunctionsStartup(typeof(Startup))]

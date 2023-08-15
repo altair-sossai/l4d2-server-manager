@@ -3,7 +3,7 @@ using FluentValidation;
 using L4D2ServerManager.Contexts.Steam.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace L4D2ServerManager.DependencyInjection;
+namespace L4D2ServerManager;
 
 public static class AppInjection
 {
