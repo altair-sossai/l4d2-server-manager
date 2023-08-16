@@ -1,11 +1,14 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using L4D2ServerManager.FunctionApp.Errors;
 using L4D2ServerManager.FunctionApp.Extensions;
+using L4D2ServerManager.FunctionApp.Requests;
 using L4D2ServerManager.Modules.Auth.Users.Enums;
 using L4D2ServerManager.Modules.Auth.Users.Services;
 using L4D2ServerManager.Modules.ServerManager.Port.Extensions;
 using L4D2ServerManager.Modules.ServerManager.Port.Services;
+using L4D2ServerManager.Modules.ServerManager.Server.Services;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Extensions;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Services;
 using Microsoft.AspNetCore.Http;
@@ -20,17 +23,20 @@ public class VirtualMachineFunction
 {
     private readonly IConfiguration _configuration;
     private readonly IPortServer _portServer;
+    private readonly IServerService _serverService;
     private readonly IUserService _userService;
     private readonly IVirtualMachineService _virtualMachineService;
 
     public VirtualMachineFunction(IConfiguration configuration,
         IUserService userService,
         IVirtualMachineService virtualMachineService,
+        IServerService serverService,
         IPortServer portServer)
     {
         _configuration = configuration;
         _userService = userService;
         _virtualMachineService = virtualMachineService;
+        _serverService = serverService;
         _portServer = portServer;
     }
 
@@ -107,6 +113,33 @@ public class VirtualMachineFunction
             _userService.ApplyPermissions(user, virtualMachine);
 
             return new OkObjectResult(virtualMachine);
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
+
+    [FunctionName(nameof(VirtualMachineFunction) + "_" + nameof(PowerOnAndRunServerAsync))]
+    public async Task<IActionResult> PowerOnAndRunServerAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "virtual-machine/power-on-and-run-server")] HttpRequest httpRequest)
+    {
+        try
+        {
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+            await virtualMachine.PowerOnAsync(user);
+
+            var ports = _portServer.GetPorts(virtualMachine.IpAddress);
+            var port = ports.OrderBy(_ => Guid.NewGuid()).First(f => !f.IsRunning);
+
+            var server = _serverService.GetByPort(virtualMachine, port.PortNumber);
+            var request = httpRequest.DeserializeBody<RunServerRequest>();
+
+            await server.RunAsync(user, request.Campaign);
+
+            _userService.ApplyPermissions(user, server);
+
+            return new OkObjectResult(server);
         }
         catch (Exception exception)
         {
