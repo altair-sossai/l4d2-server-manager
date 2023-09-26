@@ -30,7 +30,7 @@ public class Server : IServer
 
     public async Task RunAsync(User user, Campaign campaign)
     {
-        var command = new RunServerCommand(Port, campaign);
+        var command = new RunServerCommand(Port, campaign, user.ServerCfgFile);
 
         await RunAsync(user, command);
     }
