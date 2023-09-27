@@ -8,8 +8,6 @@ namespace L4D2ServerManager.Modules.Auth.Users;
 
 public class User : ITableEntity
 {
-    private string? _serverCfgFile;
-
     public string Id
     {
         get => RowKey;
@@ -28,13 +26,6 @@ public class User : ITableEntity
     }
 
     public string? Secret { get; set; }
-
-    public string ServerCfgFile
-    {
-        get => string.IsNullOrEmpty(_serverCfgFile) ? "server.cfg" : _serverCfgFile;
-        set => _serverCfgFile = value;
-    }
-
     public string PartitionKey { get; set; } = "shared";
     public string RowKey { get; set; } = default!;
     public DateTimeOffset? Timestamp { get; set; }
