@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using FluentValidation;
 using L4D2ServerManager.Contexts.Steam.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +13,6 @@ public static class AppInjection
             Assembly.Load("L4D2ServerManager")
         };
 
-        serviceCollection.AddValidatorsFromAssemblies(assemblies);
         serviceCollection.AddMemoryCache();
 
         serviceCollection.Scan(scan => scan
