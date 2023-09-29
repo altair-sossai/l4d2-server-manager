@@ -14,7 +14,6 @@ public static class AppInjection
             Assembly.Load("L4D2ServerManager")
         };
 
-        serviceCollection.AddAutoMapper(assemblies);
         serviceCollection.AddValidatorsFromAssemblies(assemblies);
         serviceCollection.AddMemoryCache();
 
