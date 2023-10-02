@@ -4,7 +4,7 @@ using L4D2ServerManager.Modules.ServerManager.Server.Enums;
 using L4D2ServerManager.Modules.ServerManager.Server.Services;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Commands;
-using L4D2ServerManager.Modules.ServerManager.VirtualMachine.ValueObjects;
+using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Enums;
 
 namespace L4D2ServerManager.Modules.ServerManager.Server;
 
@@ -23,7 +23,7 @@ public class Server : IServer
     public string IpAddress => _virtualMachine.IpAddress;
     public int Port { get; }
     public bool IsRunning => _serverService.IsRunningAsync(IpAddress, Port).Result;
-    public PortInfo PortInfo => _virtualMachine.GetPortInfoAsync(Port).Result;
+    public PortStatus PortStatus => _virtualMachine.GetPortStatusAsync(Port).Result;
     public HashSet<string> Permissions { get; } = new();
     public string? StartedBy => _virtualMachine.StartedBy(Port);
     public DateTime? StartedAt => _virtualMachine.StartedAt(Port);
@@ -53,6 +53,20 @@ public class Server : IServer
     public async Task ClosePortAsync(IEnumerable<string> allowedIps)
     {
         await _virtualMachine.ClosePortAsync(Port, allowedIps);
+    }
+
+    public async Task OpenSlotAsync()
+    {
+        const int minSlots = 1;
+        const int maxSlots = 30;
+
+        var serverInfo = await _serverService.GetServerInfoAsync(IpAddress, Port);
+        var connectedPlayers = serverInfo?.Players ?? maxSlots;
+        var slots = Math.Max(minSlots, Math.Min(maxSlots, connectedPlayers + 1));
+
+        var command = new OpenSlotCommand(Port, slots);
+
+        await _virtualMachine.RunCommandAsync(command);
     }
 
     private async Task RunAsync(User user, RunScriptCommand command)

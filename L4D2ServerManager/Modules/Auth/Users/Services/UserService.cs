@@ -90,6 +90,7 @@ public class UserService : IUserService
         ApplyStopPermission(user, server);
         ApplyOpenPortPermission(user, server);
         ApplyClosePortPermission(user, server);
+        ApplyOpenSlotPermission(user, server);
     }
 
     private static void ApplyAllPermissions(IVirtualMachine virtualMachine)
@@ -127,6 +128,11 @@ public class UserService : IUserService
     private static void ApplyClosePortPermission(User user, IServer server)
     {
         ApplyServerPermission(user, server, ServerPermissions.ClosePort);
+    }
+
+    private static void ApplyOpenSlotPermission(User user, IServer server)
+    {
+        ApplyServerPermission(user, server, ServerPermissions.OpenSlot);
     }
 
     private static void ApplyServerPermission(User user, IServer server, string permission)

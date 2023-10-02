@@ -9,7 +9,6 @@ using L4D2ServerManager.Modules.Auth.Users;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Enums;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Extensions;
-using L4D2ServerManager.Modules.ServerManager.VirtualMachine.ValueObjects;
 using Polly;
 using Polly.Retry;
 
@@ -262,12 +261,12 @@ public class VirtualMachine : IVirtualMachine
         await RunCommandWithRetryAsync(input);
     }
 
-    public async Task<PortInfo> GetPortInfoAsync(int port)
+    public async Task<PortStatus> GetPortStatusAsync(int port)
     {
         var securityRule = await NetworkSecurityGroupResource.GetSecurityRuleAsync(port.ToString());
         var securityRuleData = securityRule.Value.Data;
 
-        return new PortInfo(securityRuleData);
+        return securityRuleData.Access == SecurityRuleAccess.Allow && securityRuleData.SourceAddressPrefix == "*" ? PortStatus.Open : PortStatus.Close;
     }
 
     public async Task OpenPortAsync(int port)

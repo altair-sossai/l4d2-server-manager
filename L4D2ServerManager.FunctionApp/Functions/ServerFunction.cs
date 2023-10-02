@@ -196,4 +196,29 @@ public class ServerFunction
             return ErrorResult.Build(exception).ResponseMessageResult();
         }
     }
+
+    [FunctionName(nameof(ServerFunction) + "_" + nameof(OpenSlotAsync))]
+    public async Task<IActionResult> OpenSlotAsync([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "server/{port}/open-slot")] HttpRequest httpRequest,
+        int port)
+    {
+        try
+        {
+            var user = _userService.EnsureAuthentication(httpRequest.AuthorizationToken(), AccessLevel.Servers);
+            var virtualMachine = _virtualMachineService.GetByName(VirtualMachineName);
+            var server = _serverService.GetByPort(virtualMachine, port);
+
+            _userService.ApplyPermissions(user, server);
+
+            if (!server.CanOpenSlot())
+                throw new UnauthorizedAccessException();
+
+            await server.OpenSlotAsync();
+
+            return new OkResult();
+        }
+        catch (Exception exception)
+        {
+            return ErrorResult.Build(exception).ResponseMessageResult();
+        }
+    }
 }

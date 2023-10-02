@@ -1,7 +1,6 @@
 ﻿using L4D2ServerManager.Modules.Auth.Users;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Commands;
 using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Enums;
-using L4D2ServerManager.Modules.ServerManager.VirtualMachine.ValueObjects;
 
 namespace L4D2ServerManager.Modules.ServerManager.VirtualMachine;
 
@@ -21,7 +20,7 @@ public interface IVirtualMachine
     Task PowerOnAsync(User user);
     Task PowerOffAsync(User user);
     Task RunCommandAsync(RunScriptCommand command);
-    Task<PortInfo> GetPortInfoAsync(int port);
+    Task<PortStatus> GetPortStatusAsync(int port);
     Task OpenPortAsync(int port);
     Task ClosePortAsync(int port, IEnumerable<string> allowedIps);
     Task UpdateTagsAsync(IDictionary<string, string> values);

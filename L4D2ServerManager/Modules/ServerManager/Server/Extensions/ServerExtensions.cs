@@ -24,4 +24,9 @@ public static class ServerExtensions
     {
         return server.Permissions.Contains(ServerPermissions.ClosePort);
     }
+
+    public static bool CanOpenSlot(this IServer server)
+    {
+        return server.Permissions.Contains(ServerPermissions.OpenSlot);
+    }
 }
