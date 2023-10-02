@@ -57,13 +57,19 @@ public class Server : IServer
 
     public async Task OpenSlotAsync()
     {
-        const int minSlots = 1;
-        const int maxSlots = 30;
+        var serverInfo = await _serverService.GetServerInfoAsync(IpAddress, Port)
+                         ?? throw new Exception("Failed to retrieve server information.");
 
-        var serverInfo = await _serverService.GetServerInfoAsync(IpAddress, Port);
-        var connectedPlayers = serverInfo?.Players ?? maxSlots;
-        var slots = Math.Max(minSlots, Math.Min(maxSlots, connectedPlayers + 1));
+        var players = serverInfo.Players
+                      ?? throw new Exception("Failed to retrieve players information.");
 
+        var maxPlayers = serverInfo.MaxPlayers
+                         ?? throw new Exception("Failed to retrieve maximum players count.");
+
+        if (maxPlayers > players || maxPlayers == 30)
+            return;
+
+        var slots = maxPlayers + 1;
         var command = new OpenSlotCommand(Port, slots);
 
         await _virtualMachine.RunCommandAsync(command);
