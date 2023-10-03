@@ -1,6 +1,5 @@
 ﻿using Azure.ResourceManager.Network;
 using Azure.ResourceManager.Network.Models;
-using L4D2ServerManager.Infrastructure.Helpers;
 
 namespace L4D2ServerManager.Modules.ServerManager.VirtualMachine.Commands;
 
@@ -11,6 +10,10 @@ public class IpTablesRulesCommand : RunScriptCommand
         Script.Add("sudo iptables -F");
         Script.Add("sudo iptables -X");
 
+        Script.Add("sudo iptables -P INPUT ACCEPT");
+        Script.Add("sudo iptables -P OUTPUT ACCEPT");
+        Script.Add("sudo iptables -P FORWARD ACCEPT");
+
         foreach (var securityRule in securityRules.Select(r => r.Data))
         {
             if (securityRule.Protocol != SecurityRuleProtocol.Udp || !int.TryParse(securityRule.DestinationPortRange, out var port))
@@ -19,19 +22,11 @@ public class IpTablesRulesCommand : RunScriptCommand
             Script.Add($"sudo iptables -A INPUT -p tcp --dport {port} -j DROP");
             Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -m length --length 0:32 -j DROP");
             Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -m length --length 2521:65535 -j DROP");
-
-            if (securityRule.SourceAddressPrefix == "*")
-                continue;
-
-            var allowedIps = new HashSet<string>(securityRule.SourceAddressPrefixes)
-            {
-                securityRule.SourceAddressPrefix
-            };
-
-            foreach (var allowedIp in allowedIps.Where(IpHelper.IsValidIpv4))
-                Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -s {allowedIp} -j ACCEPT");
-
-            Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -j DROP");
         }
+
+        Script.Add("sudo iptables -A INPUT -p udp -m state --state ESTABLISH -j ACCEPT");
+        Script.Add("sudo iptables -A INPUT -p udp -m state --state NEW -m hashlimit --hashlimit-mode srcip,dstport --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
+        Script.Add("sudo iptables -A INPUT -p udp -m state --state NEW -m hashlimit --hashlimit-mode srcip --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
+        Script.Add("sudo iptables -A INPUT -p udp -j DROP");
     }
 }
