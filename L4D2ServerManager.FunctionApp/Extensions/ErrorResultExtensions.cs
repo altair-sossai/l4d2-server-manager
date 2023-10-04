@@ -13,7 +13,7 @@ public static class ErrorResultExtensions
         {
             HttpStatusCode.BadRequest => new BadRequestObjectResult(errorResult),
             HttpStatusCode.Unauthorized => new UnauthorizedObjectResult(errorResult),
-            _ => new BadRequestObjectResult(errorResult)
+            _ => new InternalServerErrorResult()
         };
     }
 }
