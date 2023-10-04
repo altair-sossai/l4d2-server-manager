@@ -15,10 +15,12 @@ public class ErrorResult
     {
         StatusCode = HttpStatusCode.InternalServerError;
         Message = exception.Message;
+        Details = exception.ToString();
     }
 
     public HttpStatusCode StatusCode { get; }
     public string Message { get; }
+    public string Details { get; }
 
     public static ErrorResult Build(Exception exception)
     {
