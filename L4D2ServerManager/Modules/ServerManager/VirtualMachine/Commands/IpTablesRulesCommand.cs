@@ -15,16 +15,6 @@ public class IpTablesRulesCommand : RunScriptCommand
         Iptables("-P OUTPUT ACCEPT");
         Iptables("-P FORWARD ACCEPT");
 
-        Iptables("-A INPUT -m conntrack --ctstate INVALID -j DROP");
-        Iptables("-A INPUT -s 10.0.0.0/8 -j DROP");
-        Iptables("-A INPUT -s 172.16.0.0/12 -j DROP");
-        Iptables("-A INPUT -s 192.168.0.0/16 -j DROP");
-        Iptables("-A INPUT -s 224.0.0.0/4 -j DROP");
-        Iptables("-A INPUT -s 240.0.0.0/5 -j DROP");
-        Iptables("-A INPUT -p udp --sport 0 -j DROP");
-        Iptables("-A INPUT -p udp -m pkttype --pkt-type broadcast -j DROP");
-        Iptables("-A INPUT -p icmp -f -j DROP");
-
         foreach (var securityRule in securityRules.Select(r => r.Data))
         {
             if (securityRule.Protocol != SecurityRuleProtocol.Udp || !int.TryParse(securityRule.DestinationPortRange, out var port))
