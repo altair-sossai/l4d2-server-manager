@@ -1,6 +1,6 @@
 ﻿using Azure.ResourceManager.Network;
 using Azure.ResourceManager.Network.Models;
-using L4D2ServerManager.Infrastructure.Helpers;
+using L4D2ServerManager.Modules.ServerManager.VirtualMachine.Extensions;
 
 namespace L4D2ServerManager.Modules.ServerManager.VirtualMachine.Commands;
 
@@ -34,24 +34,18 @@ public class IpTablesRulesCommand : RunScriptCommand
             Iptables($"-A INPUT -p udp --dport {port} -m length --length 0:32 -j DROP");
             Iptables($"-A INPUT -p udp --dport {port} -m length --length 2521:65535 -j DROP");
 
-            if (securityRule.SourceAddressPrefix == "*")
-                continue;
+            var ips = securityRule.Ips().ToHashSet();
 
-            var allowedIps = new HashSet<string>(securityRule.SourceAddressPrefixes)
-            {
-                securityRule.SourceAddressPrefix
-            };
+            foreach (var ip in ips)
+                Iptables($"-A INPUT -p udp --dport {port} -s {ip} -m state --state ESTABLISH -j ACCEPT");
 
-            foreach (var allowedIp in allowedIps.Where(IpHelper.IsValidIpv4))
-                Iptables($"-A INPUT -p udp --dport {port} -s {allowedIp} -j ACCEPT");
+            if (ips.Count == 0)
+                Iptables($"-A INPUT -p udp --dport {port} -m state --state ESTABLISH -j ACCEPT");
 
+            Iptables($"-A INPUT -p udp --dport {port} -m state --state NEW -m hashlimit --hashlimit-mode srcip,dstport --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
+            Iptables($"-A INPUT -p udp --dport {port} -m state --state NEW -m hashlimit --hashlimit-mode srcip --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
             Iptables($"-A INPUT -p udp --dport {port} -j DROP");
         }
-
-        Iptables("-A INPUT -p udp -m state --state ESTABLISH -j ACCEPT");
-        Iptables("-A INPUT -p udp -m state --state NEW -m hashlimit --hashlimit-mode srcip,dstport --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
-        Iptables("-A INPUT -p udp -m state --state NEW -m hashlimit --hashlimit-mode srcip --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
-        Iptables("-A INPUT -p udp -j DROP");
     }
 
     private void Iptables(string rule)
