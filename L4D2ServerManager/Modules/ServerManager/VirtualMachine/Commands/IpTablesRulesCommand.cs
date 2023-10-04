@@ -8,21 +8,31 @@ public class IpTablesRulesCommand : RunScriptCommand
 {
     public IpTablesRulesCommand(SecurityRuleCollection securityRules)
     {
-        Script.Add("sudo iptables -F");
-        Script.Add("sudo iptables -X");
+        Iptables("-F");
+        Iptables("-X");
 
-        Script.Add("sudo iptables -P INPUT ACCEPT");
-        Script.Add("sudo iptables -P OUTPUT ACCEPT");
-        Script.Add("sudo iptables -P FORWARD ACCEPT");
+        Iptables("-P INPUT ACCEPT");
+        Iptables("-P OUTPUT ACCEPT");
+        Iptables("-P FORWARD ACCEPT");
+
+        Iptables("-A INPUT -m conntrack --ctstate INVALID -j DROP");
+        Iptables("-A INPUT -s 10.0.0.0/8 -j DROP");
+        Iptables("-A INPUT -s 172.16.0.0/12 -j DROP");
+        Iptables("-A INPUT -s 192.168.0.0/16 -j DROP");
+        Iptables("-A INPUT -s 224.0.0.0/4 -j DROP");
+        Iptables("-A INPUT -s 240.0.0.0/5 -j DROP");
+        Iptables("-A INPUT -p udp --sport 0 -j DROP");
+        Iptables("-A INPUT -p udp -m pkttype --pkt-type broadcast -j DROP");
+        Iptables("-A INPUT -p icmp -f -j DROP");
 
         foreach (var securityRule in securityRules.Select(r => r.Data))
         {
             if (securityRule.Protocol != SecurityRuleProtocol.Udp || !int.TryParse(securityRule.DestinationPortRange, out var port))
                 continue;
 
-            Script.Add($"sudo iptables -A INPUT -p tcp --dport {port} -j DROP");
-            Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -m length --length 0:32 -j DROP");
-            Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -m length --length 2521:65535 -j DROP");
+            Iptables($"-A INPUT -p tcp --dport {port} -j DROP");
+            Iptables($"-A INPUT -p udp --dport {port} -m length --length 0:32 -j DROP");
+            Iptables($"-A INPUT -p udp --dport {port} -m length --length 2521:65535 -j DROP");
 
             if (securityRule.SourceAddressPrefix == "*")
                 continue;
@@ -33,14 +43,19 @@ public class IpTablesRulesCommand : RunScriptCommand
             };
 
             foreach (var allowedIp in allowedIps.Where(IpHelper.IsValidIpv4))
-                Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -s {allowedIp} -j ACCEPT");
+                Iptables($"-A INPUT -p udp --dport {port} -s {allowedIp} -j ACCEPT");
 
-            Script.Add($"sudo iptables -A INPUT -p udp --dport {port} -j DROP");
+            Iptables($"-A INPUT -p udp --dport {port} -j DROP");
         }
 
-        Script.Add("sudo iptables -A INPUT -p udp -m state --state ESTABLISH -j ACCEPT");
-        Script.Add("sudo iptables -A INPUT -p udp -m state --state NEW -m hashlimit --hashlimit-mode srcip,dstport --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
-        Script.Add("sudo iptables -A INPUT -p udp -m state --state NEW -m hashlimit --hashlimit-mode srcip --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
-        Script.Add("sudo iptables -A INPUT -p udp -j DROP");
+        Iptables("-A INPUT -p udp -m state --state ESTABLISH -j ACCEPT");
+        Iptables("-A INPUT -p udp -m state --state NEW -m hashlimit --hashlimit-mode srcip,dstport --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
+        Iptables("-A INPUT -p udp -m state --state NEW -m hashlimit --hashlimit-mode srcip --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
+        Iptables("-A INPUT -p udp -j DROP");
+    }
+
+    private void Iptables(string rule)
+    {
+        Script.Add($"sudo iptables {rule}");
     }
 }
