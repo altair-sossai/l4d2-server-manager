@@ -37,10 +37,10 @@ public class IpTablesRulesCommand : RunScriptCommand
             var ips = securityRule.Ips().ToHashSet();
 
             foreach (var ip in ips)
-                Iptables($"-A INPUT -p udp --dport {port} -s {ip} -m state --state ESTABLISH -j ACCEPT");
+                Iptables($"-A INPUT -p udp --dport {port} -s {ip} -m state --state ESTABLISHED -j ACCEPT");
 
             if (ips.Count == 0)
-                Iptables($"-A INPUT -p udp --dport {port} -m state --state ESTABLISH -j ACCEPT");
+                Iptables($"-A INPUT -p udp --dport {port} -m state --state ESTABLISHED -j ACCEPT");
 
             Iptables($"-A INPUT -p udp --dport {port} -m state --state NEW -m hashlimit --hashlimit-mode srcip,dstport --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
             Iptables($"-A INPUT -p udp --dport {port} -m state --state NEW -m hashlimit --hashlimit-mode srcip --hashlimit-name StopDoS --hashlimit 1/s --hashlimit-burst 3 -j ACCEPT");
