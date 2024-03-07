@@ -226,7 +226,6 @@ public class VirtualMachine : IVirtualMachine
         };
 
         await UpdateTagsAsync(values);
-        await UpdateIpTablesRulesAsync();
     }
 
     public async Task PowerOffAsync(User user)
